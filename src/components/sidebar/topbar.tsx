@@ -14,6 +14,7 @@ const VIEW_LABELS: Record<ViewKey, { label: string; sub: string }> = {
   'ai-replay': { label: 'AI Replay', sub: 'Home' },
   'ai-eval': { label: 'AI Eval', sub: 'Home' },
   'audit-log': { label: 'Audit Log', sub: 'Home' },
+  'inquiry-detail': { label: 'Inquiry Detail', sub: 'Home' },
 };
 
 export function Topbar({

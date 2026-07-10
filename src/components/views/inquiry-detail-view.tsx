@@ -26,6 +26,8 @@ import {
   CheckCircle2,
   Building2,
   Globe,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -79,7 +81,17 @@ function initials(name: string): string {
 }
 
 export function InquiryDetailView() {
-  const { inquiries, detailInquiryId, setDetailInquiryId, setView, addAuditEntry, addNotification } = useAppStore();
+  const {
+    inquiries,
+    detailInquiryId,
+    setDetailInquiryId,
+    setView,
+    addAuditEntry,
+    addNotification,
+    openTabs,
+    activeTabId,
+    navigateInquiry,
+  } = useAppStore();
 
   const selected = useMemo(
     () => inquiries.find((e) => e.id === detailInquiryId) || null,
@@ -170,6 +182,12 @@ export function InquiryDetailView() {
   const attachmentsExtracted = Object.keys(extractions).length;
   const totalAttachments = selected.attachments.length;
 
+  // Find current tab position in openTabs for prev/next navigation
+  const currentTabIndex = openTabs.findIndex((t) => t.id === activeTabId);
+  const canGoPrev = currentTabIndex > 0;
+  const canGoNext = currentTabIndex >= 0 && currentTabIndex < openTabs.length - 1;
+  const tabPosition = currentTabIndex >= 0 ? `${currentTabIndex + 1} / ${openTabs.length}` : '';
+
   return (
     <div className="p-4 sm:p-6 space-y-4 max-w-[1400px] mx-auto">
       {/* Header */}
@@ -184,6 +202,36 @@ export function InquiryDetailView() {
             <ArrowLeft className="size-4" />
             <span className="hidden sm:inline">Back</span>
           </Button>
+
+          {/* Previous / Next navigation */}
+          <div className="flex items-center gap-1 shrink-0">
+            <Button
+              variant="outline"
+              size="icon"
+              className="size-8"
+              onClick={() => navigateInquiry('prev')}
+              disabled={!canGoPrev}
+              title="Previous inquiry"
+            >
+              <ChevronLeft className="size-4" />
+            </Button>
+            <Button
+              variant="outline"
+              size="icon"
+              className="size-8"
+              onClick={() => navigateInquiry('next')}
+              disabled={!canGoNext}
+              title="Next inquiry"
+            >
+              <ChevronRight className="size-4" />
+            </Button>
+            {tabPosition && (
+              <span className="text-[11px] text-zinc-500 font-mono px-1.5 hidden sm:inline">
+                {tabPosition}
+              </span>
+            )}
+          </div>
+
           <div className="min-w-0">
             <h1 className="text-xl font-bold text-zinc-900 dark:text-white truncate">
               {selected.subject || '(no subject)'}

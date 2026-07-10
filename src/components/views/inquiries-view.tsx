@@ -118,6 +118,7 @@ export function InquiriesView() {
     selectedInquiryId,
     setSelectedInquiryId,
     addAuditEntry,
+    openInquiryTab,
   } = useAppStore();
 
   const [loading, setLoading] = useState(false);
@@ -224,11 +225,13 @@ export function InquiriesView() {
     [inquiries, selectedInquiryId]
   );
 
-  // Open the full-page inquiry detail in a new browser tab
-  const openInNewTab = useCallback((uid: number) => {
-    const url = `${window.location.origin}/?view=inquiry-detail&uid=${uid}`;
-    window.open(url, '_blank', 'noopener,noreferrer');
-  }, []);
+  // Open the inquiry in a new in-app tab (inside the ERP, not a browser window)
+  const openInAppTab = useCallback(
+    (inquiry: { id: string; uid: number; subject: string }) => {
+      openInquiryTab(inquiry.id, inquiry.uid, inquiry.subject || '(no subject)');
+    },
+    [openInquiryTab]
+  );
 
   // Tab counts
   const tabCounts = useMemo(() => {
@@ -449,7 +452,7 @@ export function InquiriesView() {
                   return (
                     <tr
                       key={e.id}
-                      onClick={() => openInNewTab(e.uid)}
+                      onClick={() => openInAppTab(e)}
                       className="hover:bg-zinc-100/50 dark:hover:bg-zinc-800/40 transition-colors cursor-pointer group"
                     >
                       <td className="px-3 py-2.5 font-mono text-[11px] text-zinc-500 whitespace-nowrap">
@@ -530,7 +533,7 @@ export function InquiriesView() {
                         <button
                           onClick={(ev) => {
                             ev.stopPropagation();
-                            openInNewTab(e.uid);
+                            openInAppTab(e);
                           }}
                           className="inline-flex items-center gap-1 text-[12px] font-medium text-zinc-900 dark:text-zinc-200 hover:underline"
                         >

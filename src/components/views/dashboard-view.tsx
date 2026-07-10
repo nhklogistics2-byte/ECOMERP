@@ -66,6 +66,7 @@ export function DashboardView() {
     addNotification,
     notifications,
     auditLog,
+    openInquiryTab,
   } = useAppStore();
   const [loading, setLoading] = useState(false);
 
@@ -230,8 +231,7 @@ export function DashboardView() {
                     <button
                       key={e.id}
                       onClick={() => {
-                        const url = `${window.location.origin}/?view=inquiry-detail&uid=${e.uid}`;
-                        window.open(url, '_blank', 'noopener,noreferrer');
+                        openInquiryTab(e.id, e.uid, e.subject || '(no subject)');
                       }}
                       className="w-full text-left p-3 hover:bg-zinc-100/50 dark:hover:bg-zinc-800/40 flex gap-3"
                     >

@@ -3,6 +3,14 @@
 import { create } from 'zustand';
 import type { AppNotification, AuditEntry, CategorizedInquiry, ViewKey } from './types';
 
+interface OpenTab {
+  id: string;          // unique tab id
+  type: 'inquiry';
+  inquiryId: string;   // the inquiry's message-id
+  uid: number;         // IMAP uid (for URL-based access)
+  title: string;       // tab label (subject)
+}
+
 interface AppState {
   // Navigation
   view: ViewKey;
@@ -11,6 +19,14 @@ interface AppState {
   // Sidebar (mobile)
   sidebarOpen: boolean;
   setSidebarOpen: (open: boolean) => void;
+
+  // In-app tabs (like browser tabs inside the ERP)
+  openTabs: OpenTab[];
+  activeTabId: string | null;
+  openInquiryTab: (inquiryId: string, uid: number, title: string) => void;
+  closeTab: (tabId: string) => void;
+  setActiveTab: (tabId: string) => void;
+  navigateInquiry: (direction: 'next' | 'prev') => void;
 
   // Inquiries
   inquiries: CategorizedInquiry[];
@@ -116,12 +132,100 @@ const SEED_AUDIT: AuditEntry[] = [
   },
 ];
 
-export const useAppStore = create<AppState>((set) => ({
+export const useAppStore = create<AppState>((set, get) => ({
   view: 'dashboard',
   setView: (v) => set({ view: v, selectedInquiryId: null }),
 
   sidebarOpen: false,
   setSidebarOpen: (open) => set({ sidebarOpen: open }),
+
+  // ── In-app tabs ──
+  openTabs: [],
+  activeTabId: null,
+
+  openInquiryTab: (inquiryId, uid, title) => {
+    const state = get();
+    // If a tab for this inquiry already exists, just activate it
+    const existing = state.openTabs.find((t) => t.inquiryId === inquiryId);
+    if (existing) {
+      set({ activeTabId: existing.id, view: 'inquiry-detail', detailInquiryId: inquiryId });
+      return;
+    }
+    // Otherwise create a new tab
+    const newTab: OpenTab = {
+      id: `tab-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+      type: 'inquiry',
+      inquiryId,
+      uid,
+      title: title || '(no subject)',
+    };
+    set({
+      openTabs: [...state.openTabs, newTab],
+      activeTabId: newTab.id,
+      view: 'inquiry-detail',
+      detailInquiryId: inquiryId,
+    });
+  },
+
+  closeTab: (tabId) => {
+    const state = get();
+    const newTabs = state.openTabs.filter((t) => t.id !== tabId);
+    let newActiveId = state.activeTabId;
+    let newView = state.view;
+    let newDetailId = state.detailInquiryId;
+    if (state.activeTabId === tabId) {
+      // Activate the next available tab, or fall back to inquiries view
+      const closedIndex = state.openTabs.findIndex((t) => t.id === tabId);
+      const nextTab = newTabs[closedIndex] || newTabs[closedIndex - 1] || null;
+      if (nextTab) {
+        newActiveId = nextTab.id;
+        newDetailId = nextTab.inquiryId;
+        newView = 'inquiry-detail';
+      } else {
+        newActiveId = null;
+        newDetailId = null;
+        newView = 'inquiries';
+      }
+    }
+    set({
+      openTabs: newTabs,
+      activeTabId: newActiveId,
+      view: newView,
+      detailInquiryId: newDetailId,
+    });
+  },
+
+  setActiveTab: (tabId) => {
+    const state = get();
+    const tab = state.openTabs.find((t) => t.id === tabId);
+    if (!tab) return;
+    set({
+      activeTabId: tabId,
+      view: 'inquiry-detail',
+      detailInquiryId: tab.inquiryId,
+    });
+  },
+
+  navigateInquiry: (direction) => {
+    const state = get();
+    if (state.openTabs.length === 0) return;
+    // Find the current active tab's position in openTabs
+    const currentIdx = state.openTabs.findIndex((t) => t.id === state.activeTabId);
+    if (currentIdx === -1) return;
+    let nextIdx: number;
+    if (direction === 'next') {
+      nextIdx = currentIdx + 1;
+      if (nextIdx >= state.openTabs.length) return; // already at last
+    } else {
+      nextIdx = currentIdx - 1;
+      if (nextIdx < 0) return; // already at first
+    }
+    const nextTab = state.openTabs[nextIdx];
+    set({
+      activeTabId: nextTab.id,
+      detailInquiryId: nextTab.inquiryId,
+    });
+  },
 
   inquiries: [],
   setInquiries: (list) => set({ inquiries: list }),

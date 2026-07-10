@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { Sidebar } from '@/components/sidebar/sidebar';
 import { Topbar } from '@/components/sidebar/topbar';
+import { TabBar } from '@/components/sidebar/tab-bar';
 import { DashboardView } from '@/components/views/dashboard-view';
 import { InquiriesView } from '@/components/views/inquiries-view';
 import { NotificationsView } from '@/components/views/notifications-view';
@@ -12,43 +13,42 @@ import { AuditLogView } from '@/components/views/audit-log-view';
 import { InquiryDetailView } from '@/components/views/inquiry-detail-view';
 import { useAppStore } from '@/lib/store';
 import { useAutoSync } from '@/lib/use-auto-sync';
-import type { ViewKey } from '@/lib/types';
 
 export default function Page() {
-  const { view, setView, setDetailInquiryId, setSelectedInquiryId } = useAppStore();
+  const { view, setView, setDetailInquiryId, openInquiryTab, openTabs } = useAppStore();
   useAutoSync();
 
-  // Handle URL params for opening inquiry detail in a new tab.
+  // Handle URL params for opening inquiry detail (deep-link support).
   // URL format: /?view=inquiry-detail&uid=<message-uid>
+  // This opens the inquiry as an in-app tab (not a new browser window).
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const v = params.get('view');
     const uid = params.get('uid');
     if (v === 'inquiry-detail' && uid) {
-      // Wait for inquiries to load, then set detail by uid
+      // Wait for inquiries to load, then open as an in-app tab
       const tryFind = () => {
         const { inquiries } = useAppStore.getState();
         const found = inquiries.find((e) => String(e.uid) === uid);
         if (found) {
-          setDetailInquiryId(found.id);
-          setView('inquiry-detail');
+          openInquiryTab(found.id, found.uid, found.subject || '(no subject)');
+          // Clean the URL so refreshes don't re-trigger
+          window.history.replaceState({}, '', window.location.pathname);
         } else {
-          // Retry after auto-sync
           setTimeout(tryFind, 1500);
         }
       };
       tryFind();
     }
-  }, [setView, setDetailInquiryId]);
-
-  // Hide sidebar + topbar when in full-page inquiry detail (for new-tab experience)
-  const isFullPage = view === 'inquiry-detail';
+  }, [openInquiryTab]);
 
   return (
     <div className="min-h-screen flex bg-zinc-50 dark:bg-zinc-950">
-      {!isFullPage && <Sidebar />}
+      <Sidebar />
       <div className="flex-1 flex flex-col min-w-0">
-        {!isFullPage && <Topbar />}
+        <Topbar />
+        {/* In-app tab bar (only shows when there are open tabs) */}
+        <TabBar />
         <main className="flex-1 overflow-x-hidden">
           {view === 'dashboard' && <DashboardView />}
           {view === 'inquiries' && <InquiriesView />}
@@ -58,21 +58,24 @@ export default function Page() {
           {view === 'audit-log' && <AuditLogView />}
           {view === 'inquiry-detail' && <InquiryDetailView />}
         </main>
-        {!isFullPage && (
-          <footer className="mt-auto border-t border-zinc-200 dark:border-zinc-800 bg-white/60 dark:bg-zinc-950/60 py-3 px-4 sm:px-6 text-xs text-zinc-500 dark:text-zinc-400 flex items-center justify-between flex-wrap gap-2">
-            <span>
-              IMAP:{' '}
-              <code className="px-1 py-0.5 bg-zinc-100 dark:bg-zinc-800 rounded">
-                imap.hostinger.com:993
-              </code>{' '}
-              · Filtering:{' '}
-              <code className="px-1 py-0.5 bg-zinc-100 dark:bg-zinc-800 rounded">
-                @techichamps.com
-              </code>
-            </span>
-            <span>Powered by OpenRouter · DeepSeek V3.1</span>
-          </footer>
-        )}
+        <footer className="mt-auto border-t border-zinc-200 dark:border-zinc-800 bg-white/60 dark:bg-zinc-950/60 py-3 px-4 sm:px-6 text-xs text-zinc-500 dark:text-zinc-400 flex items-center justify-between flex-wrap gap-2">
+          <span>
+            IMAP:{' '}
+            <code className="px-1 py-0.5 bg-zinc-100 dark:bg-zinc-800 rounded">
+              imap.hostinger.com:993
+            </code>{' '}
+            · Filtering:{' '}
+            <code className="px-1 py-0.5 bg-zinc-100 dark:bg-zinc-800 rounded">
+              @techichamps.com
+            </code>
+          </span>
+          <span>
+            Powered by OpenRouter · DeepSeek V3.1
+            {openTabs.length > 0 && (
+              <span className="ml-2 text-zinc-400">· {openTabs.length} tab{openTabs.length !== 1 ? 's' : ''} open</span>
+            )}
+          </span>
+        </footer>
       </div>
     </div>
   );
