@@ -52,3 +52,17 @@ prompt
 server.log
 # Skills directory
 /skills/
+# Generated quotations (PDFs)
+/public/quotations/
+
+# Uploaded reference files
+/upload/
+
+# SQLite database
+/db/*.db
+
+# pdfkit font data (can be reinstalled via npm)
+/public/pdfkit-data/
+
+# Skills (internal)
+/skills/
