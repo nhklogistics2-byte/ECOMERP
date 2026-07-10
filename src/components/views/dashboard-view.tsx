@@ -24,24 +24,24 @@ import { useAppStore } from '@/lib/store';
 import { toast } from 'sonner';
 
 const PRIORITY_COLORS: Record<string, string> = {
-  urgent: 'bg-zinc-900 text-white',
-  high: 'bg-zinc-700 text-white',
-  medium: 'bg-zinc-500 text-white',
-  low: 'bg-zinc-900 text-white',
+  urgent: 'bg-teal-600 text-white',
+  high: 'bg-amber-500 text-white',
+  medium: 'bg-amber-500 text-white',
+  low: 'bg-teal-600 text-white',
 };
 
 const CATEGORY_COLORS: Record<string, string> = {
-  Sales: 'bg-zinc-900 text-white border-zinc-900',
-  Pricing: 'bg-zinc-200 text-zinc-800 border-zinc-300',
-  Partnership: 'bg-zinc-100 text-zinc-700 border-zinc-300',
-  'Technical Support': 'bg-zinc-100 text-zinc-700 border-zinc-300',
-  Onboarding: 'bg-zinc-200 text-zinc-800 border-zinc-300',
-  'Project Update': 'bg-zinc-100 text-zinc-700 border-zinc-300',
-  'Bug Report': 'bg-zinc-900 text-white border-zinc-900',
-  Billing: 'bg-zinc-200 text-zinc-800 border-zinc-300',
-  'Meeting Request': 'bg-zinc-100 text-zinc-700 border-zinc-300',
-  'General Inquiry': 'bg-zinc-100 text-zinc-700 border-zinc-300',
-  ' Spam / Junk': 'bg-zinc-300 text-zinc-600 border-zinc-400',
+  Sales: 'bg-teal-600 text-white border-zinc-900',
+  Pricing: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
+  Partnership: 'bg-zinc-700/50 text-muted-foreground/50 border-border',
+  'Technical Support': 'bg-zinc-700/50 text-muted-foreground/50 border-border',
+  Onboarding: 'bg-teal-500/20 text-teal-400 border-teal-500/30',
+  'Project Update': 'bg-zinc-700/50 text-muted-foreground/50 border-border',
+  'Bug Report': 'bg-teal-600 text-white border-zinc-900',
+  Billing: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
+  'Meeting Request': 'bg-zinc-700/50 text-muted-foreground/50 border-border',
+  'General Inquiry': 'bg-zinc-700/50 text-muted-foreground/50 border-border',
+  ' Spam / Junk': 'bg-zinc-700 text-muted-foreground/70 border-border',
 };
 
 function formatRelative(iso: string): string {
@@ -139,12 +139,12 @@ export function DashboardView() {
       {/* Page header */}
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-zinc-900 dark:text-white">Dashboard</h1>
-          <p className="text-sm text-zinc-500 mt-0.5 flex items-center gap-1.5 flex-wrap">
+          <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
+          <p className="text-sm text-muted-foreground mt-0.5 flex items-center gap-1.5 flex-wrap">
             <Building2 className="size-3.5" />
-            <span className="font-medium text-zinc-900 dark:text-zinc-200">ecomruns.com</span>
-            <span className="text-zinc-400">↔</span>
-            <span className="font-medium text-zinc-900 dark:text-zinc-200">techichamps.com</span>
+            <span className="font-medium text-teal-400">ecomruns.com</span>
+            <span className="text-muted-foreground/70">↔</span>
+            <span className="font-medium text-teal-400">techichamps.com</span>
           </p>
         </div>
         <Button
@@ -152,7 +152,7 @@ export function DashboardView() {
           size="sm"
           onClick={() => fetchEmails(true)}
           disabled={loading}
-          className="gap-2 h-8 border-zinc-300 text-zinc-900 hover:bg-zinc-100"
+          className="gap-2 h-8 border-border text-foreground hover:bg-muted"
         >
           {loading ? <Loader2 className="size-3.5 animate-spin" /> : <RefreshCw className="size-3.5" />}
           Sync Now
@@ -199,16 +199,16 @@ export function DashboardView() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Recent inquiries */}
         <div className="lg:col-span-2">
-          <Card className="border-zinc-200 dark:border-zinc-800">
-            <CardHeader className="py-3 px-4 border-b border-zinc-100 dark:border-zinc-800 flex-row items-center justify-between">
-              <CardTitle className="text-sm font-semibold text-zinc-700 dark:text-zinc-200 flex items-center gap-2">
-                <Mail className="size-4 text-zinc-900" />
+          <Card className="border-border">
+            <CardHeader className="py-3 px-4 border-b border-border/50 flex-row items-center justify-between">
+              <CardTitle className="text-sm font-semibold text-muted-foreground flex items-center gap-2">
+                <Mail className="size-4 text-foreground" />
                 Recent Inquiries
               </CardTitle>
               <Button
                 variant="ghost"
                 size="sm"
-                className="text-[12px] text-zinc-900 gap-1 h-7"
+                className="text-[12px] text-foreground gap-1 h-7"
                 onClick={() => setView('inquiries')}
               >
                 View all <ArrowRight className="size-3" />
@@ -216,31 +216,31 @@ export function DashboardView() {
             </CardHeader>
             <CardContent className="p-0">
               {loading && inquiries.length === 0 ? (
-                <div className="p-8 text-center text-zinc-500">
-                  <Loader2 className="size-5 animate-spin mx-auto mb-2 text-zinc-500" />
+                <div className="p-8 text-center text-muted-foreground">
+                  <Loader2 className="size-5 animate-spin mx-auto mb-2 text-muted-foreground" />
                   Loading…
                 </div>
               ) : recent.length === 0 ? (
-                <div className="p-8 text-center text-zinc-500">
+                <div className="p-8 text-center text-muted-foreground">
                   <Inbox className="size-8 mx-auto mb-2 opacity-30" />
                   No inquiries yet
                 </div>
               ) : (
-                <div className="divide-y divide-zinc-100 dark:divide-zinc-800">
+                <div className="divide-y divide-border">
                   {recent.map((e) => (
                     <button
                       key={e.id}
                       onClick={() => {
                         openInquiryTab(e.id, e.uid, e.subject || '(no subject)');
                       }}
-                      className="w-full text-left p-3 hover:bg-zinc-100/50 dark:hover:bg-zinc-800/40 flex gap-3"
+                      className="w-full text-left p-3 hover:bg-muted/50 flex gap-3"
                     >
-                      <div className="size-9 rounded-full bg-gradient-to-br from-zinc-900 to-zinc-800 text-white text-xs font-semibold flex items-center justify-center shrink-0">
+                      <div className="size-9 rounded-full bg-gradient-to-br from-teal-600 to-teal-700 text-white text-xs font-semibold flex items-center justify-center shrink-0">
                         {(e.fromName || e.from)[0]?.toUpperCase()}
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
-                          <span className="text-[13px] font-medium text-zinc-900 dark:text-white truncate">
+                          <span className="text-[13px] font-medium text-foreground truncate">
                             {e.fromName || e.from}
                           </span>
                           <span
@@ -255,7 +255,7 @@ export function DashboardView() {
                         <p className="text-[13px] text-zinc-800 dark:text-zinc-200 truncate">
                           {e.subject || '(no subject)'}
                         </p>
-                        <p className="text-[11px] text-zinc-500 truncate mt-0.5">{e.summary}</p>
+                        <p className="text-[11px] text-muted-foreground truncate mt-0.5">{e.summary}</p>
                       </div>
                       <div className="flex flex-col items-end gap-1 shrink-0">
                         <Badge
@@ -267,7 +267,7 @@ export function DashboardView() {
                         >
                           {e.category.trim()}
                         </Badge>
-                        <span className="text-[10px] text-zinc-400 flex items-center gap-0.5">
+                        <span className="text-[10px] text-muted-foreground/70 flex items-center gap-0.5">
                           <Clock className="size-2.5" />
                           {formatRelative(e.receivedAt)}
                         </span>
@@ -280,10 +280,10 @@ export function DashboardView() {
           </Card>
 
           {/* Category breakdown */}
-          <Card className="border-zinc-200 dark:border-zinc-800 mt-4">
-            <CardHeader className="py-3 px-4 border-b border-zinc-100 dark:border-zinc-800">
-              <CardTitle className="text-sm font-semibold text-zinc-700 dark:text-zinc-200 flex items-center gap-2">
-                <TrendingUp className="size-4 text-zinc-900" />
+          <Card className="border-border mt-4">
+            <CardHeader className="py-3 px-4 border-b border-border/50">
+              <CardTitle className="text-sm font-semibold text-muted-foreground flex items-center gap-2">
+                <TrendingUp className="size-4 text-foreground" />
                 By Category
               </CardTitle>
             </CardHeader>
@@ -295,12 +295,12 @@ export function DashboardView() {
                   return (
                     <div key={cat}>
                       <div className="flex items-center justify-between text-[12px] mb-1">
-                        <span className="text-zinc-700 dark:text-zinc-300">{cat.trim()}</span>
-                        <span className="text-zinc-500 font-mono">{n}</span>
+                        <span className="text-muted-foreground">{cat.trim()}</span>
+                        <span className="text-muted-foreground font-mono">{n}</span>
                       </div>
-                      <div className="h-1.5 bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden">
+                      <div className="h-1.5 bg-muted rounded-full overflow-hidden">
                         <div
-                          className="h-full bg-gradient-to-r from-zinc-800 to-zinc-700 rounded-full transition-all"
+                          className="h-full bg-gradient-to-r from-teal-600 to-teal-700 rounded-full transition-all"
                           style={{ width: `${pct}%` }}
                         />
                       </div>
@@ -308,7 +308,7 @@ export function DashboardView() {
                   );
                 })}
               {Object.keys(stats.catCounts).length === 0 && (
-                <p className="text-sm text-zinc-500 text-center py-4">No data</p>
+                <p className="text-sm text-muted-foreground text-center py-4">No data</p>
               )}
             </CardContent>
           </Card>
@@ -317,16 +317,16 @@ export function DashboardView() {
         {/* Side panel: notifications + audit */}
         <div className="space-y-4">
           {/* Notifications */}
-          <Card className="border-zinc-200 dark:border-zinc-800">
-            <CardHeader className="py-3 px-4 border-b border-zinc-100 dark:border-zinc-800 flex-row items-center justify-between">
-              <CardTitle className="text-sm font-semibold text-zinc-700 dark:text-zinc-200 flex items-center gap-2">
-                <Bell className="size-4 text-zinc-900" />
+          <Card className="border-border">
+            <CardHeader className="py-3 px-4 border-b border-border/50 flex-row items-center justify-between">
+              <CardTitle className="text-sm font-semibold text-muted-foreground flex items-center gap-2">
+                <Bell className="size-4 text-foreground" />
                 Notifications
               </CardTitle>
               <Button
                 variant="ghost"
                 size="sm"
-                className="text-[12px] text-zinc-900 gap-1 h-7"
+                className="text-[12px] text-foreground gap-1 h-7"
                 onClick={() => setView('notifications')}
               >
                 All <ArrowRight className="size-3" />
@@ -334,21 +334,21 @@ export function DashboardView() {
             </CardHeader>
             <CardContent className="p-0">
               {unreadNotifications.length === 0 ? (
-                <p className="text-sm text-zinc-500 text-center py-6">All caught up!</p>
+                <p className="text-sm text-muted-foreground text-center py-6">All caught up!</p>
               ) : (
-                <div className="divide-y divide-zinc-100 dark:divide-zinc-800">
+                <div className="divide-y divide-border">
                   {unreadNotifications.map((n) => (
                     <div key={n.id} className="p-3 flex gap-2.5">
                       <div
                         className={cn(
                           'size-2 rounded-full mt-1.5 shrink-0',
-                          n.type === 'warning' ? 'bg-zinc-500' : n.type === 'ai' ? 'bg-zinc-900' : n.type === 'system' ? 'bg-zinc-600' : 'bg-zinc-400'
+                          n.type === 'warning' ? 'bg-muted/500' : n.type === 'ai' ? 'bg-zinc-900' : n.type === 'system' ? 'bg-zinc-600' : 'bg-zinc-400'
                         )}
                       />
                       <div className="min-w-0">
-                        <p className="text-[13px] font-medium text-zinc-900 dark:text-white">{n.title}</p>
-                        <p className="text-[11px] text-zinc-500 mt-0.5">{n.message}</p>
-                        <p className="text-[10px] text-zinc-400 mt-1">{formatRelative(n.timestamp)}</p>
+                        <p className="text-[13px] font-medium text-foreground">{n.title}</p>
+                        <p className="text-[11px] text-muted-foreground mt-0.5">{n.message}</p>
+                        <p className="text-[10px] text-muted-foreground/70 mt-1">{formatRelative(n.timestamp)}</p>
                       </div>
                     </div>
                   ))}
@@ -358,34 +358,34 @@ export function DashboardView() {
           </Card>
 
           {/* Audit log */}
-          <Card className="border-zinc-200 dark:border-zinc-800">
-            <CardHeader className="py-3 px-4 border-b border-zinc-100 dark:border-zinc-800 flex-row items-center justify-between">
-              <CardTitle className="text-sm font-semibold text-zinc-700 dark:text-zinc-200 flex items-center gap-2">
-                <ScrollText className="size-4 text-zinc-900" />
+          <Card className="border-border">
+            <CardHeader className="py-3 px-4 border-b border-border/50 flex-row items-center justify-between">
+              <CardTitle className="text-sm font-semibold text-muted-foreground flex items-center gap-2">
+                <ScrollText className="size-4 text-foreground" />
                 Recent Activity
               </CardTitle>
               <Button
                 variant="ghost"
                 size="sm"
-                className="text-[12px] text-zinc-900 gap-1 h-7"
+                className="text-[12px] text-foreground gap-1 h-7"
                 onClick={() => setView('audit-log')}
               >
                 All <ArrowRight className="size-3" />
               </Button>
             </CardHeader>
             <CardContent className="p-0">
-              <div className="divide-y divide-zinc-100 dark:divide-zinc-800">
+              <div className="divide-y divide-border">
                 {recentAudit.map((e) => (
                   <div key={e.id} className="p-3">
                     <div className="flex items-center gap-2 mb-0.5">
-                      <span className="text-[12px] font-mono text-zinc-900 dark:text-zinc-200">
+                      <span className="text-[12px] font-mono text-teal-400">
                         {e.action}
                       </span>
-                      <span className="text-[10px] text-zinc-400 ml-auto">
+                      <span className="text-[10px] text-muted-foreground/70 ml-auto">
                         {formatRelative(e.timestamp)}
                       </span>
                     </div>
-                    <p className="text-[11px] text-zinc-500 truncate">{e.note}</p>
+                    <p className="text-[11px] text-muted-foreground truncate">{e.note}</p>
                   </div>
                 ))}
               </div>
@@ -441,15 +441,15 @@ function StatCard({
   onClick?: () => void;
 }) {
   const toneMap = {
-    black: 'from-zinc-900 to-zinc-800',
-    red: 'from-zinc-700 to-zinc-800',
-    gray: 'from-zinc-600 to-zinc-500',
-    darkgray: 'from-zinc-700 to-zinc-600',
+    black: 'from-teal-600 to-teal-700',
+    red: 'from-red-500 to-rose-600',
+    gray: 'from-amber-500 to-orange-600',
+    darkgray: 'from-violet-500 to-purple-600',
   };
   return (
     <button
       onClick={onClick}
-      className="text-left bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 hover:border-zinc-400 hover:shadow-md hover:shadow-zinc-900/10 transition-all"
+      className="text-left bg-card border border-border rounded-xl p-4 hover:border-teal-500/50 hover:shadow-md hover:shadow-teal-500/10 transition-all"
     >
       <div className="flex items-center gap-3">
         <div
@@ -461,11 +461,11 @@ function StatCard({
           {icon}
         </div>
         <div className="min-w-0 flex-1">
-          <p className="text-xs text-zinc-500 truncate">{label}</p>
-          <p className="text-xl font-bold text-zinc-900 dark:text-white leading-tight truncate">
+          <p className="text-xs text-muted-foreground truncate">{label}</p>
+          <p className="text-xl font-bold text-foreground leading-tight truncate">
             {value}
           </p>
-          {sub && <p className="text-[10px] text-zinc-400 truncate">{sub}</p>}
+          {sub && <p className="text-[10px] text-muted-foreground/70 truncate">{sub}</p>}
         </div>
       </div>
     </button>
@@ -486,14 +486,14 @@ function QuickAction({
   return (
     <button
       onClick={onClick}
-      className="text-left bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-3 hover:border-zinc-400 hover:bg-zinc-100/40 transition-all flex items-center gap-2.5"
+      className="text-left bg-card border border-border rounded-xl p-3 hover:border-teal-500/50 hover:bg-muted/40 transition-all flex items-center gap-2.5"
     >
-      <div className="size-8 rounded-md bg-zinc-100 dark:bg-zinc-800/60 text-zinc-900 dark:text-zinc-200 flex items-center justify-center shrink-0">
+      <div className="size-8 rounded-md bg-muted/60 text-teal-400 flex items-center justify-center shrink-0">
         {icon}
       </div>
       <div className="min-w-0">
-        <div className="text-[13px] font-medium text-zinc-900 dark:text-white truncate">{label}</div>
-        <div className="text-[11px] text-zinc-500 truncate">{desc}</div>
+        <div className="text-[13px] font-medium text-foreground truncate">{label}</div>
+        <div className="text-[11px] text-muted-foreground truncate">{desc}</div>
       </div>
     </button>
   );

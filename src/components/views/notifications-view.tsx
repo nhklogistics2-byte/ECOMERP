@@ -28,10 +28,10 @@ const TYPE_META: Record<
   AppNotification['type'],
   { icon: React.ComponentType<{ className?: string }>; color: string; bg: string; label: string }
 > = {
-  inquiry: { icon: Mail, color: 'text-zinc-900', bg: 'bg-zinc-100 dark:bg-zinc-800/60', label: 'Inquiry' },
-  ai: { icon: Sparkles, color: 'text-zinc-700', bg: 'bg-zinc-100 dark:bg-zinc-800/40', label: 'AI' },
-  system: { icon: Server, color: 'text-zinc-600', bg: 'bg-zinc-100 dark:bg-zinc-800/40', label: 'System' },
-  warning: { icon: AlertTriangle, color: 'text-zinc-700', bg: 'bg-zinc-100 dark:bg-zinc-800/40', label: 'Warning' },
+  inquiry: { icon: Mail, color: 'text-foreground', bg: 'bg-muted/60', label: 'Inquiry' },
+  ai: { icon: Sparkles, color: 'text-muted-foreground', bg: 'bg-muted/40', label: 'AI' },
+  system: { icon: Server, color: 'text-muted-foreground', bg: 'bg-muted/40', label: 'System' },
+  warning: { icon: AlertTriangle, color: 'text-muted-foreground', bg: 'bg-muted/40', label: 'Warning' },
 };
 
 export function NotificationsView() {
@@ -75,11 +75,11 @@ export function NotificationsView() {
       {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-zinc-900 dark:text-white flex items-center gap-2">
-            <Bell className="size-6 text-zinc-900" />
+          <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
+            <Bell className="size-6 text-foreground" />
             Notifications
           </h1>
-          <p className="text-sm text-zinc-500 mt-0.5">
+          <p className="text-sm text-muted-foreground mt-0.5">
             {unreadCount} unread of {notifications.length} total
           </p>
         </div>
@@ -88,7 +88,7 @@ export function NotificationsView() {
             variant="outline"
             size="sm"
             onClick={handleMarkAll}
-            className="gap-2 h-8 border-zinc-300 text-zinc-900 hover:bg-zinc-100"
+            className="gap-2 h-8 border-border text-foreground hover:bg-muted"
           >
             <CheckCheck className="size-3.5" />
             Mark all as read
@@ -97,15 +97,15 @@ export function NotificationsView() {
       </div>
 
       {/* Filters */}
-      <Card className="border-zinc-200 dark:border-zinc-800">
+      <Card className="border-border">
         <CardContent className="p-4 space-y-3">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-zinc-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground/70" />
             <Input
               placeholder="Search notifications…"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="pl-9 bg-white dark:bg-zinc-900"
+              className="pl-9 bg-card"
             />
           </div>
           <div className="flex flex-wrap gap-2 items-center">
@@ -117,7 +117,7 @@ export function NotificationsView() {
                   'text-xs px-2.5 py-1 rounded-full border transition-colors capitalize',
                   filter === f
                     ? 'bg-zinc-900 border-zinc-900 text-white'
-                    : 'bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-300 hover:border-zinc-400 hover:text-zinc-900'
+                    : 'bg-card border-border text-muted-foreground hover:border-teal-600 hover:text-teal-400'
                 )}
               >
                 {f === 'all' ? 'All' : f}
@@ -128,21 +128,21 @@ export function NotificationsView() {
       </Card>
 
       {/* List */}
-      <Card className="border-zinc-200 dark:border-zinc-800">
-        <CardHeader className="py-3 px-4 border-b border-zinc-100 dark:border-zinc-800">
-          <CardTitle className="text-sm font-semibold text-zinc-700 dark:text-zinc-200">
+      <Card className="border-border">
+        <CardHeader className="py-3 px-4 border-b border-border/50">
+          <CardTitle className="text-sm font-semibold text-muted-foreground">
             {filtered.length} notification{filtered.length !== 1 ? 's' : ''}
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0">
           {filtered.length === 0 ? (
-            <div className="p-8 text-center text-zinc-500">
+            <div className="p-8 text-center text-muted-foreground">
               <Bell className="size-8 mx-auto mb-2 opacity-30" />
               <p className="font-medium">No notifications</p>
               <p className="text-sm mt-1">You're all caught up!</p>
             </div>
           ) : (
-            <div className="divide-y divide-zinc-100 dark:divide-zinc-800">
+            <div className="divide-y divide-border">
               {filtered.map((n) => {
                 const meta = TYPE_META[n.type];
                 const Icon = meta.icon;
@@ -151,8 +151,8 @@ export function NotificationsView() {
                     key={n.id}
                     onClick={() => handleMarkOne(n.id)}
                     className={cn(
-                      'w-full text-left p-4 hover:bg-zinc-100/50 dark:hover:bg-zinc-800/40 flex gap-3 transition-colors',
-                      !n.read && 'bg-zinc-100/50 dark:bg-zinc-800/20'
+                      'w-full text-left p-4 hover:bg-muted/50 flex gap-3 transition-colors',
+                      !n.read && 'bg-muted/30 dark:bg-zinc-800/20'
                     )}
                   >
                     <div
@@ -165,7 +165,7 @@ export function NotificationsView() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-0.5">
-                        <p className="text-sm font-medium text-zinc-900 dark:text-white truncate">
+                        <p className="text-sm font-medium text-foreground truncate">
                           {n.title}
                         </p>
                         <Badge
@@ -178,8 +178,8 @@ export function NotificationsView() {
                           <span className="size-2 rounded-full bg-zinc-900 shrink-0 ml-auto" />
                         )}
                       </div>
-                      <p className="text-[13px] text-zinc-600 dark:text-zinc-300">{n.message}</p>
-                      <p className="text-[11px] text-zinc-400 mt-1">{formatTimestamp(n.timestamp)}</p>
+                      <p className="text-[13px] text-muted-foreground">{n.message}</p>
+                      <p className="text-[11px] text-muted-foreground/70 mt-1">{formatTimestamp(n.timestamp)}</p>
                     </div>
                   </button>
                 );

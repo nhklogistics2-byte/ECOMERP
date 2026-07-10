@@ -29,7 +29,7 @@ export function Topbar({
   const unread = notifications.filter((n) => !n.read).length;
 
   return (
-    <header className="sticky top-0 z-20 h-14 bg-white/90 dark:bg-zinc-900/80 backdrop-blur-xl border-b border-zinc-200 dark:border-zinc-800 flex items-center gap-3 px-4">
+    <header className="sticky top-0 z-20 h-14 bg-background/90 backdrop-blur-xl border-b border-border flex items-center gap-3 px-4">
       <Button
         variant="ghost"
         size="icon"
@@ -41,29 +41,29 @@ export function Topbar({
 
       {/* Breadcrumb */}
       <div className="flex items-center gap-1.5 text-sm min-w-0">
-        <span className="text-zinc-500 dark:text-zinc-400 hidden sm:inline">{meta.sub}</span>
-        <ChevronRight className="size-3.5 text-zinc-300 hidden sm:inline" />
-        <span className="font-semibold text-zinc-900 dark:text-white truncate">{meta.label}</span>
+        <span className="text-muted-foreground hidden sm:inline">{meta.sub}</span>
+        <ChevronRight className="size-3.5 text-muted-foreground/50 hidden sm:inline" />
+        <span className="font-semibold text-foreground truncate">{meta.label}</span>
       </div>
 
       {/* Search */}
       <div className="flex-1 max-w-md mx-auto relative hidden sm:block">
-        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-4 text-zinc-400" />
+        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
         <Input
           placeholder="Jump to a page..."
-          className="pl-9 h-8 text-[13px] bg-zinc-50 dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700"
+          className="pl-9 h-8 text-[13px] bg-muted border-border"
         />
       </div>
 
       <div className="flex-1 sm:flex-none" />
 
       {/* AI Model badge */}
-      <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-zinc-100 dark:bg-zinc-800/60 border border-zinc-300 dark:border-zinc-700">
-        <div className="size-1.5 rounded-full bg-zinc-900 animate-pulse" />
-        <span className="text-[11px] font-medium text-zinc-900 dark:text-zinc-200 hidden sm:inline">
+      <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-muted/60 border border-border">
+        <div className="size-1.5 rounded-full bg-teal-500 animate-pulse" />
+        <span className="text-[11px] font-medium text-teal-400 hidden sm:inline">
           DeepSeek V3.1
         </span>
-        <span className="text-[11px] font-medium text-zinc-900 dark:text-zinc-200 sm:hidden">
+        <span className="text-[11px] font-medium text-teal-400 sm:hidden">
           AI
         </span>
       </div>
@@ -78,9 +78,9 @@ export function Topbar({
           disabled={loading}
         >
           {loading ? (
-            <Loader2 className="size-4 animate-spin text-zinc-900" />
+            <Loader2 className="size-4 animate-spin text-teal-400" />
           ) : (
-            <RefreshCw className="size-4 text-zinc-500" />
+            <RefreshCw className="size-4 text-muted-foreground" />
           )}
         </Button>
       )}
@@ -92,7 +92,7 @@ export function Topbar({
         className="size-9 shrink-0 relative"
         onClick={() => setView('notifications')}
       >
-        <Bell className="size-4 text-zinc-500" />
+        <Bell className="size-4 text-muted-foreground" />
         {unread > 0 && (
           <span
             className={cn(

@@ -39,31 +39,31 @@ import { useAppStore } from '@/lib/store';
 import { toast } from 'sonner';
 
 const CATEGORY_COLORS: Record<string, string> = {
-  Sales: 'bg-zinc-900 text-white border-zinc-900',
-  Pricing: 'bg-zinc-200 text-zinc-800 border-zinc-300',
-  Partnership: 'bg-zinc-100 text-zinc-700 border-zinc-300',
-  'Technical Support': 'bg-zinc-100 text-zinc-700 border-zinc-300',
-  Onboarding: 'bg-zinc-200 text-zinc-800 border-zinc-300',
-  'Project Update': 'bg-zinc-100 text-zinc-700 border-zinc-300',
-  'Bug Report': 'bg-zinc-900 text-white border-zinc-900',
-  Billing: 'bg-zinc-200 text-zinc-800 border-zinc-300',
-  'Meeting Request': 'bg-zinc-100 text-zinc-700 border-zinc-300',
-  'General Inquiry': 'bg-zinc-100 text-zinc-700 border-zinc-300',
-  ' Spam / Junk': 'bg-zinc-300 text-zinc-600 border-zinc-400',
+  Sales: 'bg-teal-600 text-white border-zinc-900',
+  Pricing: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
+  Partnership: 'bg-zinc-700/50 text-muted-foreground/50 border-border',
+  'Technical Support': 'bg-zinc-700/50 text-muted-foreground/50 border-border',
+  Onboarding: 'bg-teal-500/20 text-teal-400 border-teal-500/30',
+  'Project Update': 'bg-zinc-700/50 text-muted-foreground/50 border-border',
+  'Bug Report': 'bg-teal-600 text-white border-zinc-900',
+  Billing: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
+  'Meeting Request': 'bg-zinc-700/50 text-muted-foreground/50 border-border',
+  'General Inquiry': 'bg-zinc-700/50 text-muted-foreground/50 border-border',
+  ' Spam / Junk': 'bg-zinc-700 text-muted-foreground/70 border-border',
 };
 
 const PRIORITY_COLORS: Record<string, string> = {
-  urgent: 'bg-zinc-900 text-white',
-  high: 'bg-zinc-700 text-white',
-  medium: 'bg-zinc-500 text-white',
-  low: 'bg-zinc-300 text-zinc-800',
+  urgent: 'bg-teal-600 text-white',
+  high: 'bg-amber-500 text-white',
+  medium: 'bg-amber-500 text-white',
+  low: 'bg-zinc-700 text-zinc-200',
 };
 
 const STATUS_BY_PRIORITY: Record<string, { label: string; color: string }> = {
-  urgent: { label: 'New', color: 'bg-zinc-200 text-zinc-800 border-zinc-300' },
-  high: { label: 'New', color: 'bg-zinc-200 text-zinc-800 border-zinc-300' },
-  medium: { label: 'Open', color: 'bg-zinc-100 text-zinc-700 border-zinc-200' },
-  low: { label: 'On Hold', color: 'bg-zinc-200 text-zinc-800 border-zinc-300' },
+  urgent: { label: 'New', color: 'bg-amber-500/20 text-amber-400 border-amber-500/30' },
+  high: { label: 'New', color: 'bg-amber-500/20 text-amber-400 border-amber-500/30' },
+  medium: { label: 'Open', color: 'bg-muted text-muted-foreground border-border' },
+  low: { label: 'On Hold', color: 'bg-amber-500/20 text-amber-400 border-amber-500/30' },
 };
 
 function formatDate(iso: string): string {
@@ -249,10 +249,10 @@ export function InquiriesView() {
       {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-zinc-900 dark:text-white">Inquiries</h1>
-          <p className="text-sm text-zinc-500 mt-0.5">
+          <h1 className="text-2xl font-bold text-foreground">Inquiries</h1>
+          <p className="text-sm text-muted-foreground mt-0.5">
             {filtered.length} of {inquiries.length} shown · from{' '}
-            <span className="font-medium text-zinc-900 dark:text-zinc-200">@techichamps.com</span>
+            <span className="font-medium text-teal-400">@techichamps.com</span>
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -270,7 +270,7 @@ export function InquiriesView() {
             size="sm"
             onClick={() => fetchEmails(true)}
             disabled={loading}
-            className="gap-2 h-8 bg-zinc-900 hover:bg-zinc-800 text-white"
+            className="gap-2 h-8 bg-teal-600 hover:bg-teal-700 text-white"
           >
             {loading ? <Loader2 className="size-3.5 animate-spin" /> : <RefreshCw className="size-3.5" />}
             <span>{loading ? 'Syncing…' : 'Refresh'}</span>
@@ -298,7 +298,7 @@ export function InquiriesView() {
           className={cn(
             'rounded-lg border p-3 flex items-start gap-2 text-sm',
             testResult.ok
-              ? 'border-zinc-300 bg-zinc-100 dark:bg-zinc-800/40 dark:border-zinc-700 text-zinc-800 dark:text-zinc-100'
+              ? 'border-border bg-muted/40 dark:border-zinc-700 text-zinc-800 dark:text-zinc-100'
               : 'border-red-200 bg-red-50 dark:bg-red-950/40 dark:border-red-900 text-red-800 dark:text-red-300'
           )}
         >
@@ -312,7 +312,7 @@ export function InquiriesView() {
       )}
 
       {/* Status tabs (ERP-style) */}
-      <div className="border-b border-zinc-200 dark:border-zinc-800">
+      <div className="border-b border-border">
         <div className="flex items-center gap-1 overflow-x-auto scrollbar-thin">
           {[
             { key: 'all', label: 'All', count: tabCounts.all },
@@ -337,8 +337,8 @@ export function InquiriesView() {
                 className={cn(
                   'flex items-center gap-1.5 px-3 py-2 text-[13px] font-medium border-b-2 -mb-px whitespace-nowrap transition-colors',
                   isActive
-                    ? 'border-zinc-900 text-zinc-900 dark:text-zinc-100'
-                    : 'border-transparent text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200'
+                    ? 'border-zinc-900 text-foreground'
+                    : 'border-transparent text-muted-foreground hover:text-zinc-800 dark:hover:text-zinc-200'
                 )}
               >
                 {t.label}
@@ -346,8 +346,8 @@ export function InquiriesView() {
                   className={cn(
                     'text-[11px] px-1.5 py-0.5 rounded-full',
                     isActive
-                      ? 'bg-zinc-200 text-zinc-900 dark:bg-zinc-800 dark:text-zinc-100'
-                      : 'bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400'
+                      ? 'bg-amber-500/20 text-amber-400'
+                      : 'bg-muted text-muted-foreground dark:bg-zinc-800 dark:text-muted-foreground/70'
                   )}
                 >
                   {t.count}
@@ -361,7 +361,7 @@ export function InquiriesView() {
       {/* Search + filter row */}
       <div className="flex items-center gap-2 flex-wrap">
         <div className="relative flex-1 min-w-[200px] max-w-md">
-          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-4 text-zinc-400" />
+          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground/70" />
           <Input
             placeholder="Search ref, subject, sender, body…"
             value={search}
@@ -372,7 +372,7 @@ export function InquiriesView() {
         <select
           value={categoryFilter}
           onChange={(e) => setCategoryFilter(e.target.value)}
-          className="h-9 px-3 text-[13px] rounded-md border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-200"
+          className="h-9 px-3 text-[13px] rounded-md border border-border bg-card text-muted-foreground"
         >
           <option value="all">All categories</option>
           {categories.map(([cat]) => (
@@ -384,7 +384,7 @@ export function InquiriesView() {
         <select
           value={priorityFilter}
           onChange={(e) => setPriorityFilter(e.target.value)}
-          className="h-9 px-3 text-[13px] rounded-md border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-200"
+          className="h-9 px-3 text-[13px] rounded-md border border-border bg-card text-muted-foreground"
         >
           <option value="all">All priorities</option>
           <option value="urgent">Urgent</option>
@@ -395,51 +395,51 @@ export function InquiriesView() {
       </div>
 
       {/* ERP-style Table */}
-      <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg overflow-hidden">
+      <div className="bg-card border border-border rounded-lg overflow-hidden">
         <div className="overflow-x-auto scrollbar-thin">
           <table className="w-full text-[13px]">
             <thead>
-              <tr className="bg-zinc-50 dark:bg-zinc-800/50 border-b border-zinc-200 dark:border-zinc-800">
-                <th className="text-left font-semibold text-zinc-600 dark:text-zinc-300 px-3 py-2.5 whitespace-nowrap w-[60px]">
+              <tr className="bg-muted/50 border-b border-border">
+                <th className="text-left font-semibold text-muted-foreground px-3 py-2.5 whitespace-nowrap w-[60px]">
                   Ref
                 </th>
-                <th className="text-left font-semibold text-zinc-600 dark:text-zinc-300 px-3 py-2.5 whitespace-nowrap w-[100px]">
+                <th className="text-left font-semibold text-muted-foreground px-3 py-2.5 whitespace-nowrap w-[100px]">
                   Date
                 </th>
-                <th className="text-left font-semibold text-zinc-600 dark:text-zinc-300 px-3 py-2.5 min-w-[260px]">
+                <th className="text-left font-semibold text-muted-foreground px-3 py-2.5 min-w-[260px]">
                   Subject
                 </th>
-                <th className="text-left font-semibold text-zinc-600 dark:text-zinc-300 px-3 py-2.5 whitespace-nowrap min-w-[160px]">
+                <th className="text-left font-semibold text-muted-foreground px-3 py-2.5 whitespace-nowrap min-w-[160px]">
                   Sender
                 </th>
-                <th className="text-left font-semibold text-zinc-600 dark:text-zinc-300 px-3 py-2.5 whitespace-nowrap w-[130px]">
+                <th className="text-left font-semibold text-muted-foreground px-3 py-2.5 whitespace-nowrap w-[130px]">
                   Category
                 </th>
-                <th className="text-left font-semibold text-zinc-600 dark:text-zinc-300 px-3 py-2.5 whitespace-nowrap w-[90px]">
+                <th className="text-left font-semibold text-muted-foreground px-3 py-2.5 whitespace-nowrap w-[90px]">
                   Priority
                 </th>
-                <th className="text-left font-semibold text-zinc-600 dark:text-zinc-300 px-3 py-2.5 whitespace-nowrap w-[100px]">
+                <th className="text-left font-semibold text-muted-foreground px-3 py-2.5 whitespace-nowrap w-[100px]">
                   Status
                 </th>
-                <th className="text-left font-semibold text-zinc-600 dark:text-zinc-300 px-3 py-2.5 whitespace-nowrap w-[110px]">
+                <th className="text-left font-semibold text-muted-foreground px-3 py-2.5 whitespace-nowrap w-[110px]">
                   AI Review
                 </th>
-                <th className="text-right font-semibold text-zinc-600 dark:text-zinc-300 px-3 py-2.5 whitespace-nowrap w-[90px]">
+                <th className="text-right font-semibold text-muted-foreground px-3 py-2.5 whitespace-nowrap w-[90px]">
                   Action
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
+            <tbody className="divide-y divide-border">
               {loading && inquiries.length === 0 ? (
                 <tr>
-                  <td colSpan={9} className="text-center py-12 text-zinc-500">
-                    <Loader2 className="size-5 animate-spin mx-auto mb-2 text-zinc-500" />
+                  <td colSpan={9} className="text-center py-12 text-muted-foreground">
+                    <Loader2 className="size-5 animate-spin mx-auto mb-2 text-muted-foreground" />
                     Loading inquiries from IMAP…
                   </td>
                 </tr>
               ) : paginated.length === 0 ? (
                 <tr>
-                  <td colSpan={9} className="text-center py-12 text-zinc-500">
+                  <td colSpan={9} className="text-center py-12 text-muted-foreground">
                     <Inbox className="size-8 mx-auto mb-2 opacity-30" />
                     <p className="font-medium">No inquiries found</p>
                     <p className="text-xs mt-1">Try adjusting filters or search.</p>
@@ -453,32 +453,32 @@ export function InquiriesView() {
                     <tr
                       key={e.id}
                       onClick={() => openInAppTab(e)}
-                      className="hover:bg-zinc-100/50 dark:hover:bg-zinc-800/40 transition-colors cursor-pointer group"
+                      className="hover:bg-muted/50 transition-colors cursor-pointer group"
                     >
-                      <td className="px-3 py-2.5 font-mono text-[11px] text-zinc-500 whitespace-nowrap">
+                      <td className="px-3 py-2.5 font-mono text-[11px] text-muted-foreground whitespace-nowrap">
                         #{String(refNum).padStart(3, '0')}
                       </td>
-                      <td className="px-3 py-2.5 text-zinc-600 dark:text-zinc-300 whitespace-nowrap text-[12px]">
+                      <td className="px-3 py-2.5 text-muted-foreground whitespace-nowrap text-[12px]">
                         {formatDate(e.receivedAt)}
                       </td>
                       <td className="px-3 py-2.5">
-                        <div className="font-medium text-zinc-900 dark:text-white truncate max-w-[280px]">
+                        <div className="font-medium text-foreground truncate max-w-[280px]">
                           {e.subject || '(no subject)'}
                         </div>
-                        <div className="text-[11px] text-zinc-500 truncate max-w-[280px] mt-0.5">
+                        <div className="text-[11px] text-muted-foreground truncate max-w-[280px] mt-0.5">
                           {e.summary}
                         </div>
                       </td>
                       <td className="px-3 py-2.5 whitespace-nowrap">
                         <div className="flex items-center gap-2">
-                          <div className="size-6 rounded-full bg-gradient-to-br from-zinc-900 to-zinc-800 text-white text-[10px] font-semibold flex items-center justify-center shrink-0">
+                          <div className="size-6 rounded-full bg-gradient-to-br from-teal-600 to-teal-700 text-white text-[10px] font-semibold flex items-center justify-center shrink-0">
                             {initials(e.fromName || e.from)}
                           </div>
                           <div className="min-w-0">
-                            <div className="text-[12px] font-medium text-zinc-900 dark:text-white truncate">
+                            <div className="text-[12px] font-medium text-foreground truncate">
                               {e.fromName || e.from}
                             </div>
-                            <div className="text-[10px] text-zinc-500 truncate max-w-[140px]">
+                            <div className="text-[10px] text-muted-foreground truncate max-w-[140px]">
                               {e.from}
                             </div>
                           </div>
@@ -516,17 +516,17 @@ export function InquiriesView() {
                           {status.label}
                         </Badge>
                       </td>
-                      <td className="px-3 py-2.5 text-[11px] text-zinc-900 dark:text-zinc-200 whitespace-nowrap">
+                      <td className="px-3 py-2.5 text-[11px] text-teal-400 whitespace-nowrap">
                         {e.keyPoints.length > 0 ? (
                           <span className="flex items-center gap-1">
                             <Sparkles className="size-3" />
                             {e.keyPoints.length} points
                           </span>
                         ) : (
-                          <span className="text-zinc-400">—</span>
+                          <span className="text-muted-foreground/70">—</span>
                         )}
                         {e.hasAttachments && (
-                          <Paperclip className="inline size-3 ml-1 text-zinc-400" />
+                          <Paperclip className="inline size-3 ml-1 text-muted-foreground/70" />
                         )}
                       </td>
                       <td className="px-3 py-2.5 text-right whitespace-nowrap">
@@ -535,7 +535,7 @@ export function InquiriesView() {
                             ev.stopPropagation();
                             openInAppTab(e);
                           }}
-                          className="inline-flex items-center gap-1 text-[12px] font-medium text-zinc-900 dark:text-zinc-200 hover:underline"
+                          className="inline-flex items-center gap-1 text-[12px] font-medium text-teal-400 hover:underline"
                         >
                           <Eye className="size-3.5" />
                           Open
@@ -551,8 +551,8 @@ export function InquiriesView() {
 
         {/* Pagination */}
         {filtered.length > PAGE_SIZE && (
-          <div className="border-t border-zinc-200 dark:border-zinc-800 px-3 py-2 flex items-center justify-between text-[12px]">
-            <span className="text-zinc-500">
+          <div className="border-t border-border px-3 py-2 flex items-center justify-between text-[12px]">
+            <span className="text-muted-foreground">
               Showing {(currentPage - 1) * PAGE_SIZE + 1}–
               {Math.min(currentPage * PAGE_SIZE, filtered.length)} of {filtered.length}
             </span>
@@ -567,7 +567,7 @@ export function InquiriesView() {
                 <ChevronLeft className="size-3.5" />
                 Prev
               </Button>
-              <span className="text-zinc-600 dark:text-zinc-300 px-2 font-mono">
+              <span className="text-muted-foreground px-2 font-mono">
                 {currentPage} / {totalPages}
               </span>
               <Button
@@ -595,14 +595,14 @@ export function InquiriesView() {
       >
         <div
           className={cn(
-            'absolute right-0 top-0 h-full w-full max-w-2xl bg-white dark:bg-zinc-900 shadow-xl',
+            'absolute right-0 top-0 h-full w-full max-w-2xl bg-card shadow-xl',
             'flex flex-col transition-transform duration-300',
             selected ? 'translate-x-0' : 'translate-x-full'
           )}
           onClick={(e) => e.stopPropagation()}
         >
           {/* Drawer header */}
-          <div className="flex items-center justify-between px-5 h-14 border-b border-zinc-200 dark:border-zinc-800 shrink-0">
+          <div className="flex items-center justify-between px-5 h-14 border-b border-border shrink-0">
             <Button
               variant="ghost"
               size="sm"
@@ -611,7 +611,7 @@ export function InquiriesView() {
             >
               <ArrowLeft className="size-4 mr-1" /> Back
             </Button>
-            <h2 className="text-sm font-semibold text-zinc-900 dark:text-white hidden lg:block">
+            <h2 className="text-sm font-semibold text-foreground hidden lg:block">
               Inquiry Detail
             </h2>
             <Button
@@ -625,7 +625,7 @@ export function InquiriesView() {
           </div>
 
           {!selected ? (
-            <div className="flex-1 flex items-center justify-center text-zinc-500">
+            <div className="flex-1 flex items-center justify-center text-muted-foreground">
               <Mail className="size-8 opacity-20" />
             </div>
           ) : (
@@ -633,7 +633,7 @@ export function InquiriesView() {
               <div className="p-5 space-y-4">
                 {/* Subject + badges */}
                 <div>
-                  <h2 className="text-lg font-bold text-zinc-900 dark:text-white leading-tight">
+                  <h2 className="text-lg font-bold text-foreground leading-tight">
                     {selected.subject || '(no subject)'}
                   </h2>
                   <div className="flex items-center gap-2 mt-2 flex-wrap">
@@ -659,31 +659,31 @@ export function InquiriesView() {
                 </div>
 
                 {/* Sender card */}
-                <div className="rounded-lg border border-zinc-200 dark:border-zinc-800 p-3 bg-zinc-50/50 dark:bg-zinc-800/30">
+                <div className="rounded-lg border border-border p-3 bg-muted/50/50 dark:bg-zinc-800/30">
                   <div className="flex items-start gap-3">
-                    <div className="size-10 rounded-full bg-gradient-to-br from-zinc-900 to-zinc-800 text-white text-sm font-semibold flex items-center justify-center shrink-0">
+                    <div className="size-10 rounded-full bg-gradient-to-br from-teal-600 to-teal-700 text-white text-sm font-semibold flex items-center justify-center shrink-0">
                       {initials(selected.fromName || selected.from)}
                     </div>
                     <div className="flex-1 min-w-0 space-y-1">
                       <div className="flex items-center gap-2 text-sm">
-                        <User className="size-3.5 text-zinc-400 shrink-0" />
-                        <span className="font-medium text-zinc-900 dark:text-zinc-100 truncate">
+                        <User className="size-3.5 text-muted-foreground/70 shrink-0" />
+                        <span className="font-medium text-foreground truncate">
                           {selected.fromName || '(no name)'}
                         </span>
                       </div>
                       <div className="flex items-center gap-2 text-sm">
-                        <Mail className="size-3.5 text-zinc-400 shrink-0" />
+                        <Mail className="size-3.5 text-muted-foreground/70 shrink-0" />
                         <a
                           href={`mailto:${selected.from}`}
-                          className="text-zinc-900 dark:text-zinc-200 hover:underline truncate"
+                          className="text-teal-400 hover:underline truncate"
                         >
                           {selected.from}
                         </a>
                       </div>
-                      <div className="flex items-center gap-2 text-xs text-zinc-500">
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
                         <Clock className="size-3.5 shrink-0" />
                         {formatDateTime(selected.receivedAt)}
-                        <span className="text-zinc-300">·</span>
+                        <span className="text-muted-foreground/50">·</span>
                         {formatRelative(selected.receivedAt)}
                       </div>
                     </div>
@@ -691,15 +691,15 @@ export function InquiriesView() {
                 </div>
 
                 {/* AI Analysis */}
-                <div className="rounded-lg border border-zinc-300 dark:border-zinc-700 bg-gradient-to-br from-zinc-100/60 to-zinc-200/40 dark:from-zinc-800/40 dark:to-zinc-800/20 p-4 space-y-3">
+                <div className="rounded-lg border border-border bg-gradient-to-br from-zinc-100/60 to-zinc-200/40 dark:from-zinc-800/40 dark:to-zinc-800/20 p-4 space-y-3">
                   <div className="flex items-center gap-2">
-                    <Sparkles className="size-4 text-zinc-900 dark:text-zinc-200" />
-                    <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+                    <Sparkles className="size-4 text-teal-400" />
+                    <h3 className="text-sm font-semibold text-foreground">
                       AI Analysis
                     </h3>
                   </div>
                   <div>
-                    <p className="text-[10px] font-medium text-zinc-500 uppercase tracking-wide mb-1">
+                    <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide mb-1">
                       Summary
                     </p>
                     <p className="text-sm text-zinc-800 dark:text-zinc-200 leading-relaxed">
@@ -708,7 +708,7 @@ export function InquiriesView() {
                   </div>
                   {selected.keyPoints.length > 0 && (
                     <div>
-                      <p className="text-[10px] font-medium text-zinc-500 uppercase tracking-wide mb-1">
+                      <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide mb-1">
                         Key Points
                       </p>
                       <ul className="space-y-1">
@@ -717,15 +717,15 @@ export function InquiriesView() {
                             key={i}
                             className="text-sm text-zinc-800 dark:text-zinc-200 flex items-start gap-2"
                           >
-                            <span className="text-zinc-900 dark:text-zinc-200 mt-1">•</span>
+                            <span className="text-teal-400 mt-1">•</span>
                             <span>{kp}</span>
                           </li>
                         ))}
                       </ul>
                     </div>
                   )}
-                  <div className="pt-2 border-t border-zinc-300/60 dark:border-zinc-700/60">
-                    <p className="text-[10px] font-medium text-zinc-500 uppercase tracking-wide mb-1 flex items-center gap-1">
+                  <div className="pt-2 border-t border-teal-600/30">
+                    <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide mb-1 flex items-center gap-1">
                       <TrendingUp className="size-3" />
                       Suggested Action
                     </p>
@@ -738,7 +738,7 @@ export function InquiriesView() {
                 {/* Attachments */}
                 {selected.hasAttachments && selected.attachments.length > 0 && (
                   <div>
-                    <p className="text-[10px] font-medium text-zinc-500 uppercase tracking-wide mb-2">
+                    <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide mb-2">
                       Attachments ({selected.attachments.length}) · click to open
                     </p>
                     <div className="flex flex-wrap gap-2">
@@ -757,25 +757,25 @@ export function InquiriesView() {
                             href={url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1.5 py-1.5 px-2 rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors group"
+                            className="inline-flex items-center gap-1.5 py-1.5 px-2 rounded-md border border-border bg-card hover:bg-muted/50 transition-colors group"
                             title={`Open ${a.filename} (${a.contentType})`}
                           >
                             {isImage ? (
-                              <ImageIcon className="size-3 text-zinc-600 dark:text-zinc-300" />
+                              <ImageIcon className="size-3 text-muted-foreground" />
                             ) : isPdf ? (
-                              <FileText className="size-3 text-zinc-600 dark:text-zinc-300" />
+                              <FileText className="size-3 text-muted-foreground" />
                             ) : isText ? (
-                              <FileText className="size-3 text-zinc-600 dark:text-zinc-300" />
+                              <FileText className="size-3 text-muted-foreground" />
                             ) : (
-                              <Download className="size-3 text-zinc-600 dark:text-zinc-300" />
+                              <Download className="size-3 text-muted-foreground" />
                             )}
-                            <span className="truncate max-w-[160px] text-[12px] font-medium text-zinc-900 dark:text-zinc-100 group-hover:underline">
+                            <span className="truncate max-w-[160px] text-[12px] font-medium text-foreground group-hover:underline">
                               {a.filename}
                             </span>
-                            <span className="text-zinc-400 text-[10px]">
+                            <span className="text-muted-foreground/70 text-[10px]">
                               {a.size > 1024 ? `${Math.round(a.size / 1024)} KB` : `${a.size} B`}
                             </span>
-                            <ExternalLink className="size-2.5 text-zinc-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+                            <ExternalLink className="size-2.5 text-muted-foreground/70 opacity-0 group-hover:opacity-100 transition-opacity" />
                           </a>
                         );
                       })}
@@ -787,10 +787,10 @@ export function InquiriesView() {
 
                 {/* Email body */}
                 <div>
-                  <p className="text-[10px] font-medium text-zinc-500 uppercase tracking-wide mb-2">
+                  <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide mb-2">
                     Email Body
                   </p>
-                  <div className="rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-4">
+                  <div className="rounded-lg border border-border bg-card p-4">
                     <pre className="text-sm text-zinc-800 dark:text-zinc-200 whitespace-pre-wrap break-words font-sans leading-relaxed max-h-[400px] overflow-y-auto scrollbar-thin">
                       {selected.text || '(no text body — HTML-only email)'}
                     </pre>
@@ -798,8 +798,8 @@ export function InquiriesView() {
                 </div>
 
                 {/* Metadata */}
-                <details className="text-xs text-zinc-500 dark:text-zinc-400">
-                  <summary className="cursor-pointer hover:text-zinc-700 dark:hover:text-zinc-300 font-medium">
+                <details className="text-xs text-muted-foreground">
+                  <summary className="cursor-pointer hover:text-muted-foreground dark:hover:text-muted-foreground/50 font-medium">
                     Technical metadata
                   </summary>
                   <div className="mt-2 space-y-1 font-mono text-[11px]">

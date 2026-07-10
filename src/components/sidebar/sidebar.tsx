@@ -88,26 +88,26 @@ export function Sidebar() {
       <aside
         className={cn(
           'fixed lg:sticky top-0 left-0 z-50 lg:z-30 h-screen w-[240px] shrink-0',
-          'bg-white dark:bg-zinc-900 border-r border-zinc-200 dark:border-zinc-800',
+          'bg-card border-r border-border',
           'flex flex-col transition-transform duration-200',
           sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         )}
       >
         {/* Logo */}
-        <div className="flex items-center gap-2.5 px-4 h-16 border-b border-zinc-200 dark:border-zinc-800 shrink-0">
-          <div className="size-9 rounded-lg bg-gradient-to-br from-zinc-900 to-zinc-800 flex items-center justify-center shadow-md shadow-zinc-900/20">
+        <div className="flex items-center gap-2.5 px-4 h-16 border-b border-border shrink-0">
+          <div className="size-9 rounded-lg bg-gradient-to-br from-teal-600 to-teal-700 flex items-center justify-center shadow-md shadow-zinc-900/20">
             <Ship className="size-5 text-white" />
           </div>
           <div className="flex-1 min-w-0">
-            <div className="font-bold text-[14px] tracking-tight text-zinc-900 dark:text-white leading-tight">
+            <div className="font-bold text-[14px] tracking-tight text-foreground leading-tight">
               ECOMRUNS
             </div>
-            <div className="text-[10px] text-zinc-900 dark:text-zinc-200 leading-tight font-medium">
+            <div className="text-[10px] text-teal-400 leading-tight font-medium">
               Inquiry & AI System
             </div>
           </div>
           <button
-            className="lg:hidden text-zinc-500 hover:text-zinc-900"
+            className="lg:hidden text-muted-foreground hover:text-foreground"
             onClick={() => setSidebarOpen(false)}
           >
             <X className="size-5" />
@@ -123,7 +123,7 @@ export function Sidebar() {
                 {section.title && (
                   <button
                     onClick={() => toggleSection(section.title)}
-                    className="w-full flex items-center justify-between px-2 py-1.5 text-[10px] font-semibold tracking-wider text-zinc-400 dark:text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-200"
+                    className="w-full flex items-center justify-between px-2 py-1.5 text-[10px] font-semibold tracking-wider text-muted-foreground/70 hover:text-teal-400"
                   >
                     <span>{section.title}</span>
                     <ChevronDown
@@ -146,16 +146,16 @@ export function Sidebar() {
                           className={cn(
                             'w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md text-[13px] font-medium transition-colors group',
                             active
-                              ? 'bg-gradient-to-r from-zinc-100 to-zinc-200 dark:from-zinc-800/40 dark:to-zinc-800/30 text-zinc-900 dark:text-zinc-100 border border-zinc-300/60 dark:border-zinc-700/60'
-                              : 'text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100/60 dark:hover:bg-zinc-800/50 hover:text-zinc-900 dark:hover:text-zinc-100'
+                              ? 'bg-teal-600/10 text-teal-400 border border-teal-600/30'
+                              : 'text-muted-foreground hover:bg-teal-600/5 hover:text-teal-400'
                           )}
                         >
                           <Icon
                             className={cn(
                               'size-4 shrink-0',
                               active
-                                ? 'text-zinc-900 dark:text-zinc-200'
-                                : 'text-zinc-400 dark:text-zinc-500 group-hover:text-zinc-900'
+                                ? 'text-teal-400'
+                                : 'text-muted-foreground/70 group-hover:text-teal-400'
                             )}
                           />
                           <span className="flex-1 text-left truncate">{item.label}</span>
@@ -164,8 +164,8 @@ export function Sidebar() {
                               className={cn(
                                 'text-[10px] font-semibold px-1.5 py-0.5 rounded-full',
                                 active
-                                  ? 'bg-zinc-900 text-white'
-                                  : 'bg-zinc-200 dark:bg-zinc-700 text-zinc-600 dark:text-zinc-300'
+                                  ? 'bg-teal-600 text-white'
+                                  : 'bg-zinc-700 text-muted-foreground'
                               )}
                             >
                               {item.badge}
@@ -182,20 +182,20 @@ export function Sidebar() {
         </nav>
 
         {/* User profile */}
-        <div className="border-t border-zinc-200 dark:border-zinc-800 p-2.5 shrink-0">
-          <div className="flex items-center gap-2.5 px-2 py-1.5 rounded-md hover:bg-zinc-100/60 dark:hover:bg-zinc-800/50 cursor-pointer group">
-            <div className="size-8 rounded-full bg-gradient-to-br from-zinc-900 to-zinc-800 text-white text-xs font-semibold flex items-center justify-center shrink-0">
+        <div className="border-t border-border p-2.5 shrink-0">
+          <div className="flex items-center gap-2.5 px-2 py-1.5 rounded-md hover:bg-muted/60 cursor-pointer group">
+            <div className="size-8 rounded-full bg-gradient-to-br from-teal-600 to-teal-700 text-white text-xs font-semibold flex items-center justify-center shrink-0">
               CE
             </div>
             <div className="flex-1 min-w-0">
-              <div className="text-[13px] font-medium text-zinc-900 dark:text-white truncate">
+              <div className="text-[13px] font-medium text-foreground truncate">
                 CEO
               </div>
-              <div className="text-[10px] text-zinc-500 dark:text-zinc-400 truncate">
+              <div className="text-[10px] text-muted-foreground truncate">
                 ceo@ecomruns.com
               </div>
             </div>
-            <LogOut className="size-4 text-zinc-400 group-hover:text-red-500 transition-colors" />
+            <LogOut className="size-4 text-muted-foreground/70 group-hover:text-red-500 transition-colors" />
           </div>
         </div>
       </aside>

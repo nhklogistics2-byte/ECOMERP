@@ -227,14 +227,14 @@ export function QuotationForm({ inquiry, items, onClose }: QuotationFormProps) {
       onClick={onClose}
     >
       <div
-        className="bg-white dark:bg-zinc-900 rounded-lg shadow-2xl w-full max-w-6xl max-h-[92vh] flex flex-col"
+        className="bg-card rounded-lg shadow-2xl w-full max-w-6xl max-h-[92vh] flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-3 border-b border-zinc-200 dark:border-zinc-800 shrink-0">
+        <div className="flex items-center justify-between px-5 py-3 border-b border-border shrink-0">
           <div className="flex items-center gap-2">
-            <FileText className="size-5 text-zinc-900 dark:text-white" />
-            <h2 className="text-base font-bold text-zinc-900 dark:text-white">
+            <FileText className="size-5 text-foreground" />
+            <h2 className="text-base font-bold text-foreground">
               Build Quotation
             </h2>
             <Badge variant="secondary" className="text-[11px]">
@@ -243,7 +243,7 @@ export function QuotationForm({ inquiry, items, onClose }: QuotationFormProps) {
           </div>
           <button
             onClick={onClose}
-            className="size-8 rounded hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center justify-center"
+            className="size-8 rounded hover:bg-muted/50 flex items-center justify-center"
           >
             <X className="size-4" />
           </button>
@@ -254,7 +254,7 @@ export function QuotationForm({ inquiry, items, onClose }: QuotationFormProps) {
             {/* Quotation meta */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               <div>
-                <label className="text-[11px] font-medium text-zinc-500 uppercase tracking-wide mb-1 block">
+                <label className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide mb-1 block">
                   Quotation No.
                 </label>
                 <Input
@@ -264,7 +264,7 @@ export function QuotationForm({ inquiry, items, onClose }: QuotationFormProps) {
                 />
               </div>
               <div>
-                <label className="text-[11px] font-medium text-zinc-500 uppercase tracking-wide mb-1 block">
+                <label className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide mb-1 block">
                   Date
                 </label>
                 <Input
@@ -275,7 +275,7 @@ export function QuotationForm({ inquiry, items, onClose }: QuotationFormProps) {
                 />
               </div>
               <div>
-                <label className="text-[11px] font-medium text-zinc-500 uppercase tracking-wide mb-1 block">
+                <label className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide mb-1 block">
                   Validity
                 </label>
                 <Input
@@ -285,7 +285,7 @@ export function QuotationForm({ inquiry, items, onClose }: QuotationFormProps) {
                 />
               </div>
               <div>
-                <label className="text-[11px] font-medium text-zinc-500 uppercase tracking-wide mb-1 block">
+                <label className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide mb-1 block">
                   Delivery
                 </label>
                 <Input
@@ -297,29 +297,29 @@ export function QuotationForm({ inquiry, items, onClose }: QuotationFormProps) {
             </div>
 
             {/* Client info banner */}
-            <div className="rounded-md border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800/30 p-3 text-[12px]">
+            <div className="rounded-md border border-border bg-muted/30 p-3 text-[12px]">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                 <div>
-                  <span className="text-zinc-500">To:</span>{' '}
-                  <span className="font-medium text-zinc-900 dark:text-white">
+                  <span className="text-muted-foreground">To:</span>{' '}
+                  <span className="font-medium text-foreground">
                     {inquiry.fromName || inquiry.from}
                   </span>
                 </div>
                 <div>
-                  <span className="text-zinc-500">Email:</span>{' '}
-                  <span className="font-mono text-zinc-700 dark:text-zinc-300">
+                  <span className="text-muted-foreground">Email:</span>{' '}
+                  <span className="font-mono text-muted-foreground">
                     {inquiry.from}
                   </span>
                 </div>
                 <div>
-                  <span className="text-zinc-500">Ref inquiry:</span>{' '}
-                  <span className="font-mono text-zinc-700 dark:text-zinc-300">
+                  <span className="text-muted-foreground">Ref inquiry:</span>{' '}
+                  <span className="font-mono text-muted-foreground">
                     #{inquiry.uid}
                   </span>
                 </div>
                 <div>
-                  <span className="text-zinc-500">Subject:</span>{' '}
-                  <span className="text-zinc-700 dark:text-zinc-300 truncate">
+                  <span className="text-muted-foreground">Subject:</span>{' '}
+                  <span className="text-muted-foreground truncate">
                     {inquiry.subject}
                   </span>
                 </div>
@@ -327,68 +327,68 @@ export function QuotationForm({ inquiry, items, onClose }: QuotationFormProps) {
             </div>
 
             {/* Line items table */}
-            <div className="border border-zinc-200 dark:border-zinc-800 rounded-lg overflow-hidden">
-              <div className="px-3 py-2 bg-zinc-50 dark:bg-zinc-800/50 border-b border-zinc-200 dark:border-zinc-800">
-                <h3 className="text-[13px] font-semibold text-zinc-700 dark:text-zinc-200 flex items-center gap-2">
+            <div className="border border-border rounded-lg overflow-hidden">
+              <div className="px-3 py-2 bg-muted/50 border-b border-border">
+                <h3 className="text-[13px] font-semibold text-muted-foreground flex items-center gap-2">
                   <Calculator className="size-3.5" />
                   Line Items ({lines.length})
-                  <span className="text-[11px] text-zinc-500 font-normal ml-2">
+                  <span className="text-[11px] text-muted-foreground font-normal ml-2">
                     Top half: extracted from attachment · Bottom half: fill the price fields
                   </span>
                 </h3>
               </div>
-              <div className="px-3 py-1.5 bg-zinc-50 dark:bg-zinc-800/30 border-b border-zinc-100 dark:border-zinc-800 text-[10px] text-zinc-500 flex items-center gap-1.5">
+              <div className="px-3 py-1.5 bg-muted/30 border-b border-border/50 text-[10px] text-muted-foreground flex items-center gap-1.5">
                 <ChevronRight className="size-3" />
                 Use the scrollbar arrows below (← →) to see all columns including Price, GST, and Totals
               </div>
               <div className="scrollbar-visible">
                 <table className="text-[12px]" style={{ minWidth: '1100px' }}>
                   <thead>
-                    <tr className="bg-zinc-50 dark:bg-zinc-800/50 border-b border-zinc-200 dark:border-zinc-800 text-[10px] uppercase tracking-wide">
-                      <th className="text-left font-semibold text-zinc-600 dark:text-zinc-300 px-2 py-2" style={{ width: '30px' }}>#</th>
-                      <th className="text-left font-semibold text-zinc-600 dark:text-zinc-300 px-2 py-2" style={{ width: '120px' }}>Part No.</th>
-                      <th className="text-left font-semibold text-zinc-600 dark:text-zinc-300 px-2 py-2" style={{ width: '120px' }}>NSN</th>
-                      <th className="text-left font-semibold text-zinc-600 dark:text-zinc-300 px-2 py-2" style={{ width: '200px' }}>Description</th>
-                      <th className="text-right font-semibold text-zinc-600 dark:text-zinc-300 px-2 py-2" style={{ width: '50px' }}>Qty</th>
-                      <th className="text-left font-semibold text-zinc-600 dark:text-zinc-300 px-2 py-2" style={{ width: '60px' }}>UOM</th>
-                      <th className="text-right font-semibold text-zinc-600 dark:text-zinc-300 px-2 py-2 bg-zinc-100 dark:bg-zinc-800" style={{ width: '90px' }}>
+                    <tr className="bg-muted/50 border-b border-border text-[10px] uppercase tracking-wide">
+                      <th className="text-left font-semibold text-muted-foreground px-2 py-2" style={{ width: '30px' }}>#</th>
+                      <th className="text-left font-semibold text-muted-foreground px-2 py-2" style={{ width: '120px' }}>Part No.</th>
+                      <th className="text-left font-semibold text-muted-foreground px-2 py-2" style={{ width: '120px' }}>NSN</th>
+                      <th className="text-left font-semibold text-muted-foreground px-2 py-2" style={{ width: '200px' }}>Description</th>
+                      <th className="text-right font-semibold text-muted-foreground px-2 py-2" style={{ width: '50px' }}>Qty</th>
+                      <th className="text-left font-semibold text-muted-foreground px-2 py-2" style={{ width: '60px' }}>UOM</th>
+                      <th className="text-right font-semibold text-muted-foreground px-2 py-2 bg-muted" style={{ width: '90px' }}>
                         <DollarSign className="size-2.5 inline" /> Price/Unit
                       </th>
-                      <th className="text-right font-semibold text-zinc-600 dark:text-zinc-300 px-2 py-2 bg-zinc-100 dark:bg-zinc-800" style={{ width: '90px' }}>
+                      <th className="text-right font-semibold text-muted-foreground px-2 py-2 bg-muted" style={{ width: '90px' }}>
                         Total Price
                       </th>
-                      <th className="text-right font-semibold text-zinc-600 dark:text-zinc-300 px-2 py-2 bg-zinc-100 dark:bg-zinc-800" style={{ width: '60px' }}>
+                      <th className="text-right font-semibold text-muted-foreground px-2 py-2 bg-muted" style={{ width: '60px' }}>
                         <Percent className="size-2.5 inline" /> GST%
                       </th>
-                      <th className="text-right font-semibold text-zinc-600 dark:text-zinc-300 px-2 py-2 bg-zinc-100 dark:bg-zinc-800" style={{ width: '80px' }}>
+                      <th className="text-right font-semibold text-muted-foreground px-2 py-2 bg-muted" style={{ width: '80px' }}>
                         GST Amt
                       </th>
-                      <th className="text-right font-semibold text-zinc-600 dark:text-zinc-300 px-2 py-2 bg-zinc-200 dark:bg-zinc-700" style={{ width: '100px' }}>
+                      <th className="text-right font-semibold text-muted-foreground px-2 py-2 bg-teal-600/10" style={{ width: '100px' }}>
                         Total w/ GST
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
+                  <tbody className="divide-y divide-border">
                     {lines.map((line, i) => (
-                      <tr key={i} className="hover:bg-zinc-50 dark:hover:bg-zinc-800/30">
-                        <td className="px-2 py-1.5 text-[10px] text-zinc-500 font-mono">{i + 1}</td>
-                        <td className="px-2 py-1.5 font-mono text-[11px] text-zinc-900 dark:text-zinc-100 whitespace-nowrap">
+                      <tr key={i} className="hover:bg-teal-600/5">
+                        <td className="px-2 py-1.5 text-[10px] text-muted-foreground font-mono">{i + 1}</td>
+                        <td className="px-2 py-1.5 font-mono text-[11px] text-foreground whitespace-nowrap">
                           {line.partNumber || '—'}
                         </td>
-                        <td className="px-2 py-1.5 font-mono text-[11px] text-zinc-700 dark:text-zinc-300 whitespace-nowrap">
+                        <td className="px-2 py-1.5 font-mono text-[11px] text-muted-foreground whitespace-nowrap">
                           {line.nsn || '—'}
                         </td>
-                        <td className="px-2 py-1.5 text-[11px] text-zinc-800 dark:text-zinc-200">
+                        <td className="px-2 py-1.5 text-[11px] text-foreground">
                           {line.description || '—'}
                         </td>
-                        <td className="px-2 py-1.5 text-right font-mono text-[11px] font-bold text-zinc-900 dark:text-zinc-100 whitespace-nowrap">
+                        <td className="px-2 py-1.5 text-right font-mono text-[11px] font-bold text-foreground whitespace-nowrap">
                           {line.quantity || '—'}
                         </td>
-                        <td className="px-2 py-1.5 text-[10px] text-zinc-600 dark:text-zinc-400 uppercase whitespace-nowrap">
+                        <td className="px-2 py-1.5 text-[10px] text-muted-foreground uppercase whitespace-nowrap">
                           {line.uom || '—'}
                         </td>
                         {/* Editable: Price per unit */}
-                        <td className="px-2 py-1.5 bg-zinc-100/50 dark:bg-zinc-800/30">
+                        <td className="px-2 py-1.5 bg-muted/30">
                           <Input
                             type="number"
                             value={line.pricePerUnit}
@@ -397,10 +397,10 @@ export function QuotationForm({ inquiry, items, onClose }: QuotationFormProps) {
                             className="h-7 text-[12px] text-right font-mono"
                           />
                         </td>
-                        <td className="px-2 py-1.5 text-right font-mono text-[11px] text-zinc-700 dark:text-zinc-300 bg-zinc-100/50 dark:bg-zinc-800/30 whitespace-nowrap">
+                        <td className="px-2 py-1.5 text-right font-mono text-[11px] text-muted-foreground bg-muted/30 whitespace-nowrap">
                           {line.totalPrice}
                         </td>
-                        <td className="px-2 py-1.5 bg-zinc-100/50 dark:bg-zinc-800/30">
+                        <td className="px-2 py-1.5 bg-muted/30">
                           <Input
                             type="number"
                             value={line.gstRate}
@@ -408,17 +408,17 @@ export function QuotationForm({ inquiry, items, onClose }: QuotationFormProps) {
                             className="h-7 text-[12px] text-right font-mono"
                           />
                         </td>
-                        <td className="px-2 py-1.5 text-right font-mono text-[11px] text-zinc-700 dark:text-zinc-300 bg-zinc-100/50 dark:bg-zinc-800/30 whitespace-nowrap">
+                        <td className="px-2 py-1.5 text-right font-mono text-[11px] text-muted-foreground bg-muted/30 whitespace-nowrap">
                           {line.gstAmount}
                         </td>
-                        <td className="px-2 py-1.5 text-right font-mono text-[11px] font-bold text-zinc-900 dark:text-zinc-100 bg-zinc-200/50 dark:bg-zinc-700/30 whitespace-nowrap">
+                        <td className="px-2 py-1.5 text-right font-mono text-[11px] font-bold text-foreground bg-teal-600/5 whitespace-nowrap">
                           {line.totalWithGst}
                         </td>
                       </tr>
                     ))}
                   </tbody>
                   <tfoot>
-                    <tr className="bg-zinc-900 text-white">
+                    <tr className="bg-teal-600 text-white">
                       <td colSpan={7} className="px-2 py-2 text-right text-[11px] font-medium uppercase tracking-wide">
                         Subtotal
                       </td>
@@ -429,7 +429,7 @@ export function QuotationForm({ inquiry, items, onClose }: QuotationFormProps) {
                       <td className="px-2 py-2 text-right font-mono text-[12px] font-bold">
                         {totals.totalGst}
                       </td>
-                      <td className="px-2 py-2 text-right font-mono text-[12px] font-bold bg-zinc-950">
+                      <td className="px-2 py-2 text-right font-mono text-[12px] font-bold bg-teal-700">
                         {totals.grandTotal}
                       </td>
                     </tr>
@@ -441,7 +441,7 @@ export function QuotationForm({ inquiry, items, onClose }: QuotationFormProps) {
             {/* Terms */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label className="text-[11px] font-medium text-zinc-500 uppercase tracking-wide mb-1 block">
+                <label className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide mb-1 block">
                   Payment Terms
                 </label>
                 <Input
@@ -451,7 +451,7 @@ export function QuotationForm({ inquiry, items, onClose }: QuotationFormProps) {
                 />
               </div>
               <div>
-                <label className="text-[11px] font-medium text-zinc-500 uppercase tracking-wide mb-1 block">
+                <label className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide mb-1 block">
                   Notes
                 </label>
                 <Textarea
@@ -465,13 +465,13 @@ export function QuotationForm({ inquiry, items, onClose }: QuotationFormProps) {
 
             {/* Generated PDF preview */}
             {generatedPdfUrl && (
-              <div className="rounded-md border border-zinc-300 dark:border-zinc-700 bg-zinc-100/50 dark:bg-zinc-800/30 p-3 flex items-center gap-3">
-                <CheckCircle2 className="size-5 text-zinc-900 dark:text-white" />
+              <div className="rounded-md border border-border bg-muted/30 p-3 flex items-center gap-3">
+                <CheckCircle2 className="size-5 text-foreground" />
                 <div className="flex-1 min-w-0">
-                  <p className="text-[13px] font-medium text-zinc-900 dark:text-white">
+                  <p className="text-[13px] font-medium text-foreground">
                     Quotation PDF generated
                   </p>
-                  <p className="text-[11px] text-zinc-500 truncate">
+                  <p className="text-[11px] text-muted-foreground truncate">
                     {quoteNumber} · {totals.grandTotal} USD · {totals.itemCount} items
                   </p>
                 </div>
@@ -479,7 +479,7 @@ export function QuotationForm({ inquiry, items, onClose }: QuotationFormProps) {
                   href={generatedPdfUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 text-[12px] font-medium text-zinc-900 dark:text-white hover:underline"
+                  className="inline-flex items-center gap-1 text-[12px] font-medium text-foreground hover:underline"
                 >
                   <Download className="size-3.5" />
                   Download
@@ -489,13 +489,13 @@ export function QuotationForm({ inquiry, items, onClose }: QuotationFormProps) {
 
             {/* Sent confirmation */}
             {sent && (
-              <div className="rounded-md border border-zinc-900 bg-zinc-900 text-white p-3 flex items-center gap-3">
+              <div className="rounded-md border border-teal-600 bg-teal-600/10 text-teal-400 p-3 flex items-center gap-3">
                 <CheckCircle2 className="size-5" />
                 <div className="flex-1">
                   <p className="text-[13px] font-medium">
                     Quotation sent to {inquiry.from}
                   </p>
-                  <p className="text-[11px] text-zinc-300">
+                  <p className="text-[11px] text-muted-foreground/50">
                     The PDF has been emailed as an attachment from info@ecomruns.com
                   </p>
                 </div>
@@ -505,9 +505,9 @@ export function QuotationForm({ inquiry, items, onClose }: QuotationFormProps) {
         </div>
 
         {/* Footer actions */}
-        <div className="flex items-center justify-between gap-2 px-5 py-3 border-t border-zinc-200 dark:border-zinc-800 shrink-0">
-          <div className="text-[11px] text-zinc-500">
-            Grand Total: <span className="font-mono font-bold text-zinc-900 dark:text-white">{totals.grandTotal} USD</span>
+        <div className="flex items-center justify-between gap-2 px-5 py-3 border-t border-border shrink-0">
+          <div className="text-[11px] text-muted-foreground">
+            Grand Total: <span className="font-mono font-bold text-foreground">{totals.grandTotal} USD</span>
             <span className="mx-2">·</span>
             GST: <span className="font-mono">{totals.totalGst}</span>
           </div>
@@ -529,7 +529,7 @@ export function QuotationForm({ inquiry, items, onClose }: QuotationFormProps) {
               size="sm"
               onClick={sendQuotation}
               disabled={sending || sent}
-              className="h-8 gap-1.5 bg-zinc-900 hover:bg-zinc-800 text-white"
+              className="h-8 gap-1.5 bg-teal-600 hover:bg-teal-700 text-white"
             >
               {sending ? <Loader2 className="size-3.5 animate-spin" /> : <Send className="size-3.5" />}
               {sending ? 'Sending…' : sent ? 'Sent' : 'Send to Client'}

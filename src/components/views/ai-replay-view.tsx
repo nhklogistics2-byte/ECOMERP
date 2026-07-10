@@ -128,33 +128,33 @@ export function AiReplayView() {
     <div className="p-4 sm:p-6 space-y-4">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-zinc-900 dark:text-white flex items-center gap-2">
-          <Reply className="size-6 text-zinc-900" />
+        <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
+          <Reply className="size-6 text-foreground" />
           AI Replay Generator
         </h1>
-        <p className="text-sm text-zinc-500 mt-1">
+        <p className="text-sm text-muted-foreground mt-1">
           Draft professional replies to inquiries using AI. Pick an inquiry, choose a tone, generate.
         </p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-[340px_1fr] gap-4">
         {/* Left: inquiry picker */}
-        <Card className="border-zinc-200 dark:border-zinc-800 flex flex-col">
-          <CardHeader className="py-3 px-4 border-b border-zinc-100 dark:border-zinc-800">
-            <CardTitle className="text-sm font-semibold text-zinc-700 dark:text-zinc-200 flex items-center gap-2">
-              <Inbox className="size-4 text-zinc-900" />
+        <Card className="border-border flex flex-col">
+          <CardHeader className="py-3 px-4 border-b border-border/50">
+            <CardTitle className="text-sm font-semibold text-muted-foreground flex items-center gap-2">
+              <Inbox className="size-4 text-foreground" />
               Pick an Inquiry
               <Badge variant="secondary" className="ml-auto">{inquiries.length}</Badge>
             </CardTitle>
           </CardHeader>
           <CardContent className="p-0 flex-1 overflow-y-auto scrollbar-thin max-h-[600px]">
             {inquiries.length === 0 ? (
-              <div className="p-6 text-center text-sm text-zinc-500">
+              <div className="p-6 text-center text-sm text-muted-foreground">
                 <Inbox className="size-8 mx-auto mb-2 opacity-30" />
                 No inquiries yet. Sync from the Inquiries tab.
               </div>
             ) : (
-              <div className="divide-y divide-zinc-100 dark:divide-zinc-800">
+              <div className="divide-y divide-border">
                 {inquiries.map((e) => {
                   const active = selectedInquiryId === e.id;
                   return (
@@ -165,25 +165,25 @@ export function AiReplayView() {
                         setResult(null);
                       }}
                       className={cn(
-                        'w-full text-left p-3 hover:bg-zinc-100/50 dark:hover:bg-zinc-800/40 transition-colors flex gap-2.5',
-                        active && 'bg-zinc-100 dark:bg-zinc-800/70 border-l-2 border-zinc-900'
+                        'w-full text-left p-3 hover:bg-muted/50 transition-colors flex gap-2.5',
+                        active && 'bg-muted/70 border-l-2 border-teal-500'
                       )}
                     >
-                      <div className="size-8 rounded-full bg-gradient-to-br from-zinc-900 to-zinc-800 text-white text-[11px] font-semibold flex items-center justify-center shrink-0">
+                      <div className="size-8 rounded-full bg-gradient-to-br from-teal-600 to-teal-700 text-white text-[11px] font-semibold flex items-center justify-center shrink-0">
                         {initials(e.fromName || e.from)}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-[13px] font-medium text-zinc-900 dark:text-white truncate">
+                        <p className="text-[13px] font-medium text-foreground truncate">
                           {e.fromName || e.from}
                         </p>
-                        <p className="text-[12px] text-zinc-600 dark:text-zinc-300 truncate">
+                        <p className="text-[12px] text-muted-foreground truncate">
                           {e.subject || '(no subject)'}
                         </p>
                         <div className="flex items-center gap-1.5 mt-1">
                           <Badge variant="outline" className="text-[9px] px-1 py-0 h-4">
                             {e.category}
                           </Badge>
-                          <span className="text-[10px] text-zinc-400 flex items-center gap-0.5">
+                          <span className="text-[10px] text-muted-foreground/70 flex items-center gap-0.5">
                             <Clock className="size-2.5" />
                             {formatRelative(e.receivedAt)}
                           </span>
@@ -201,39 +201,39 @@ export function AiReplayView() {
         <div className="space-y-4 min-w-0">
           {/* Selected inquiry context */}
           {!selected ? (
-            <Card className="border-zinc-200 dark:border-zinc-800">
-              <CardContent className="p-8 text-center text-zinc-500">
+            <Card className="border-border">
+              <CardContent className="p-8 text-center text-muted-foreground">
                 <Reply className="size-10 mx-auto mb-3 opacity-20" />
-                <p className="font-medium text-zinc-700 dark:text-zinc-300">No inquiry selected</p>
+                <p className="font-medium text-muted-foreground">No inquiry selected</p>
                 <p className="text-sm mt-1">Pick an inquiry from the left to draft a reply.</p>
               </CardContent>
             </Card>
           ) : (
             <>
               {/* Inquiry context card */}
-              <Card className="border-zinc-200 dark:border-zinc-800">
-                <CardHeader className="py-3 px-4 border-b border-zinc-100 dark:border-zinc-800">
-                  <CardTitle className="text-sm font-semibold text-zinc-700 dark:text-zinc-200">
+              <Card className="border-border">
+                <CardHeader className="py-3 px-4 border-b border-border/50">
+                  <CardTitle className="text-sm font-semibold text-muted-foreground">
                     Original Inquiry
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="p-4 space-y-3">
                   <div className="flex items-start gap-3">
-                    <div className="size-9 rounded-full bg-gradient-to-br from-zinc-900 to-zinc-800 text-white text-xs font-semibold flex items-center justify-center shrink-0">
+                    <div className="size-9 rounded-full bg-gradient-to-br from-teal-600 to-teal-700 text-white text-xs font-semibold flex items-center justify-center shrink-0">
                       {initials(selected.fromName || selected.from)}
                     </div>
                     <div className="flex-1 min-w-0 space-y-1">
                       <div className="flex items-center gap-2 text-sm">
-                        <User className="size-3.5 text-zinc-400 shrink-0" />
-                        <span className="font-medium text-zinc-900 dark:text-zinc-100 truncate">
+                        <User className="size-3.5 text-muted-foreground/70 shrink-0" />
+                        <span className="font-medium text-foreground truncate">
                           {selected.fromName || '(no name)'}
                         </span>
                       </div>
                       <div className="flex items-center gap-2 text-sm">
-                        <Mail className="size-3.5 text-zinc-400 shrink-0" />
+                        <Mail className="size-3.5 text-muted-foreground/70 shrink-0" />
                         <a
                           href={`mailto:${selected.from}`}
-                          className="text-zinc-900 dark:text-zinc-200 hover:underline truncate"
+                          className="text-teal-400 hover:underline truncate"
                         >
                           {selected.from}
                         </a>
@@ -241,10 +241,10 @@ export function AiReplayView() {
                     </div>
                   </div>
                   <div>
-                    <p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wide mb-1">
+                    <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide mb-1">
                       Subject
                     </p>
-                    <p className="text-sm font-medium text-zinc-900 dark:text-white">
+                    <p className="text-sm font-medium text-foreground">
                       {selected.subject || '(no subject)'}
                     </p>
                   </div>
@@ -260,10 +260,10 @@ export function AiReplayView() {
                     </Badge>
                   </div>
                   <div>
-                    <p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wide mb-1">
+                    <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide mb-1">
                       Body
                     </p>
-                    <pre className="text-[13px] text-zinc-700 dark:text-zinc-300 whitespace-pre-wrap break-words font-sans leading-relaxed max-h-[160px] overflow-y-auto scrollbar-thin bg-zinc-50 dark:bg-zinc-900 rounded-md p-3 border border-zinc-100 dark:border-zinc-800">
+                    <pre className="text-[13px] text-muted-foreground whitespace-pre-wrap break-words font-sans leading-relaxed max-h-[160px] overflow-y-auto scrollbar-thin bg-muted/50 dark:bg-zinc-900 rounded-md p-3 border border-border/50">
                       {selected.text || '(no text body)'}
                     </pre>
                   </div>
@@ -271,10 +271,10 @@ export function AiReplayView() {
               </Card>
 
               {/* Tone selector */}
-              <Card className="border-zinc-200 dark:border-zinc-800">
-                <CardHeader className="py-3 px-4 border-b border-zinc-100 dark:border-zinc-800">
-                  <CardTitle className="text-sm font-semibold text-zinc-700 dark:text-zinc-200 flex items-center gap-2">
-                    <Sparkles className="size-4 text-zinc-900" />
+              <Card className="border-border">
+                <CardHeader className="py-3 px-4 border-b border-border/50">
+                  <CardTitle className="text-sm font-semibold text-muted-foreground flex items-center gap-2">
+                    <Sparkles className="size-4 text-foreground" />
                     Reply Tone
                   </CardTitle>
                 </CardHeader>
@@ -287,14 +287,14 @@ export function AiReplayView() {
                         className={cn(
                           'text-left border rounded-md p-2.5 transition-all',
                           tone === t.key
-                            ? 'border-zinc-900 bg-zinc-100 dark:bg-zinc-800/60 ring-1 ring-zinc-900'
-                            : 'border-zinc-200 dark:border-zinc-800 hover:border-zinc-400'
+                            ? 'border-zinc-900 bg-muted/60 ring-1 ring-zinc-900'
+                            : 'border-border hover:border-teal-500/50'
                         )}
                       >
-                        <div className="text-[13px] font-semibold text-zinc-900 dark:text-white">
+                        <div className="text-[13px] font-semibold text-foreground">
                           {t.label}
                         </div>
-                        <div className="text-[11px] text-zinc-500 mt-0.5">{t.desc}</div>
+                        <div className="text-[11px] text-muted-foreground mt-0.5">{t.desc}</div>
                       </button>
                     ))}
                   </div>
@@ -306,7 +306,7 @@ export function AiReplayView() {
                 <Button
                   onClick={generate}
                   disabled={generating}
-                  className="gap-2 bg-zinc-900 hover:bg-zinc-800 text-white"
+                  className="gap-2 bg-teal-600 hover:bg-teal-700 text-white"
                 >
                   {generating ? (
                     <Loader2 className="size-4 animate-spin" />
@@ -330,12 +330,12 @@ export function AiReplayView() {
 
               {/* Result */}
               {result && (
-                <Card className="border-zinc-300 dark:border-zinc-700">
-                  <CardHeader className="py-3 px-4 border-b border-zinc-200 dark:border-zinc-700 flex-row items-center justify-between">
-                    <CardTitle className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
+                <Card className="border-border">
+                  <CardHeader className="py-3 px-4 border-b border-border flex-row items-center justify-between">
+                    <CardTitle className="text-sm font-semibold text-foreground flex items-center gap-2">
                       <Reply className="size-4" />
                       Generated Reply
-                      <span className="text-[11px] text-zinc-500 font-normal">
+                      <span className="text-[11px] text-muted-foreground font-normal">
                         · {result.latencyMs}ms · {result.tone}
                       </span>
                     </CardTitle>
@@ -347,7 +347,7 @@ export function AiReplayView() {
                     >
                       {copied ? (
                         <>
-                          <Check className="size-3 text-zinc-900" />
+                          <Check className="size-3 text-foreground" />
                           Copied
                         </>
                       ) : (
@@ -360,27 +360,27 @@ export function AiReplayView() {
                   </CardHeader>
                   <CardContent className="p-4 space-y-3">
                     <div>
-                      <p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wide mb-1">
+                      <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide mb-1">
                         Reply Subject
                       </p>
                       <Input
                         readOnly
                         value={result.replySubject || ''}
-                        className="font-mono text-[13px] bg-zinc-50 dark:bg-zinc-900"
+                        className="font-mono text-[13px] bg-muted/50 dark:bg-zinc-900"
                       />
                     </div>
                     <div>
-                      <p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wide mb-1">
+                      <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide mb-1">
                         Reply Body
                       </p>
                       <Textarea
                         readOnly
                         value={result.replyBody || ''}
                         rows={12}
-                        className="text-[13px] leading-relaxed bg-zinc-50 dark:bg-zinc-900"
+                        className="text-[13px] leading-relaxed bg-muted/50 dark:bg-zinc-900"
                       />
                     </div>
-                    <p className="text-[11px] text-zinc-500 flex items-center gap-1">
+                    <p className="text-[11px] text-muted-foreground flex items-center gap-1">
                       <Send className="size-3" />
                       SMTP sending is not yet configured — copy the reply and send manually from your mail client.
                     </p>
