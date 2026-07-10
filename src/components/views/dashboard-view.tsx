@@ -3,9 +3,6 @@
 import { useEffect, useMemo, useState, useCallback } from 'react';
 import {
   Inbox,
-  Clock,
-  Route,
-  Cpu,
   Activity,
   ArrowRight,
   Bell,
@@ -224,45 +221,45 @@ export function DashboardView() {
         </Button>
       </div>
 
-      {/* Stats cards row */}
+      {/* Stats cards row — with line graphs */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
         <StatCard
           label="Total Inquiries"
           value={stats.total}
-          icon={<Inbox className="size-5" />}
-          iconBg="bg-violet-100 text-violet-600"
+          graphData={[12, 18, 15, 22, 28, 25, 32, 35, 30, 38, 42, stats.total || 44]}
+          graphColor="#8b5cf6"
           trend="+18%"
           trendUp
         />
         <StatCard
           label="Pending Review"
           value={stats.pendingReview}
-          icon={<Clock className="size-5" />}
-          iconBg="bg-amber-100 text-amber-600"
+          graphData={[5, 8, 6, 10, 12, 9, 14, 11, 16, 13, 15, stats.pendingReview || 18]}
+          graphColor="#f59e0b"
           trend="+7%"
           trendUp
         />
         <StatCard
           label="Routing Health"
           value="98.6%"
-          icon={<Route className="size-5" />}
-          iconBg="bg-teal-100 text-blue-600"
+          graphData={[94, 95, 96, 97, 96, 98, 97, 98, 99, 98, 98.6, 98.6]}
+          graphColor="#10b981"
           trend="+2.4%"
           trendUp
         />
         <StatCard
           label="Active AI Models"
           value={8}
-          icon={<Cpu className="size-5" />}
-          iconBg="bg-blue-100 text-blue-600"
+          graphData={[3, 4, 5, 6, 6, 7, 7, 8, 8, 8, 8, 8]}
+          graphColor="#3b82f6"
           trend="0%"
         />
         <StatCard
           label="System Health"
           value="Healthy"
-          icon={<CheckCircle2 className="size-5" />}
-          iconBg="bg-green-100 text-green-600"
-          trend="All systems operational"
+          graphData={[99, 99, 98, 99, 100, 99, 100, 99, 100, 100, 99, 100]}
+          graphColor="#22c55e"
+          trend="Operational"
           isText
         />
       </div>
@@ -567,29 +564,87 @@ export function DashboardView() {
   );
 }
 
+// Mini SVG line graph (sparkline) component
+function Sparkline({
+  data,
+  color,
+  width = 100,
+  height = 36,
+}: {
+  data: number[];
+  color: string;
+  width?: number;
+  height?: number;
+}) {
+  if (data.length === 0) return null;
+
+  const max = Math.max(...data);
+  const min = Math.min(...data);
+  const range = max - min || 1;
+
+  const points = data.map((value, i) => {
+    const x = (i / (data.length - 1)) * width;
+    const y = height - ((value - min) / range) * height;
+    return `${x.toFixed(1)},${y.toFixed(1)}`;
+  });
+
+  const linePath = `M ${points.join(' L ')}`;
+  const areaPath = `M 0,${height} L ${points.join(' L ')} L ${width},${height} Z`;
+
+  const gradId = `spark-grad-${color.replace('#', '')}`;
+
+  return (
+    <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} className="overflow-visible">
+      <defs>
+        <linearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor={color} stopOpacity="0.25" />
+          <stop offset="100%" stopColor={color} stopOpacity="0" />
+        </linearGradient>
+      </defs>
+      {/* Area fill */}
+      <path d={areaPath} fill={`url(#${gradId})`} />
+      {/* Line */}
+      <path
+        d={linePath}
+        fill="none"
+        stroke={color}
+        strokeWidth="2"
+        strokeLinejoin="round"
+        strokeLinecap="round"
+      />
+      {/* Last point dot */}
+      <circle
+        cx={width}
+        cy={height - ((data[data.length - 1] - min) / range) * height}
+        r="3"
+        fill={color}
+      />
+    </svg>
+  );
+}
+
 function StatCard({
   label,
   value,
-  icon,
-  iconBg,
+  graphData,
+  graphColor,
   trend,
   trendUp,
   isText,
 }: {
   label: string;
   value: number | string;
-  icon: React.ReactNode;
-  iconBg: string;
+  graphData: number[];
+  graphColor: string;
   trend: string;
   trendUp?: boolean;
   isText?: boolean;
 }) {
   return (
-    <div className="bg-white border border-[#e5e7eb] rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow">
-      <div className="flex items-start justify-between mb-2">
-        <div className={cn('size-9 rounded-lg flex items-center justify-center', iconBg)}>
-          {icon}
-        </div>
+    <div className="bg-white border border-[#e5e7eb] rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden">
+      {/* Top: label + trend */}
+      <div className="flex items-start justify-between mb-1">
+        <p className="text-[11px] text-gray-500 uppercase tracking-wide font-medium">{label}</p>
         {trend && (
           <span
             className={cn(
@@ -602,10 +657,14 @@ function StatCard({
           </span>
         )}
       </div>
-      <p className="text-[11px] text-gray-500 uppercase tracking-wide">{label}</p>
-      <p className={cn('font-bold text-gray-900 leading-tight', isText ? 'text-[15px]' : 'text-xl')}>
+      {/* Value */}
+      <p className={cn('font-bold text-gray-900 leading-tight', isText ? 'text-[15px]' : 'text-2xl')}>
         {value}
       </p>
+      {/* Line graph */}
+      <div className="mt-2 flex items-end justify-end">
+        <Sparkline data={graphData} color={graphColor} width={100} height={32} />
+      </div>
     </div>
   );
 }
