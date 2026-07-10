@@ -37,6 +37,7 @@ import { cn } from '@/lib/utils';
 import { useAppStore } from '@/lib/store';
 import { toast } from 'sonner';
 import type { CategorizedInquiry, ExtractResult, ExtractedItem } from '@/lib/types';
+import { QuotationForm } from '@/components/views/quotation-form';
 
 const PRIORITY_COLORS: Record<string, string> = {
   urgent: 'bg-zinc-900 text-white',
@@ -101,6 +102,9 @@ export function InquiryDetailView() {
   // Per-attachment extraction state
   const [extractions, setExtractions] = useState<Record<string, ExtractResult>>({});
   const [extractingKey, setExtractingKey] = useState<string | null>(null);
+
+  // Quotation form state
+  const [showQuotationForm, setShowQuotationForm] = useState(false);
 
   const extract = useCallback(
     async (uid: number, filename: string) => {
@@ -459,7 +463,7 @@ export function InquiryDetailView() {
           </Card>
         </div>
 
-        {/* Right: Extracted Line Items Table */}
+        {/* Right: Extracted Line Items Table + Build Quotation */}
         <Card className="border-zinc-200 dark:border-zinc-800">
           <CardHeader className="py-3 px-4 border-b border-zinc-100 dark:border-zinc-800 flex-row items-center justify-between">
             <CardTitle className="text-sm font-semibold text-zinc-700 dark:text-zinc-200 flex items-center gap-2">
@@ -467,12 +471,24 @@ export function InquiryDetailView() {
               Extracted Line Items
               <Badge variant="secondary" className="ml-1 text-[11px]">{allItems.length}</Badge>
             </CardTitle>
-            {extractingKey && (
-              <span className="text-[11px] text-zinc-500 flex items-center gap-1">
-                <Loader2 className="size-3 animate-spin" />
-                Processing…
-              </span>
-            )}
+            <div className="flex items-center gap-2">
+              {extractingKey && (
+                <span className="text-[11px] text-zinc-500 flex items-center gap-1">
+                  <Loader2 className="size-3 animate-spin" />
+                  Processing…
+                </span>
+              )}
+              {allItems.length > 0 && (
+                <Button
+                  size="sm"
+                  className="h-7 text-[12px] gap-1.5 bg-zinc-900 hover:bg-zinc-800 text-white"
+                  onClick={() => setShowQuotationForm(true)}
+                >
+                  <FileText className="size-3.5" />
+                  Build Quotation
+                </Button>
+              )}
+            </div>
           </CardHeader>
           <CardContent className="p-0">
             {allItems.length === 0 ? (
@@ -498,89 +514,96 @@ export function InquiryDetailView() {
                 )}
               </div>
             ) : (
-              <div className="overflow-x-auto scrollbar-thin">
-                <table className="w-full text-[13px]">
-                  <thead>
-                    <tr className="bg-zinc-50 dark:bg-zinc-800/50 border-b border-zinc-200 dark:border-zinc-800">
-                      <th className="text-left font-semibold text-zinc-600 dark:text-zinc-300 px-3 py-2.5 whitespace-nowrap w-[40px]">
-                        #
-                      </th>
-                      <th className="text-left font-semibold text-zinc-600 dark:text-zinc-300 px-3 py-2.5 whitespace-nowrap min-w-[140px]">
-                        <Hash className="size-3 inline mr-1" />
-                        Part Number
-                      </th>
-                      <th className="text-left font-semibold text-zinc-600 dark:text-zinc-300 px-3 py-2.5 whitespace-nowrap min-w-[130px]">
-                        <Barcode className="size-3 inline mr-1" />
-                        NSN
-                      </th>
-                      <th className="text-left font-semibold text-zinc-600 dark:text-zinc-300 px-3 py-2.5 min-w-[200px]">
-                        <Package className="size-3 inline mr-1" />
-                        Description
-                      </th>
-                      <th className="text-left font-semibold text-zinc-600 dark:text-zinc-300 px-3 py-2.5 whitespace-nowrap w-[80px]">
-                        Qty
-                      </th>
-                      <th className="text-left font-semibold text-zinc-600 dark:text-zinc-300 px-3 py-2.5 whitespace-nowrap w-[80px]">
-                        UOM
-                      </th>
-                      <th className="text-left font-semibold text-zinc-600 dark:text-zinc-300 px-3 py-2.5 whitespace-nowrap min-w-[120px]">
-                        <HashIcon className="size-3 inline mr-1" />
-                        Serial No
-                      </th>
-                      <th className="text-left font-semibold text-zinc-600 dark:text-zinc-300 px-3 py-2.5 min-w-[120px]">
-                        Source
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
-                    {allItems.map((item, i) => (
-                      <tr
-                        key={i}
-                        className="hover:bg-zinc-50 dark:hover:bg-zinc-800/40 transition-colors"
-                      >
-                        <td className="px-3 py-2.5 text-[11px] text-zinc-500 font-mono">
-                          {String(i + 1).padStart(2, '0')}
-                        </td>
-                        <td className="px-3 py-2.5">
-                          <span className="font-mono text-[12px] font-medium text-zinc-900 dark:text-zinc-100">
-                            {item.partNumber || '—'}
-                          </span>
-                        </td>
-                        <td className="px-3 py-2.5">
-                          <span className="font-mono text-[12px] text-zinc-700 dark:text-zinc-300">
-                            {item.nsn || '—'}
-                          </span>
-                        </td>
-                        <td className="px-3 py-2.5">
-                          <span className="text-[12px] text-zinc-800 dark:text-zinc-200">
-                            {item.description || '—'}
-                          </span>
-                        </td>
-                        <td className="px-3 py-2.5">
-                          <span className="font-mono text-[12px] font-medium text-zinc-900 dark:text-zinc-100">
-                            {item.quantity || '—'}
-                          </span>
-                        </td>
-                        <td className="px-3 py-2.5">
-                          <span className="text-[11px] text-zinc-600 dark:text-zinc-400 uppercase">
-                            {item.uom || '—'}
-                          </span>
-                        </td>
-                        <td className="px-3 py-2.5">
-                          <span className="font-mono text-[12px] text-zinc-600 dark:text-zinc-400">
-                            {item.serialNumber || '—'}
-                          </span>
-                        </td>
-                        <td className="px-3 py-2.5">
-                          <span className="text-[10px] text-zinc-500 truncate max-w-[120px] block" title={item.source}>
-                            {item.source}
-                          </span>
-                        </td>
+              <>
+                {/* Horizontal slider hint */}
+                <div className="px-3 py-1.5 bg-zinc-50 dark:bg-zinc-800/30 border-b border-zinc-100 dark:border-zinc-800 text-[10px] text-zinc-500 flex items-center gap-1.5">
+                  <ChevronRight className="size-3" />
+                  Scroll horizontally to view all columns →
+                </div>
+                <div className="overflow-x-auto scrollbar-thin" style={{ maxWidth: '100%' }}>
+                  <table className="text-[13px]" style={{ minWidth: '900px' }}>
+                    <thead>
+                      <tr className="bg-zinc-50 dark:bg-zinc-800/50 border-b border-zinc-200 dark:border-zinc-800">
+                        <th className="text-left font-semibold text-zinc-600 dark:text-zinc-300 px-3 py-2.5 whitespace-nowrap" style={{ width: '40px' }}>
+                          #
+                        </th>
+                        <th className="text-left font-semibold text-zinc-600 dark:text-zinc-300 px-3 py-2.5 whitespace-nowrap" style={{ width: '150px' }}>
+                          <Hash className="size-3 inline mr-1" />
+                          Part Number
+                        </th>
+                        <th className="text-left font-semibold text-zinc-600 dark:text-zinc-300 px-3 py-2.5 whitespace-nowrap" style={{ width: '140px' }}>
+                          <Barcode className="size-3 inline mr-1" />
+                          NSN
+                        </th>
+                        <th className="text-left font-semibold text-zinc-600 dark:text-zinc-300 px-3 py-2.5 whitespace-nowrap" style={{ width: '240px' }}>
+                          <Package className="size-3 inline mr-1" />
+                          Description
+                        </th>
+                        <th className="text-right font-semibold text-zinc-600 dark:text-zinc-300 px-3 py-2.5 whitespace-nowrap" style={{ width: '80px' }}>
+                          Qty
+                        </th>
+                        <th className="text-left font-semibold text-zinc-600 dark:text-zinc-300 px-3 py-2.5 whitespace-nowrap" style={{ width: '70px' }}>
+                          UOM
+                        </th>
+                        <th className="text-left font-semibold text-zinc-600 dark:text-zinc-300 px-3 py-2.5 whitespace-nowrap" style={{ width: '130px' }}>
+                          <HashIcon className="size-3 inline mr-1" />
+                          Serial No
+                        </th>
+                        <th className="text-left font-semibold text-zinc-600 dark:text-zinc-300 px-3 py-2.5 whitespace-nowrap" style={{ width: '150px' }}>
+                          Source
+                        </th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                    </thead>
+                    <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
+                      {allItems.map((item, i) => (
+                        <tr
+                          key={i}
+                          className="hover:bg-zinc-50 dark:hover:bg-zinc-800/40 transition-colors"
+                        >
+                          <td className="px-3 py-2.5 text-[11px] text-zinc-500 font-mono whitespace-nowrap">
+                            {String(i + 1).padStart(2, '0')}
+                          </td>
+                          <td className="px-3 py-2.5 whitespace-nowrap">
+                            <span className="font-mono text-[12px] font-medium text-zinc-900 dark:text-zinc-100">
+                              {item.partNumber || '—'}
+                            </span>
+                          </td>
+                          <td className="px-3 py-2.5 whitespace-nowrap">
+                            <span className="font-mono text-[12px] text-zinc-700 dark:text-zinc-300">
+                              {item.nsn || '—'}
+                            </span>
+                          </td>
+                          <td className="px-3 py-2.5">
+                            <span className="text-[12px] text-zinc-800 dark:text-zinc-200">
+                              {item.description || '—'}
+                            </span>
+                          </td>
+                          <td className="px-3 py-2.5 text-right whitespace-nowrap">
+                            <span className="font-mono text-[12px] font-bold text-zinc-900 dark:text-zinc-100">
+                              {item.quantity || '—'}
+                            </span>
+                          </td>
+                          <td className="px-3 py-2.5 whitespace-nowrap">
+                            <span className="text-[11px] text-zinc-600 dark:text-zinc-400 uppercase">
+                              {item.uom || '—'}
+                            </span>
+                          </td>
+                          <td className="px-3 py-2.5 whitespace-nowrap">
+                            <span className="font-mono text-[12px] text-zinc-600 dark:text-zinc-400">
+                              {item.serialNumber || '—'}
+                            </span>
+                          </td>
+                          <td className="px-3 py-2.5">
+                            <span className="text-[10px] text-zinc-500 truncate block max-w-[140px]" title={item.source}>
+                              {item.source}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </>
             )}
           </CardContent>
         </Card>
@@ -615,6 +638,15 @@ export function InquiryDetailView() {
           )}
         </div>
       </details>
+
+      {/* Quotation Form Modal */}
+      {showQuotationForm && (
+        <QuotationForm
+          inquiry={selected}
+          items={allItems}
+          onClose={() => setShowQuotationForm(false)}
+        />
+      )}
     </div>
   );
 }
