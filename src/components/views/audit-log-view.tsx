@@ -25,7 +25,7 @@ function formatTimestamp(iso: string): string {
 
 function actionColor(action: string): string {
   if (action.startsWith('ai.')) return 'bg-purple-100 text-purple-700 border-purple-200';
-  if (action.startsWith('imap.')) return 'bg-emerald-100 text-emerald-700 border-emerald-200';
+  if (action.startsWith('imap.')) return 'bg-indigo-100 text-indigo-700 border-indigo-200';
   if (action.startsWith('auth.')) return 'bg-blue-100 text-blue-700 border-blue-200';
   if (action.startsWith('notification.')) return 'bg-amber-100 text-amber-700 border-amber-200';
   if (action.startsWith('routing.')) return 'bg-cyan-100 text-cyan-700 border-cyan-200';
@@ -59,7 +59,7 @@ export function AuditLogView() {
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-zinc-900 dark:text-white flex items-center gap-2">
-          <ScrollText className="size-6 text-emerald-600" />
+          <ScrollText className="size-6 text-indigo-600" />
           Audit Log
         </h1>
         <p className="text-sm text-zinc-500 mt-0.5">
@@ -68,7 +68,7 @@ export function AuditLogView() {
       </div>
 
       {/* Filters */}
-      <Card className="border-emerald-100/80 dark:border-zinc-800">
+      <Card className="border-zinc-200 dark:border-zinc-800">
         <CardContent className="p-4 space-y-3">
           <div className="flex items-center gap-2 flex-wrap">
             <div className="relative flex-1 min-w-[200px] max-w-xs">
@@ -110,7 +110,7 @@ export function AuditLogView() {
       </div>
 
       {/* Table */}
-      <Card className="border-emerald-100/80 dark:border-zinc-800 overflow-hidden">
+      <Card className="border-zinc-200 dark:border-zinc-800 overflow-hidden">
         <CardHeader className="py-3 px-4 border-b border-zinc-100 dark:border-zinc-800">
           <CardTitle className="text-sm font-semibold text-zinc-700 dark:text-zinc-200">
             System Events
@@ -153,7 +153,7 @@ export function AuditLogView() {
                   filtered.map((e) => (
                     <tr
                       key={e.id}
-                      className="hover:bg-emerald-50/30 dark:hover:bg-zinc-800/30 transition-colors"
+                      className="hover:bg-indigo-50/30 dark:hover:bg-zinc-800/30 transition-colors"
                     >
                       <td className="px-3 py-2.5 text-zinc-600 dark:text-zinc-300 whitespace-nowrap font-mono text-[12px]">
                         {formatTimestamp(e.timestamp)}

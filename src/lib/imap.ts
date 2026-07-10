@@ -29,6 +29,8 @@ const IMAP_CONFIG = {
     pass: process.env.IMAP_PASSWORD || '',
   },
   logger: false,
+  // Timeouts — keep tight for fast failure
+  emitLogs: false,
 };
 
 const INQUIRY_DOMAIN = (process.env.INQUIRY_DOMAIN || 'techichamps.com').toLowerCase();
@@ -61,14 +63,14 @@ export async function listMailboxes(): Promise<string[]> {
 }
 
 /**
- * Fetches the latest N emails and returns only those whose sender domain
- * matches the configured INQUIRY_DOMAIN (default: techichamps.com).
+ * FAST PATH: Fetch only envelopes first (no source), filter by sender domain,
+ * then fetch full source ONLY for the matching messages.
  *
- * @param limit - Maximum number of recent emails to scan (default 200)
+ * @param limit - Maximum number of recent emails to scan (default 100 for speed)
  * @param mailbox - Mailbox to read from (default INBOX)
  */
 export async function fetchInquiryEmails(
-  limit: number = 200,
+  limit: number = 100,
   mailbox: string = 'INBOX'
 ): Promise<EmailInquiry[]> {
   const client = new ImapFlow(IMAP_CONFIG);
@@ -81,28 +83,75 @@ export async function fetchInquiryEmails(
       const total = status.messages || 0;
       if (total === 0) return [];
 
+      // Scan only the most recent `limit` messages
       const startSeq = Math.max(1, total - limit + 1);
       const range = `${startSeq}:*`;
 
-      const messages: EmailInquiry[] = [];
+      // ── PASS 1: fetch envelopes only (fast, no source) ──
+      const matchingUids: number[] = [];
+      const envelopeCache = new Map<number, {
+        from: string;
+        fromName: string;
+        subject: string;
+        date: string;
+        to: string;
+        messageId: string;
+        inReplyTo: string | null;
+        references: string | null;
+        internalDate: Date;
+      }>();
 
       for await (const msg of client.fetch(range, {
         envelope: true,
-        source: true,
-        internalDate: true,
         uid: true,
-        flags: true,
+        internalDate: true,
       })) {
+        const env = msg.envelope as {
+          from?: Array<{ address?: string; name?: string }>;
+          to?: Array<{ address?: string }>;
+          subject?: string;
+          date?: Date;
+          messageId?: string;
+          inReplyTo?: string | null;
+          references?: string | null;
+        } | undefined;
+
+        const fromAddr = env?.from?.[0]?.address?.toLowerCase() || '';
+        const fromDomain = extractDomain(fromAddr);
+
+        if (!fromDomain || fromDomain !== INQUIRY_DOMAIN) continue;
+
+        const uid = msg.uid as number;
+        matchingUids.push(uid);
+        envelopeCache.set(uid, {
+          from: fromAddr,
+          fromName: env?.from?.[0]?.name || fromAddr,
+          subject: env?.subject || '(no subject)',
+          date: env?.date?.toISOString() || new Date().toISOString(),
+          to: env?.to?.map((t) => t.address).filter(Boolean).join(', ') || '',
+          messageId: env?.messageId || '',
+          inReplyTo: env?.inReplyTo || null,
+          references: env?.references || null,
+          internalDate: (msg.internalDate as Date) || new Date(),
+        });
+      }
+
+      if (matchingUids.length === 0) return [];
+
+      // ── PASS 2: fetch full source ONLY for matching uids ──
+      const messages: EmailInquiry[] = [];
+      const uidRange = matchingUids.join(',');
+
+      for await (const msg of client.fetch(`${uidRange}`, {
+        source: true,
+        uid: true,
+      }, { uid: true })) {
+        const uid = msg.uid as number;
+        const meta = envelopeCache.get(uid);
+        if (!meta) continue;
+
         try {
           const parsed = await simpleParser(msg.source);
-
-          const fromAddr =
-            parsed.from?.value?.[0]?.address?.toLowerCase() || '';
-          const fromName = parsed.from?.value?.[0]?.name || fromAddr;
-          const fromDomain = extractDomain(fromAddr);
-
-          // Filter: only inquiries from the configured partner domain
-          if (!fromDomain || fromDomain !== INQUIRY_DOMAIN) continue;
 
           const attachments = (parsed.attachments || []).map((a) => ({
             filename: a.filename || 'unnamed',
@@ -111,33 +160,44 @@ export async function fetchInquiryEmails(
           }));
 
           messages.push({
-            id: parsed.messageId || `uid-${msg.uid}`,
-            uid: msg.uid as number,
-            from: fromAddr,
-            fromName,
-            fromDomain,
-            to:
-              parsed.to?.value
-                ?.map((t: { address?: string }) => t.address)
-                .filter(Boolean)
-                .join(', ') || '',
-            subject: parsed.subject || '(no subject)',
+            id: parsed.messageId || `uid-${uid}`,
+            uid,
+            from: meta.from,
+            fromName: meta.fromName,
+            fromDomain: INQUIRY_DOMAIN,
+            to: meta.to,
+            subject: meta.subject,
             text: parsed.text || '',
             html: parsed.html || null,
-            date: parsed.date?.toISOString() || new Date().toISOString(),
-            receivedAt:
-              (msg.internalDate as Date)?.toISOString() ||
-              parsed.date?.toISOString() ||
-              new Date().toISOString(),
+            date: meta.date,
+            receivedAt: meta.internalDate.toISOString(),
             hasAttachments: attachments.length > 0,
             attachments,
-            messageId: parsed.messageId || '',
-            inReplyTo: parsed.inReplyTo || null,
-            references: parsed.references || null,
+            messageId: meta.messageId,
+            inReplyTo: meta.inReplyTo,
+            references: meta.references,
           });
         } catch (err) {
-          console.error('Failed to parse a message:', err);
-          continue;
+          console.error(`Failed to parse uid=${uid}:`, err);
+          // Still include with empty body so it shows up
+          messages.push({
+            id: meta.messageId || `uid-${uid}`,
+            uid,
+            from: meta.from,
+            fromName: meta.fromName,
+            fromDomain: INQUIRY_DOMAIN,
+            to: meta.to,
+            subject: meta.subject,
+            text: '',
+            html: null,
+            date: meta.date,
+            receivedAt: meta.internalDate.toISOString(),
+            hasAttachments: false,
+            attachments: [],
+            messageId: meta.messageId,
+            inReplyTo: meta.inReplyTo,
+            references: meta.references,
+          });
         }
       }
 

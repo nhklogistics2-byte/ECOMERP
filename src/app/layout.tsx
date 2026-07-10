@@ -1,23 +1,25 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 
-const geistSans = Geist({
+const inter = Inter({
   variable: "--font-geist-sans",
   subsets: ["latin"],
+  display: "swap",
 });
 
-const geistMono = Geist_Mono({
+const jetbrains = JetBrains_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "EcomRuns · Email Inquiry Dashboard",
+  title: "EcomRuns · Inquiry & AI Console",
   description:
-    "AI-powered email inquiry dashboard for ecomruns.com. Fetches real inquiries from techichamps.com via IMAP and categorizes them with OpenRouter AI.",
-  keywords: ["ecomruns", "inquiry", "AI", "IMAP", "OpenRouter", "techichamps"],
+    "Enterprise email inquiry management console for ecomruns.com — IMAP-powered inquiry capture from techichamps.com with AI categorization, reply drafting, and model evaluation via OpenRouter.",
+  keywords: ["ecomruns", "inquiry", "AI", "IMAP", "OpenRouter", "techichamps", "ERP"],
   authors: [{ name: "EcomRuns" }],
 };
 
@@ -29,7 +31,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground`}
+        className={`${inter.variable} ${jetbrains.variable} antialiased bg-background text-foreground`}
       >
         {children}
         <Toaster richColors position="top-right" />

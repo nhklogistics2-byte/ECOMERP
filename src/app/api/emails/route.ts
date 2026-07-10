@@ -7,19 +7,19 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 300;
 
 // In-memory cache to avoid re-fetching + re-categorizing on every page reload.
-// TTL: 2 minutes. Refresh button forces a fresh fetch.
+// TTL: 90 seconds. Refresh button forces a fresh fetch.
 type CacheEntry = {
   data: CategorizedInquiry[];
   fetchedAt: number;
   rawCount: number;
 };
 let cache: CacheEntry | null = null;
-const CACHE_TTL_MS = 2 * 60 * 1000;
+const CACHE_TTL_MS = 90 * 1000;
 
 export async function GET(req: Request) {
   const url = new URL(req.url);
   const force = url.searchParams.get('force') === '1';
-  const limit = Number(url.searchParams.get('limit') || 200);
+  const limit = Number(url.searchParams.get('limit') || 100);
   const nocategorize = url.searchParams.get('nocategorize') === '1';
   const testonly = url.searchParams.get('test') === '1';
 
@@ -54,7 +54,7 @@ export async function GET(req: Request) {
       });
     }
 
-    const categorized = await categorizeBatch(raw, 4);
+    const categorized = await categorizeBatch(raw, 3);
 
     cache = {
       data: categorized,

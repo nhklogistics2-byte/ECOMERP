@@ -28,7 +28,7 @@ const TYPE_META: Record<
   AppNotification['type'],
   { icon: React.ComponentType<{ className?: string }>; color: string; bg: string; label: string }
 > = {
-  inquiry: { icon: Mail, color: 'text-emerald-600', bg: 'bg-emerald-50 dark:bg-emerald-950/40', label: 'Inquiry' },
+  inquiry: { icon: Mail, color: 'text-indigo-600', bg: 'bg-indigo-50 dark:bg-indigo-950/40', label: 'Inquiry' },
   ai: { icon: Sparkles, color: 'text-purple-600', bg: 'bg-purple-50 dark:bg-purple-950/40', label: 'AI' },
   system: { icon: Server, color: 'text-blue-600', bg: 'bg-blue-50 dark:bg-blue-950/40', label: 'System' },
   warning: { icon: AlertTriangle, color: 'text-amber-600', bg: 'bg-amber-50 dark:bg-amber-950/40', label: 'Warning' },
@@ -76,7 +76,7 @@ export function NotificationsView() {
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <h1 className="text-2xl font-bold text-zinc-900 dark:text-white flex items-center gap-2">
-            <Bell className="size-6 text-emerald-600" />
+            <Bell className="size-6 text-indigo-600" />
             Notifications
           </h1>
           <p className="text-sm text-zinc-500 mt-0.5">
@@ -88,7 +88,7 @@ export function NotificationsView() {
             variant="outline"
             size="sm"
             onClick={handleMarkAll}
-            className="gap-2 h-8 border-emerald-200 text-emerald-700 hover:bg-emerald-50"
+            className="gap-2 h-8 border-emerald-200 text-indigo-700 hover:bg-emerald-50"
           >
             <CheckCheck className="size-3.5" />
             Mark all as read
@@ -97,7 +97,7 @@ export function NotificationsView() {
       </div>
 
       {/* Filters */}
-      <Card className="border-emerald-100/80 dark:border-zinc-800">
+      <Card className="border-zinc-200 dark:border-zinc-800">
         <CardContent className="p-4 space-y-3">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-zinc-400" />
@@ -117,7 +117,7 @@ export function NotificationsView() {
                   'text-xs px-2.5 py-1 rounded-full border transition-colors capitalize',
                   filter === f
                     ? 'bg-emerald-600 border-emerald-600 text-white'
-                    : 'bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-300 hover:border-emerald-400 hover:text-emerald-700'
+                    : 'bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-300 hover:border-emerald-400 hover:text-indigo-700'
                 )}
               >
                 {f === 'all' ? 'All' : f}
@@ -128,7 +128,7 @@ export function NotificationsView() {
       </Card>
 
       {/* List */}
-      <Card className="border-emerald-100/80 dark:border-zinc-800">
+      <Card className="border-zinc-200 dark:border-zinc-800">
         <CardHeader className="py-3 px-4 border-b border-zinc-100 dark:border-zinc-800">
           <CardTitle className="text-sm font-semibold text-zinc-700 dark:text-zinc-200">
             {filtered.length} notification{filtered.length !== 1 ? 's' : ''}
@@ -151,7 +151,7 @@ export function NotificationsView() {
                     key={n.id}
                     onClick={() => handleMarkOne(n.id)}
                     className={cn(
-                      'w-full text-left p-4 hover:bg-emerald-50/40 dark:hover:bg-zinc-800/40 flex gap-3 transition-colors',
+                      'w-full text-left p-4 hover:bg-indigo-50/40 dark:hover:bg-zinc-800/40 flex gap-3 transition-colors',
                       !n.read && 'bg-emerald-50/30 dark:bg-emerald-950/10'
                     )}
                   >
@@ -175,7 +175,7 @@ export function NotificationsView() {
                           {meta.label}
                         </Badge>
                         {!n.read && (
-                          <span className="size-2 rounded-full bg-emerald-500 shrink-0 ml-auto" />
+                          <span className="size-2 rounded-full bg-indigo-500 shrink-0 ml-auto" />
                         )}
                       </div>
                       <p className="text-[13px] text-zinc-600 dark:text-zinc-300">{n.message}</p>

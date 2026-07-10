@@ -4,6 +4,7 @@ import {
   LayoutDashboard,
   Inbox,
   Bell,
+  Reply,
   Sparkles,
   ScrollText,
   Ship,
@@ -53,6 +54,7 @@ export function Sidebar() {
     {
       title: 'AI & ADMIN',
       items: [
+        { key: 'ai-reply', label: 'AI Reply', icon: Reply },
         { key: 'ai-eval', label: 'AI Eval', icon: Sparkles },
         { key: 'audit-log', label: 'Audit Log', icon: ScrollText },
       ],
@@ -86,21 +88,21 @@ export function Sidebar() {
       <aside
         className={cn(
           'fixed lg:sticky top-0 left-0 z-50 lg:z-30 h-screen w-[240px] shrink-0',
-          'bg-white dark:bg-zinc-900 border-r border-emerald-100/80 dark:border-zinc-800',
+          'bg-white dark:bg-zinc-900 border-r border-zinc-200 dark:border-zinc-800',
           'flex flex-col transition-transform duration-200',
           sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         )}
       >
         {/* Logo */}
-        <div className="flex items-center gap-2.5 px-4 h-16 border-b border-emerald-100/80 dark:border-zinc-800 shrink-0">
-          <div className="size-9 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-md shadow-emerald-500/20">
+        <div className="flex items-center gap-2.5 px-4 h-16 border-b border-zinc-200 dark:border-zinc-800 shrink-0">
+          <div className="size-9 rounded-lg bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center shadow-md shadow-indigo-500/20">
             <Ship className="size-5 text-white" />
           </div>
           <div className="flex-1 min-w-0">
             <div className="font-bold text-[14px] tracking-tight text-zinc-900 dark:text-white leading-tight">
               ECOMRUNS
             </div>
-            <div className="text-[10px] text-emerald-700 dark:text-emerald-400 leading-tight font-medium">
+            <div className="text-[10px] text-indigo-600 dark:text-indigo-400 leading-tight font-medium">
               Inquiry & AI System
             </div>
           </div>
@@ -121,7 +123,7 @@ export function Sidebar() {
                 {section.title && (
                   <button
                     onClick={() => toggleSection(section.title)}
-                    className="w-full flex items-center justify-between px-2 py-1.5 text-[10px] font-semibold tracking-wider text-zinc-400 dark:text-zinc-500 hover:text-emerald-700 dark:hover:text-emerald-400"
+                    className="w-full flex items-center justify-between px-2 py-1.5 text-[10px] font-semibold tracking-wider text-zinc-400 dark:text-zinc-500 hover:text-indigo-700 dark:hover:text-indigo-400"
                   >
                     <span>{section.title}</span>
                     <ChevronDown
@@ -144,16 +146,16 @@ export function Sidebar() {
                           className={cn(
                             'w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md text-[13px] font-medium transition-colors group',
                             active
-                              ? 'bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-950/40 dark:to-teal-950/30 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-900/60'
-                              : 'text-zinc-600 dark:text-zinc-300 hover:bg-emerald-50/50 dark:hover:bg-zinc-800/50 hover:text-emerald-700 dark:hover:text-emerald-300'
+                              ? 'bg-gradient-to-r from-indigo-50 to-violet-50 dark:from-indigo-950/40 dark:to-violet-950/30 text-indigo-700 dark:text-indigo-300 border border-indigo-200/60 dark:border-indigo-900/60'
+                              : 'text-zinc-600 dark:text-zinc-300 hover:bg-indigo-50/50 dark:hover:bg-zinc-800/50 hover:text-indigo-700 dark:hover:text-indigo-300'
                           )}
                         >
                           <Icon
                             className={cn(
                               'size-4 shrink-0',
                               active
-                                ? 'text-emerald-600 dark:text-emerald-400'
-                                : 'text-zinc-400 dark:text-zinc-500 group-hover:text-emerald-600'
+                                ? 'text-indigo-600 dark:text-indigo-400'
+                                : 'text-zinc-400 dark:text-zinc-500 group-hover:text-indigo-600'
                             )}
                           />
                           <span className="flex-1 text-left truncate">{item.label}</span>
@@ -162,7 +164,7 @@ export function Sidebar() {
                               className={cn(
                                 'text-[10px] font-semibold px-1.5 py-0.5 rounded-full',
                                 active
-                                  ? 'bg-emerald-600 text-white'
+                                  ? 'bg-indigo-600 text-white'
                                   : 'bg-zinc-200 dark:bg-zinc-700 text-zinc-600 dark:text-zinc-300'
                               )}
                             >
@@ -180,9 +182,9 @@ export function Sidebar() {
         </nav>
 
         {/* User profile */}
-        <div className="border-t border-emerald-100/80 dark:border-zinc-800 p-2.5 shrink-0">
-          <div className="flex items-center gap-2.5 px-2 py-1.5 rounded-md hover:bg-emerald-50/50 dark:hover:bg-zinc-800/50 cursor-pointer group">
-            <div className="size-8 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 text-white text-xs font-semibold flex items-center justify-center shrink-0">
+        <div className="border-t border-zinc-200 dark:border-zinc-800 p-2.5 shrink-0">
+          <div className="flex items-center gap-2.5 px-2 py-1.5 rounded-md hover:bg-indigo-50/50 dark:hover:bg-zinc-800/50 cursor-pointer group">
+            <div className="size-8 rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 text-white text-xs font-semibold flex items-center justify-center shrink-0">
               CE
             </div>
             <div className="flex-1 min-w-0">

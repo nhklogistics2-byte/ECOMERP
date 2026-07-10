@@ -220,37 +220,43 @@ ${emailContent}`;
 }
 
 /**
- * Categorizes a batch of emails. Processes SEQUENTIALLY with a small delay
- * between each LLM call to avoid hitting rate limits.
+ * Categorizes a batch of emails with limited concurrency (3 parallel)
+ * for fast turnaround while respecting OpenRouter rate limits.
  */
 export async function categorizeBatch(
   emails: EmailInquiry[],
-  _concurrency = 1
+  concurrency = 3
 ): Promise<CategorizedInquiry[]> {
   const results: CategorizedInquiry[] = new Array(emails.length);
+  let index = 0;
 
-  for (let i = 0; i < emails.length; i++) {
-    const email = emails[i];
-    try {
-      const cat = await categorizeEmail(email);
-      results[i] = { ...email, ...cat };
-    } catch (err) {
-      console.error(`Failed to categorize email uid=${email.uid}:`, err);
-      results[i] = {
-        ...email,
-        category: 'General Inquiry',
-        priority: 'medium',
-        summary: '(categorization failed — LLM rate-limited or errored)',
-        keyPoints: [],
-        suggestedAction: 'Manually review.',
-        language: 'Unknown',
-      };
-    }
-    // Small delay between calls (skip after the last one)
-    if (i < emails.length - 1) {
-      await new Promise((r) => setTimeout(r, 400));
+  async function worker() {
+    while (index < emails.length) {
+      const i = index++;
+      const email = emails[i];
+      try {
+        const cat = await categorizeEmail(email);
+        results[i] = { ...email, ...cat };
+      } catch (err) {
+        console.error(`Failed to categorize email uid=${email.uid}:`, err);
+        results[i] = {
+          ...email,
+          category: 'General Inquiry',
+          priority: 'medium',
+          summary: '(categorization failed — LLM rate-limited or errored)',
+          keyPoints: [],
+          suggestedAction: 'Manually review.',
+          language: 'Unknown',
+        };
+      }
     }
   }
+
+  const workers = Array.from(
+    { length: Math.min(concurrency, emails.length) },
+    () => worker()
+  );
+  await Promise.all(workers);
 
   return results;
 }

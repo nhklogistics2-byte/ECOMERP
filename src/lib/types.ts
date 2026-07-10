@@ -4,6 +4,7 @@ export type ViewKey =
   | 'dashboard'
   | 'inquiries'
   | 'notifications'
+  | 'ai-reply'
   | 'ai-eval'
   | 'audit-log';
 
@@ -66,6 +67,15 @@ export interface EvalResult {
   suggestedAction?: string;
   keyPoints?: string[];
   language?: string;
+  latencyMs: number;
+  error?: string;
+}
+
+export interface ReplyResult {
+  ok: boolean;
+  replySubject?: string;
+  replyBody?: string;
+  tone?: string;
   latencyMs: number;
   error?: string;
 }

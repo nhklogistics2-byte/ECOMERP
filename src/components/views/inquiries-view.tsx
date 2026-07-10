@@ -31,7 +31,7 @@ import { useAppStore } from '@/lib/store';
 import { toast } from 'sonner';
 
 const CATEGORY_COLORS: Record<string, string> = {
-  Sales: 'bg-emerald-100 text-emerald-700 border-emerald-200 dark:bg-emerald-950 dark:text-emerald-300 dark:border-emerald-900',
+  Sales: 'bg-emerald-100 text-indigo-700 border-emerald-200 dark:bg-emerald-950 dark:text-emerald-300 dark:border-emerald-900',
   Pricing: 'bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-950 dark:text-amber-300 dark:border-amber-900',
   Partnership: 'bg-purple-100 text-purple-700 border-purple-200 dark:bg-purple-950 dark:text-purple-300 dark:border-purple-900',
   'Technical Support': 'bg-cyan-100 text-cyan-700 border-cyan-200 dark:bg-cyan-950 dark:text-cyan-300 dark:border-cyan-900',
@@ -202,7 +202,7 @@ export function InquiriesView() {
           <h1 className="text-2xl font-bold text-zinc-900 dark:text-white">Inquiries</h1>
           <p className="text-sm text-zinc-500 mt-0.5">
             {filtered.length} of {inquiries.length} shown · from{' '}
-            <span className="font-medium text-emerald-700 dark:text-emerald-400">@techichamps.com</span>
+            <span className="font-medium text-indigo-700 dark:text-indigo-400">@techichamps.com</span>
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -220,7 +220,7 @@ export function InquiriesView() {
             size="sm"
             onClick={() => fetchEmails(true)}
             disabled={loading}
-            className="gap-2 h-8 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white shadow-md shadow-emerald-500/20"
+            className="gap-2 h-8 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-indigo-700 hover:to-violet-700 text-white shadow-md shadow-indigo-500/20"
           >
             {loading ? <Loader2 className="size-3.5 animate-spin" /> : <RefreshCw className="size-3.5" />}
             <span>{loading ? 'Syncing…' : 'Refresh'}</span>
@@ -265,7 +265,7 @@ export function InquiriesView() {
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.4fr] gap-6">
         {/* Left: filters + list */}
         <div className="flex flex-col gap-4 min-w-0">
-          <Card className="border-emerald-100/80 dark:border-zinc-800">
+          <Card className="border-zinc-200 dark:border-zinc-800">
             <CardContent className="p-4 space-y-3">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-zinc-400" />
@@ -310,14 +310,14 @@ export function InquiriesView() {
             </CardContent>
           </Card>
 
-          <Card className="flex-1 min-h-[400px] flex flex-col border-emerald-100/80 dark:border-zinc-800">
+          <Card className="flex-1 min-h-[400px] flex flex-col border-zinc-200 dark:border-zinc-800">
             <CardHeader className="py-3 px-4 border-b border-zinc-100 dark:border-zinc-800 flex-row items-center justify-between">
               <CardTitle className="text-sm font-semibold text-zinc-700 dark:text-zinc-200 flex items-center gap-2">
-                <Mail className="size-4 text-emerald-600" />
+                <Mail className="size-4 text-indigo-600" />
                 Inquiries from techichamps.com
                 <Badge variant="secondary" className="ml-1">{filtered.length}</Badge>
               </CardTitle>
-              {loading && <Loader2 className="size-4 animate-spin text-emerald-600" />}
+              {loading && <Loader2 className="size-4 animate-spin text-indigo-600" />}
             </CardHeader>
             <ScrollArea className="flex-1 max-h-[70vh]">
               {filtered.length === 0 ? (
@@ -337,11 +337,11 @@ export function InquiriesView() {
                       key={e.id}
                       onClick={() => setSelectedInquiryId(e.id)}
                       className={cn(
-                        'w-full text-left p-4 hover:bg-emerald-50/50 dark:hover:bg-zinc-800/50 transition-colors flex gap-3',
+                        'w-full text-left p-4 hover:bg-indigo-50/50 dark:hover:bg-zinc-800/50 transition-colors flex gap-3',
                         selectedInquiryId === e.id && 'bg-emerald-50 dark:bg-zinc-800/70 border-l-2 border-emerald-600'
                       )}
                     >
-                      <div className="size-9 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 text-white text-xs font-semibold flex items-center justify-center shrink-0">
+                      <div className="size-9 rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 text-white text-xs font-semibold flex items-center justify-center shrink-0">
                         {initials(e.fromName || e.from)}
                       </div>
                       <div className="flex-1 min-w-0">
@@ -391,7 +391,7 @@ export function InquiriesView() {
         </div>
 
         {/* Right: detail panel */}
-        <Card className="min-h-[400px] flex flex-col border-emerald-100/80 dark:border-zinc-800">
+        <Card className="min-h-[400px] flex flex-col border-zinc-200 dark:border-zinc-800">
           {!selected ? (
             <div className="flex-1 flex items-center justify-center p-8 text-center text-zinc-500 dark:text-zinc-400">
               <div>
@@ -442,7 +442,7 @@ export function InquiriesView() {
 
                 <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 p-3 bg-zinc-50/50 dark:bg-zinc-900/50">
                   <div className="flex items-start gap-3">
-                    <div className="size-10 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 text-white text-sm font-semibold flex items-center justify-center shrink-0">
+                    <div className="size-10 rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 text-white text-sm font-semibold flex items-center justify-center shrink-0">
                       {initials(selected.fromName || selected.from)}
                     </div>
                     <div className="flex-1 min-w-0 space-y-1">
@@ -456,7 +456,7 @@ export function InquiriesView() {
                         <Mail className="size-3.5 text-zinc-400 shrink-0" />
                         <a
                           href={`mailto:${selected.from}`}
-                          className="text-emerald-700 dark:text-emerald-400 hover:underline truncate"
+                          className="text-indigo-700 dark:text-indigo-400 hover:underline truncate"
                         >
                           {selected.from}
                         </a>
@@ -469,9 +469,9 @@ export function InquiriesView() {
                   </div>
                 </div>
 
-                <div className="rounded-xl border border-emerald-200 dark:border-emerald-900 bg-gradient-to-br from-emerald-50/60 to-teal-50/40 dark:from-emerald-950/30 dark:to-teal-950/20 p-4 space-y-3">
+                <div className="rounded-xl border border-indigo-200 dark:border-indigo-900 bg-gradient-to-br from-indigo-50/60 to-violet-50/40 dark:from-indigo-950/30 dark:to-violet-950/20 p-4 space-y-3">
                   <div className="flex items-center gap-2">
-                    <Sparkles className="size-4 text-emerald-600 dark:text-emerald-400" />
+                    <Sparkles className="size-4 text-indigo-600 dark:text-indigo-400" />
                     <h3 className="text-sm font-semibold text-emerald-800 dark:text-emerald-300">
                       AI Analysis
                     </h3>
@@ -492,7 +492,7 @@ export function InquiriesView() {
                       <ul className="space-y-1">
                         {selected.keyPoints.map((kp, i) => (
                           <li key={i} className="text-sm text-zinc-800 dark:text-zinc-200 flex items-start gap-2">
-                            <span className="text-emerald-600 dark:text-emerald-400 mt-1">•</span>
+                            <span className="text-indigo-600 dark:text-indigo-400 mt-1">•</span>
                             <span>{kp}</span>
                           </li>
                         ))}
@@ -581,7 +581,7 @@ function FilterChip({
         'text-xs px-2.5 py-1 rounded-full border transition-colors',
         active
           ? 'bg-emerald-600 border-emerald-600 text-white'
-          : 'bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-300 hover:border-emerald-400 hover:text-emerald-700'
+          : 'bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-300 hover:border-emerald-400 hover:text-indigo-700'
       )}
     >
       {label}

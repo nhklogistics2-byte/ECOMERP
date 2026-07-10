@@ -11,6 +11,7 @@ const VIEW_LABELS: Record<ViewKey, { label: string; sub: string }> = {
   dashboard: { label: 'Dashboard', sub: 'Home' },
   inquiries: { label: 'Inquiries', sub: 'Home' },
   notifications: { label: 'Notifications', sub: 'Home' },
+  'ai-reply': { label: 'AI Reply', sub: 'Home' },
   'ai-eval': { label: 'AI Eval', sub: 'Home' },
   'audit-log': { label: 'Audit Log', sub: 'Home' },
 };
@@ -27,7 +28,7 @@ export function Topbar({
   const unread = notifications.filter((n) => !n.read).length;
 
   return (
-    <header className="sticky top-0 z-20 h-14 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl border-b border-emerald-100/60 dark:border-zinc-800 flex items-center gap-3 px-4">
+    <header className="sticky top-0 z-20 h-14 bg-white/90 dark:bg-zinc-900/80 backdrop-blur-xl border-b border-zinc-200 dark:border-zinc-800 flex items-center gap-3 px-4">
       <Button
         variant="ghost"
         size="icon"
@@ -56,12 +57,12 @@ export function Topbar({
       <div className="flex-1 sm:flex-none" />
 
       {/* AI Model badge */}
-      <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800">
-        <div className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
-        <span className="text-[11px] font-medium text-emerald-700 dark:text-emerald-400 hidden sm:inline">
+      <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800">
+        <div className="size-1.5 rounded-full bg-indigo-500 animate-pulse" />
+        <span className="text-[11px] font-medium text-indigo-700 dark:text-indigo-400 hidden sm:inline">
           DeepSeek V3.1
         </span>
-        <span className="text-[11px] font-medium text-emerald-700 dark:text-emerald-400 sm:hidden">
+        <span className="text-[11px] font-medium text-indigo-700 dark:text-indigo-400 sm:hidden">
           AI
         </span>
       </div>
@@ -76,7 +77,7 @@ export function Topbar({
           disabled={loading}
         >
           {loading ? (
-            <Loader2 className="size-4 animate-spin text-emerald-600" />
+            <Loader2 className="size-4 animate-spin text-indigo-600" />
           ) : (
             <RefreshCw className="size-4 text-zinc-500" />
           )}
