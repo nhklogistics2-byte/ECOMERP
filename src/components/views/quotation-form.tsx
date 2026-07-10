@@ -12,6 +12,7 @@ import {
   DollarSign,
   Percent,
   Calculator,
+  ChevronRight,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -337,7 +338,11 @@ export function QuotationForm({ inquiry, items, onClose }: QuotationFormProps) {
                   </span>
                 </h3>
               </div>
-              <div className="overflow-x-auto scrollbar-thin">
+              <div className="px-3 py-1.5 bg-zinc-50 dark:bg-zinc-800/30 border-b border-zinc-100 dark:border-zinc-800 text-[10px] text-zinc-500 flex items-center gap-1.5">
+                <ChevronRight className="size-3" />
+                Use the scrollbar arrows below (← →) to see all columns including Price, GST, and Totals
+              </div>
+              <div className="scrollbar-visible">
                 <table className="text-[12px]" style={{ minWidth: '1100px' }}>
                   <thead>
                     <tr className="bg-zinc-50 dark:bg-zinc-800/50 border-b border-zinc-200 dark:border-zinc-800 text-[10px] uppercase tracking-wide">

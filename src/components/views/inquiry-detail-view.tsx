@@ -518,9 +518,9 @@ export function InquiryDetailView() {
                 {/* Horizontal slider hint */}
                 <div className="px-3 py-1.5 bg-zinc-50 dark:bg-zinc-800/30 border-b border-zinc-100 dark:border-zinc-800 text-[10px] text-zinc-500 flex items-center gap-1.5">
                   <ChevronRight className="size-3" />
-                  Scroll horizontally to view all columns →
+                  Use the scrollbar arrows below (← →) to see all columns
                 </div>
-                <div className="overflow-x-auto scrollbar-thin" style={{ maxWidth: '100%' }}>
+                <div className="scrollbar-visible" style={{ maxWidth: '100%' }}>
                   <table className="text-[13px]" style={{ minWidth: '900px' }}>
                     <thead>
                       <tr className="bg-zinc-50 dark:bg-zinc-800/50 border-b border-zinc-200 dark:border-zinc-800">
