@@ -1,4 +1,3 @@
-import ZAI from 'z-ai-web-dev-sdk';
 import type { EmailInquiry } from './imap';
 
 export interface CategorizedInquiry extends EmailInquiry {
@@ -21,7 +20,7 @@ export type InquiryCategory =
   | 'Billing'
   | 'Meeting Request'
   | 'General Inquiry'
-  | ' Spam / Junk';
+  | 'Spam / Junk';
 
 const VALID_CATEGORIES: InquiryCategory[] = [
   'Sales',
@@ -34,7 +33,7 @@ const VALID_CATEGORIES: InquiryCategory[] = [
   'Billing',
   'Meeting Request',
   'General Inquiry',
-  ' Spam / Junk',
+  'Spam / Junk',
 ];
 
 interface LLMCategorizationResult {
@@ -46,18 +45,100 @@ interface LLMCategorizationResult {
   language: string;
 }
 
+const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY || '';
+const OPENROUTER_BASE_URL =
+  process.env.OPENROUTER_BASE_URL || 'https://openrouter.ai/api/v1';
+const OPENROUTER_MODEL =
+  process.env.OPENROUTER_MODEL || 'openai/gpt-4o-mini';
+
 /**
- * Use the LLM to categorize a single email inquiry.
+ * Calls the OpenRouter Chat Completions API (OpenAI-compatible).
+ * Returns the raw text content from the model.
+ */
+async function callOpenRouter(
+  systemPrompt: string,
+  userPrompt: string
+): Promise<string> {
+  if (!OPENROUTER_API_KEY) {
+    throw new Error(
+      'OPENROUTER_API_KEY is not set. Add it to .env to enable AI categorization.'
+    );
+  }
+
+  const url = `${OPENROUTER_BASE_URL}/chat/completions`;
+
+  // Retry with exponential backoff for 429 / 5xx responses
+  const MAX_RETRIES = 4;
+  let lastError: Error | null = null;
+
+  for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${OPENROUTER_API_KEY}`,
+          'Content-Type': 'application/json',
+          // Optional headers OpenRouter uses for ranking/attributing
+          'HTTP-Referer': 'https://ecomruns.com',
+          'X-Title': 'EcomRuns Inquiry Dashboard',
+        },
+        body: JSON.stringify({
+          model: OPENROUTER_MODEL,
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: userPrompt },
+          ],
+          temperature: 0.2,
+          max_tokens: 700,
+        }),
+      });
+
+      if (!res.ok) {
+        const body = await res.text();
+        const msg = `OpenRouter ${res.status}: ${body.slice(0, 300)}`;
+        if (
+          (res.status === 429 || res.status >= 500) &&
+          attempt < MAX_RETRIES
+        ) {
+          console.warn(
+            `OpenRouter attempt ${attempt}/${MAX_RETRIES} failed (${res.status}), retrying…`
+          );
+          lastError = new Error(msg);
+          await new Promise((r) => setTimeout(r, Math.pow(2, attempt) * 1000));
+          continue;
+        }
+        throw new Error(msg);
+      }
+
+      const data = (await res.json()) as {
+        choices?: Array<{ message?: { content?: string } }>;
+      };
+      const content = data.choices?.[0]?.message?.content || '';
+      return content;
+    } catch (e) {
+      lastError = e as Error;
+      if (attempt < MAX_RETRIES) {
+        await new Promise((r) => setTimeout(r, Math.pow(2, attempt) * 1000));
+        continue;
+      }
+      throw e;
+    }
+  }
+
+  throw lastError || new Error('OpenRouter call failed');
+}
+
+/**
+ * Use OpenRouter LLM to categorize a single email inquiry.
  * Returns a structured object with category, priority, summary, etc.
  */
 export async function categorizeEmail(
   email: EmailInquiry
 ): Promise<LLMCategorizationResult> {
-  const zai = await ZAI.create();
-
   const emailContent = (email.text || '').slice(0, 4000);
   const subject = email.subject || '(no subject)';
   const senderName = email.fromName || email.from;
+
   const systemPrompt = `You are an email classification assistant for ecomruns.com (an e-commerce services company that works with techichamps.com).
 Your job is to analyze an inquiry email and return a JSON object with the following fields:
 {
@@ -80,7 +161,7 @@ Classification guidelines:
 - "Billing": questions about payments, invoices, refunds, or subscription status
 - "Meeting Request": asking to schedule a call or meeting
 - "General Inquiry": anything else that does not fit the above
-- " Spam / Junk": marketing newsletters, promotional spam, or unrelated mass email
+- "Spam / Junk": marketing newsletters, promotional spam, or unrelated mass email
 
 Priority guidelines:
 - "urgent": time-sensitive, blocking, or escalated
@@ -98,38 +179,8 @@ Subject: ${subject}
 Body:
 ${emailContent}`;
 
-  // Retry with exponential backoff to handle 429 rate-limit responses
-  const MAX_RETRIES = 4;
-  let lastError: Error | null = null;
-  let raw = '';
+  const raw = await callOpenRouter(systemPrompt, userPrompt);
 
-  for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
-    try {
-      const completion = await zai.chat.completions.create({
-        messages: [
-          { role: 'assistant', content: systemPrompt },
-          { role: 'user', content: userPrompt },
-        ],
-        thinking: { type: 'disabled' },
-      });
-      raw = completion.choices[0]?.message?.content || '';
-      lastError = null;
-      break;
-    } catch (e) {
-      lastError = e as Error;
-      const msg = (e as Error).message || '';
-      const is429 = msg.includes('429') || msg.includes('Too many requests');
-      if (!is429 || attempt === MAX_RETRIES) {
-        throw e;
-      }
-      // Exponential backoff: 2s, 4s, 8s
-      const wait = Math.pow(2, attempt) * 1000;
-      console.warn(`LLM 429 on attempt ${attempt}/${MAX_RETRIES}, waiting ${wait}ms…`);
-      await new Promise((r) => setTimeout(r, wait));
-    }
-  }
-
-  if (lastError) throw lastError;
   // Strip markdown code fences if present
   const cleaned = raw
     .replace(/^```(?:json)?\s*/i, '')
@@ -150,7 +201,8 @@ ${emailContent}`;
       parsed.keyPoints = [];
     }
     if (!parsed.summary) parsed.summary = '(no summary)';
-    if (!parsed.suggestedAction) parsed.suggestedAction = 'Review and reply as appropriate.';
+    if (!parsed.suggestedAction)
+      parsed.suggestedAction = 'Review and reply as appropriate.';
     if (!parsed.language) parsed.language = 'English';
 
     return parsed;
@@ -169,7 +221,7 @@ ${emailContent}`;
 
 /**
  * Categorizes a batch of emails. Processes SEQUENTIALLY with a small delay
- * between each LLM call to avoid hitting the 429 rate-limit on the LLM API.
+ * between each LLM call to avoid hitting rate limits.
  */
 export async function categorizeBatch(
   emails: EmailInquiry[],
@@ -194,9 +246,9 @@ export async function categorizeBatch(
         language: 'Unknown',
       };
     }
-    // Small delay between calls to avoid rate-limit (skip after the last one)
+    // Small delay between calls (skip after the last one)
     if (i < emails.length - 1) {
-      await new Promise((r) => setTimeout(r, 800));
+      await new Promise((r) => setTimeout(r, 400));
     }
   }
 
