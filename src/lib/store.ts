@@ -18,6 +18,10 @@ interface AppState {
   selectedInquiryId: string | null;
   setSelectedInquiryId: (id: string | null) => void;
 
+  // Full-page inquiry detail (opens in new tab)
+  detailInquiryId: string | null;
+  setDetailInquiryId: (id: string | null) => void;
+
   // Notifications
   notifications: AppNotification[];
   markNotificationRead: (id: string) => void;
@@ -123,6 +127,9 @@ export const useAppStore = create<AppState>((set) => ({
   setInquiries: (list) => set({ inquiries: list }),
   selectedInquiryId: null,
   setSelectedInquiryId: (id) => set({ selectedInquiryId: id }),
+
+  detailInquiryId: null,
+  setDetailInquiryId: (id) => set({ detailInquiryId: id }),
 
   notifications: SEED_NOTIFICATIONS,
   markNotificationRead: (id) =>

@@ -224,6 +224,12 @@ export function InquiriesView() {
     [inquiries, selectedInquiryId]
   );
 
+  // Open the full-page inquiry detail in a new browser tab
+  const openInNewTab = useCallback((uid: number) => {
+    const url = `${window.location.origin}/?view=inquiry-detail&uid=${uid}`;
+    window.open(url, '_blank', 'noopener,noreferrer');
+  }, []);
+
   // Tab counts
   const tabCounts = useMemo(() => {
     const c = {
@@ -443,7 +449,7 @@ export function InquiriesView() {
                   return (
                     <tr
                       key={e.id}
-                      onClick={() => setSelectedInquiryId(e.id)}
+                      onClick={() => openInNewTab(e.uid)}
                       className="hover:bg-zinc-100/50 dark:hover:bg-zinc-800/40 transition-colors cursor-pointer group"
                     >
                       <td className="px-3 py-2.5 font-mono text-[11px] text-zinc-500 whitespace-nowrap">
@@ -524,12 +530,12 @@ export function InquiriesView() {
                         <button
                           onClick={(ev) => {
                             ev.stopPropagation();
-                            setSelectedInquiryId(e.id);
+                            openInNewTab(e.uid);
                           }}
                           className="inline-flex items-center gap-1 text-[12px] font-medium text-zinc-900 dark:text-zinc-200 hover:underline"
                         >
                           <Eye className="size-3.5" />
-                          View
+                          Open
                         </button>
                       </td>
                     </tr>

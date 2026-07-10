@@ -6,7 +6,8 @@ export type ViewKey =
   | 'notifications'
   | 'ai-replay'
   | 'ai-eval'
-  | 'audit-log';
+  | 'audit-log'
+  | 'inquiry-detail';
 
 export interface EmailAttachment {
   filename: string;
@@ -78,4 +79,27 @@ export interface ReplyResult {
   tone?: string;
   latencyMs: number;
   error?: string;
+}
+
+export interface ExtractedItem {
+  partNumber: string;
+  nsn: string;
+  description: string;
+  quantity: string;
+  serialNumber: string;
+  uom: string;
+  notes: string;
+}
+
+export interface ExtractResult {
+  ok: boolean;
+  filename?: string;
+  contentType?: string;
+  size?: number;
+  textLength?: number;
+  items?: ExtractedItem[];
+  rawText?: string;
+  latencyMs?: number;
+  error?: string;
+  cached?: boolean;
 }
