@@ -22,7 +22,6 @@ import {
   Hash as HashIcon,
   FileSearch,
   RefreshCw,
-  AlertCircle,
   CheckCircle2,
   Building2,
   Globe,
@@ -40,24 +39,24 @@ import type { CategorizedInquiry, ExtractResult, ExtractedItem } from '@/lib/typ
 import { QuotationForm } from '@/components/views/quotation-form';
 
 const PRIORITY_COLORS: Record<string, string> = {
-  urgent: 'bg-blue-600 text-white',
+  urgent: 'bg-red-500 text-white',
   high: 'bg-amber-500 text-white',
-  medium: 'bg-amber-500 text-white',
-  low: 'bg-zinc-700 text-zinc-200',
+  medium: 'bg-blue-500 text-white',
+  low: 'bg-gray-400 text-white',
 };
 
 const CATEGORY_COLORS: Record<string, string> = {
-  Sales: 'bg-blue-500/20 text-blue-600 border-blue-500/30',
-  Pricing: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
-  Partnership: 'bg-zinc-700/50 text-gray-300 border-[#e5e7eb]',
-  'Technical Support': 'bg-zinc-700/50 text-gray-300 border-[#e5e7eb]',
-  Onboarding: 'bg-blue-500/20 text-blue-600 border-blue-500/30',
-  'Project Update': 'bg-zinc-700/50 text-gray-300 border-[#e5e7eb]',
-  'Bug Report': 'bg-red-500/20 text-red-400 border-red-500/30',
-  Billing: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
-  'Meeting Request': 'bg-zinc-700/50 text-gray-300 border-[#e5e7eb]',
-  'General Inquiry': 'bg-zinc-700/50 text-gray-300 border-[#e5e7eb]',
-  'Spam / Junk': 'bg-zinc-700 text-gray-400 border-[#e5e7eb]',
+  Sales: 'bg-gray-100 text-gray-700 border-gray-200',
+  Pricing: 'bg-gray-100 text-gray-700 border-gray-200',
+  Partnership: 'bg-gray-100 text-gray-700 border-gray-200',
+  'Technical Support': 'bg-gray-100 text-gray-700 border-gray-200',
+  Onboarding: 'bg-gray-100 text-gray-700 border-gray-200',
+  'Project Update': 'bg-gray-100 text-gray-700 border-gray-200',
+  'Bug Report': 'bg-gray-100 text-gray-700 border-gray-200',
+  Billing: 'bg-gray-100 text-gray-700 border-gray-200',
+  'Meeting Request': 'bg-gray-100 text-gray-700 border-gray-200',
+  'General Inquiry': 'bg-gray-100 text-gray-700 border-gray-200',
+  'Spam / Junk': 'bg-gray-200 text-gray-500 border-gray-300',
 };
 
 function formatDateTime(iso: string): string {
@@ -449,12 +448,6 @@ export function InquiryDetailView() {
                           </span>
                         )}
                       </div>
-                      {ext?.error && (
-                        <p className="text-[11px] text-red-600 flex items-center gap-1">
-                          <AlertCircle className="size-3" />
-                          {ext.error}
-                        </p>
-                      )}
                     </div>
                   );
                 })

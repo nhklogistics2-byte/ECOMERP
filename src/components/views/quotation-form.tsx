@@ -363,14 +363,14 @@ export function QuotationForm({ inquiry, items, onClose }: QuotationFormProps) {
                       <th className="text-right font-semibold text-gray-500 px-2 py-2 bg-gray-50" style={{ width: '80px' }}>
                         GST Amt
                       </th>
-                      <th className="text-right font-semibold text-gray-500 px-2 py-2 bg-blue-50" style={{ width: '100px' }}>
+                      <th className="text-right font-semibold text-gray-500 px-2 py-2 bg-gray-50" style={{ width: '100px' }}>
                         Total w/ GST
                       </th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100">
                     {lines.map((line, i) => (
-                      <tr key={i} className="hover:bg-blue-50">
+                      <tr key={i} className="hover:bg-gray-50">
                         <td className="px-2 py-1.5 text-[10px] text-gray-500 font-mono">{i + 1}</td>
                         <td className="px-2 py-1.5 font-mono text-[11px] text-gray-900 whitespace-nowrap">
                           {line.partNumber || '—'}
@@ -418,7 +418,7 @@ export function QuotationForm({ inquiry, items, onClose }: QuotationFormProps) {
                     ))}
                   </tbody>
                   <tfoot>
-                    <tr className="bg-blue-600 text-white">
+                    <tr className="bg-gray-900 text-white">
                       <td colSpan={7} className="px-2 py-2 text-right text-[11px] font-medium uppercase tracking-wide">
                         Subtotal
                       </td>
@@ -429,7 +429,7 @@ export function QuotationForm({ inquiry, items, onClose }: QuotationFormProps) {
                       <td className="px-2 py-2 text-right font-mono text-[12px] font-bold">
                         {totals.totalGst}
                       </td>
-                      <td className="px-2 py-2 text-right font-mono text-[12px] font-bold bg-blue-700">
+                      <td className="px-2 py-2 text-right font-mono text-[12px] font-bold bg-gray-800">
                         {totals.grandTotal}
                       </td>
                     </tr>
@@ -489,7 +489,7 @@ export function QuotationForm({ inquiry, items, onClose }: QuotationFormProps) {
 
             {/* Sent confirmation */}
             {sent && (
-              <div className="rounded-md border border-blue-600 bg-blue-50 text-blue-600 p-3 flex items-center gap-3">
+              <div className="rounded-md border border-gray-300 bg-gray-50 text-gray-700 p-3 flex items-center gap-3">
                 <CheckCircle2 className="size-5" />
                 <div className="flex-1">
                   <p className="text-[13px] font-medium">
@@ -529,7 +529,7 @@ export function QuotationForm({ inquiry, items, onClose }: QuotationFormProps) {
               size="sm"
               onClick={sendQuotation}
               disabled={sending || sent}
-              className="h-8 gap-1.5 bg-blue-600 hover:bg-blue-700 text-white"
+              className="h-8 gap-1.5 bg-blue-600 hover:bg-gray-800 text-white"
             >
               {sending ? <Loader2 className="size-3.5 animate-spin" /> : <Send className="size-3.5" />}
               {sending ? 'Sending…' : sent ? 'Sent' : 'Send to Client'}
