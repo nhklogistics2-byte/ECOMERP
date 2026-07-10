@@ -23,6 +23,10 @@ import {
   ChevronLeft,
   ChevronRight,
   Eye,
+  ImageIcon,
+  FileText,
+  Download,
+  ExternalLink,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -726,18 +730,46 @@ export function InquiriesView() {
                 {selected.hasAttachments && selected.attachments.length > 0 && (
                   <div>
                     <p className="text-[10px] font-medium text-zinc-500 uppercase tracking-wide mb-2">
-                      Attachments ({selected.attachments.length})
+                      Attachments ({selected.attachments.length}) · click to open
                     </p>
                     <div className="flex flex-wrap gap-2">
-                      {selected.attachments.map((a, i) => (
-                        <Badge key={i} variant="secondary" className="gap-1.5 py-1.5">
-                          <Paperclip className="size-3" />
-                          <span className="truncate max-w-[160px]">{a.filename}</span>
-                          <span className="text-zinc-400 text-[10px]">
-                            {a.size > 1024 ? `${Math.round(a.size / 1024)} KB` : `${a.size} B`}
-                          </span>
-                        </Badge>
-                      ))}
+                      {selected.attachments.map((a, i) => {
+                        const isImage = a.contentType.startsWith('image/');
+                        const isPdf = a.contentType === 'application/pdf';
+                        const isText =
+                          a.contentType.startsWith('text/') ||
+                          a.contentType.includes('json') ||
+                          a.contentType.includes('xml');
+                        const isViewable = isImage || isPdf || isText;
+                        const url = `/api/attachment?uid=${selected.uid}&filename=${encodeURIComponent(a.filename)}${isViewable ? '' : '&download=1'}`;
+                        return (
+                          <a
+                            key={i}
+                            href={url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1.5 py-1.5 px-2 rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors group"
+                            title={`Open ${a.filename} (${a.contentType})`}
+                          >
+                            {isImage ? (
+                              <ImageIcon className="size-3 text-zinc-600 dark:text-zinc-300" />
+                            ) : isPdf ? (
+                              <FileText className="size-3 text-zinc-600 dark:text-zinc-300" />
+                            ) : isText ? (
+                              <FileText className="size-3 text-zinc-600 dark:text-zinc-300" />
+                            ) : (
+                              <Download className="size-3 text-zinc-600 dark:text-zinc-300" />
+                            )}
+                            <span className="truncate max-w-[160px] text-[12px] font-medium text-zinc-900 dark:text-zinc-100 group-hover:underline">
+                              {a.filename}
+                            </span>
+                            <span className="text-zinc-400 text-[10px]">
+                              {a.size > 1024 ? `${Math.round(a.size / 1024)} KB` : `${a.size} B`}
+                            </span>
+                            <ExternalLink className="size-2.5 text-zinc-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+                          </a>
+                        );
+                      })}
                     </div>
                   </div>
                 )}

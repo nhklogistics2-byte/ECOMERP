@@ -217,6 +217,60 @@ export async function fetchInquiryEmails(
 }
 
 /**
+ * Fetches a single attachment's binary content from a specific email by UID.
+ * Returns the attachment buffer + metadata, or null if not found.
+ */
+export async function fetchAttachment(
+  uid: number,
+  filename: string,
+  mailbox: string = 'INBOX'
+): Promise<{
+  buffer: Buffer;
+  filename: string;
+  contentType: string;
+  size: number;
+} | null> {
+  const client = new ImapFlow(IMAP_CONFIG);
+  await client.connect();
+
+  try {
+    const lock = await client.getMailboxLock(mailbox);
+    try {
+      // Fetch the full source of the message with this UID
+      const range = String(uid);
+      let msgSource: Buffer | null = null;
+
+      for await (const msg of client.fetch(range, { source: true }, { uid: true })) {
+        msgSource = msg.source as Buffer;
+        break;
+      }
+
+      if (!msgSource) return null;
+
+      const parsed = await simpleParser(msgSource);
+
+      // Find the attachment matching the requested filename
+      const target = (parsed.attachments || []).find(
+        (a) => (a.filename || 'unnamed') === filename
+      );
+
+      if (!target) return null;
+
+      return {
+        buffer: target.content as Buffer,
+        filename: target.filename || filename,
+        contentType: target.contentType || 'application/octet-stream',
+        size: target.size || (target.content as Buffer).length,
+      };
+    } finally {
+      lock.release();
+    }
+  } finally {
+    await client.logout();
+  }
+}
+
+/**
  * Tests IMAP connectivity. Returns status object.
  */
 export async function testImapConnection(): Promise<{
