@@ -410,9 +410,9 @@ export function DashboardView() {
         />
         <QuickAction
           icon={<Sparkles className="size-5" />}
-          label="AI Reply"
+          label="AI Replay"
           desc="Draft replies"
-          onClick={() => setView('ai-reply')}
+          onClick={() => setView('ai-replay')}
         />
         <QuickAction
           icon={<ScrollText className="size-5" />}

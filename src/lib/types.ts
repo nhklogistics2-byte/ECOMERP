@@ -4,7 +4,7 @@ export type ViewKey =
   | 'dashboard'
   | 'inquiries'
   | 'notifications'
-  | 'ai-reply'
+  | 'ai-replay'
   | 'ai-eval'
   | 'audit-log';
 

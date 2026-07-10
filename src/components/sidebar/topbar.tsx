@@ -11,7 +11,7 @@ const VIEW_LABELS: Record<ViewKey, { label: string; sub: string }> = {
   dashboard: { label: 'Dashboard', sub: 'Home' },
   inquiries: { label: 'Inquiries', sub: 'Home' },
   notifications: { label: 'Notifications', sub: 'Home' },
-  'ai-reply': { label: 'AI Reply', sub: 'Home' },
+  'ai-replay': { label: 'AI Replay', sub: 'Home' },
   'ai-eval': { label: 'AI Eval', sub: 'Home' },
   'audit-log': { label: 'Audit Log', sub: 'Home' },
 };

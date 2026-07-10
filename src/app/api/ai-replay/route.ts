@@ -90,7 +90,7 @@ ${(body.body || '').slice(0, 4000)}`;
         Authorization: `Bearer ${OPENROUTER_API_KEY}`,
         'Content-Type': 'application/json',
         'HTTP-Referer': 'https://ecomruns.com',
-        'X-Title': 'EcomRuns AI Reply',
+        'X-Title': 'EcomRuns AI Replay',
       },
       body: JSON.stringify({
         model: OPENROUTER_MODEL,

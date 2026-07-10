@@ -52,7 +52,7 @@ function initials(name: string): string {
   return (parts[0][0] + parts[1][0]).toUpperCase();
 }
 
-export function AiReplyView() {
+export function AiReplayView() {
   const { inquiries, addAuditEntry, addNotification } = useAppStore();
   const [selectedInquiryId, setSelectedInquiryId] = useState<string | null>(null);
   const [tone, setTone] = useState<Tone>('professional');
@@ -73,7 +73,7 @@ export function AiReplyView() {
     setGenerating(true);
     setResult(null);
     try {
-      const res = await fetch('/api/ai-reply', {
+      const res = await fetch('/api/ai-replay', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -99,7 +99,7 @@ export function AiReplyView() {
       });
       addNotification({
         type: 'ai',
-        title: 'AI Reply generated',
+        title: 'AI Replay generated',
         message: `${tone} reply drafted for "${selected.subject.slice(0, 40)}"`,
       });
       toast.success(`Reply generated in ${data.latencyMs}ms`);
@@ -130,7 +130,7 @@ export function AiReplyView() {
       <div>
         <h1 className="text-2xl font-bold text-zinc-900 dark:text-white flex items-center gap-2">
           <Reply className="size-6 text-indigo-600" />
-          AI Reply Generator
+          AI Replay Generator
         </h1>
         <p className="text-sm text-zinc-500 mt-1">
           Draft professional replies to inquiries using AI. Pick an inquiry, choose a tone, generate.

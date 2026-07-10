@@ -5,7 +5,7 @@ import { Topbar } from '@/components/sidebar/topbar';
 import { DashboardView } from '@/components/views/dashboard-view';
 import { InquiriesView } from '@/components/views/inquiries-view';
 import { NotificationsView } from '@/components/views/notifications-view';
-import { AiReplyView } from '@/components/views/ai-reply-view';
+import { AiReplayView } from '@/components/views/ai-replay-view';
 import { AiEvalView } from '@/components/views/ai-eval-view';
 import { AuditLogView } from '@/components/views/audit-log-view';
 import { useAppStore } from '@/lib/store';
@@ -22,7 +22,7 @@ export default function Page() {
           {view === 'dashboard' && <DashboardView />}
           {view === 'inquiries' && <InquiriesView />}
           {view === 'notifications' && <NotificationsView />}
-          {view === 'ai-reply' && <AiReplyView />}
+          {view === 'ai-replay' && <AiReplayView />}
           {view === 'ai-eval' && <AiEvalView />}
           {view === 'audit-log' && <AuditLogView />}
         </main>

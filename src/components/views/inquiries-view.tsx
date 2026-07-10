@@ -19,6 +19,10 @@ import {
   ArrowLeft,
   TrendingUp,
   CheckCircle2,
+  X,
+  ChevronLeft,
+  ChevronRight,
+  Eye,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -31,17 +35,17 @@ import { useAppStore } from '@/lib/store';
 import { toast } from 'sonner';
 
 const CATEGORY_COLORS: Record<string, string> = {
-  Sales: 'bg-emerald-100 text-indigo-700 border-emerald-200 dark:bg-emerald-950 dark:text-emerald-300 dark:border-emerald-900',
-  Pricing: 'bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-950 dark:text-amber-300 dark:border-amber-900',
-  Partnership: 'bg-purple-100 text-purple-700 border-purple-200 dark:bg-purple-950 dark:text-purple-300 dark:border-purple-900',
-  'Technical Support': 'bg-cyan-100 text-cyan-700 border-cyan-200 dark:bg-cyan-950 dark:text-cyan-300 dark:border-cyan-900',
-  Onboarding: 'bg-teal-100 text-teal-700 border-teal-200 dark:bg-teal-950 dark:text-teal-300 dark:border-teal-900',
-  'Project Update': 'bg-sky-100 text-sky-700 border-sky-200 dark:bg-sky-950 dark:text-sky-300 dark:border-sky-900',
-  'Bug Report': 'bg-red-100 text-red-700 border-red-200 dark:bg-red-950 dark:text-red-300 dark:border-red-900',
-  Billing: 'bg-orange-100 text-orange-700 border-orange-200 dark:bg-orange-950 dark:text-orange-300 dark:border-orange-900',
-  'Meeting Request': 'bg-pink-100 text-pink-700 border-pink-200 dark:bg-pink-950 dark:text-pink-300 dark:border-pink-900',
-  'General Inquiry': 'bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700',
-  ' Spam / Junk': 'bg-zinc-200 text-zinc-500 border-zinc-300 dark:bg-zinc-800 dark:text-zinc-400 dark:border-zinc-700',
+  Sales: 'bg-emerald-100 text-emerald-700 border-emerald-200',
+  Pricing: 'bg-amber-100 text-amber-700 border-amber-200',
+  Partnership: 'bg-purple-100 text-purple-700 border-purple-200',
+  'Technical Support': 'bg-cyan-100 text-cyan-700 border-cyan-200',
+  Onboarding: 'bg-teal-100 text-teal-700 border-teal-200',
+  'Project Update': 'bg-sky-100 text-sky-700 border-sky-200',
+  'Bug Report': 'bg-red-100 text-red-700 border-red-200',
+  Billing: 'bg-orange-100 text-orange-700 border-orange-200',
+  'Meeting Request': 'bg-pink-100 text-pink-700 border-pink-200',
+  'General Inquiry': 'bg-slate-100 text-slate-700 border-slate-200',
+  ' Spam / Junk': 'bg-zinc-200 text-zinc-500 border-zinc-300',
 };
 
 const PRIORITY_COLORS: Record<string, string> = {
@@ -51,10 +55,28 @@ const PRIORITY_COLORS: Record<string, string> = {
   low: 'bg-emerald-500 text-white',
 };
 
+const STATUS_BY_PRIORITY: Record<string, { label: string; color: string }> = {
+  urgent: { label: 'New', color: 'bg-blue-100 text-blue-700 border-blue-200' },
+  high: { label: 'New', color: 'bg-blue-100 text-blue-700 border-blue-200' },
+  medium: { label: 'Open', color: 'bg-zinc-100 text-zinc-700 border-zinc-200' },
+  low: { label: 'On Hold', color: 'bg-amber-100 text-amber-700 border-amber-200' },
+};
+
 function formatDate(iso: string): string {
   try {
-    const d = new Date(iso);
-    return d.toLocaleString('en-US', {
+    return new Date(iso).toLocaleDateString('en-GB', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+    });
+  } catch {
+    return iso;
+  }
+}
+
+function formatDateTime(iso: string): string {
+  try {
+    return new Date(iso).toLocaleString('en-US', {
       month: 'short',
       day: 'numeric',
       year: 'numeric',
@@ -68,14 +90,11 @@ function formatDate(iso: string): string {
 
 function formatRelative(iso: string): string {
   try {
-    const d = new Date(iso).getTime();
-    const now = Date.now();
-    const diff = Math.floor((now - d) / 1000);
+    const diff = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
     if (diff < 60) return 'just now';
     if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
     if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
-    if (diff < 604800) return `${Math.floor(diff / 86400)}d ago`;
-    return formatDate(iso);
+    return `${Math.floor(diff / 86400)}d ago`;
   } catch {
     return iso;
   }
@@ -95,7 +114,6 @@ export function InquiriesView() {
     selectedInquiryId,
     setSelectedInquiryId,
     addAuditEntry,
-    addNotification,
   } = useAppStore();
 
   const [loading, setLoading] = useState(false);
@@ -107,12 +125,16 @@ export function InquiriesView() {
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [priorityFilter, setPriorityFilter] = useState<string>('all');
 
+  // Pagination
+  const [page, setPage] = useState(1);
+  const PAGE_SIZE = 10;
+
   const fetchEmails = useCallback(
     async (force: boolean) => {
       setLoading(true);
       setError(null);
       try {
-        const url = `/api/emails?force=${force ? '1' : '0'}&limit=200`;
+        const url = `/api/emails?force=${force ? '1' : '0'}&limit=100`;
         const res = await fetch(url, { cache: 'no-store' });
         const data = await res.json();
         if (!data.ok) throw new Error(data.error || 'Failed to fetch emails');
@@ -168,14 +190,6 @@ export function InquiriesView() {
     return Object.entries(counts).sort((a, b) => b[1] - a[1]);
   }, [inquiries]);
 
-  const priorities = useMemo(() => {
-    const counts: Record<string, number> = { urgent: 0, high: 0, medium: 0, low: 0 };
-    for (const e of inquiries) {
-      counts[e.priority] = (counts[e.priority] || 0) + 1;
-    }
-    return counts;
-  }, [inquiries]);
-
   const filtered = useMemo(() => {
     const s = search.trim().toLowerCase();
     return inquiries.filter((e) => {
@@ -189,10 +203,33 @@ export function InquiriesView() {
     });
   }, [inquiries, search, categoryFilter, priorityFilter]);
 
+  // Reset page when filters change
+  useEffect(() => {
+    setPage(1);
+  }, [search, categoryFilter, priorityFilter]);
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const currentPage = Math.min(page, totalPages);
+  const paginated = filtered.slice(
+    (currentPage - 1) * PAGE_SIZE,
+    currentPage * PAGE_SIZE
+  );
+
   const selected = useMemo(
     () => inquiries.find((e) => e.id === selectedInquiryId) || null,
     [inquiries, selectedInquiryId]
   );
+
+  // Tab counts
+  const tabCounts = useMemo(() => {
+    const c = {
+      all: inquiries.length,
+      new: inquiries.filter((e) => e.priority === 'urgent' || e.priority === 'high').length,
+      open: inquiries.filter((e) => e.priority === 'medium').length,
+      onHold: inquiries.filter((e) => e.priority === 'low').length,
+    };
+    return c;
+  }, [inquiries]);
 
   return (
     <div className="p-4 sm:p-6 space-y-4">
@@ -220,7 +257,7 @@ export function InquiriesView() {
             size="sm"
             onClick={() => fetchEmails(true)}
             disabled={loading}
-            className="gap-2 h-8 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-indigo-700 hover:to-violet-700 text-white shadow-md shadow-indigo-500/20"
+            className="gap-2 h-8 bg-indigo-600 hover:bg-indigo-700 text-white"
           >
             {loading ? <Loader2 className="size-3.5 animate-spin" /> : <RefreshCw className="size-3.5" />}
             <span>{loading ? 'Syncing…' : 'Refresh'}</span>
@@ -230,13 +267,13 @@ export function InquiriesView() {
 
       {/* Error banner */}
       {error && (
-        <div className="rounded-xl border border-red-200 bg-red-50 dark:bg-red-950/40 dark:border-red-900 p-4 flex items-start gap-3">
-          <XCircle className="size-5 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
-          <div className="flex-1 min-w-0">
-            <p className="font-semibold text-red-800 dark:text-red-300">Connection error</p>
-            <p className="text-sm text-red-700 dark:text-red-400 mt-1 break-words">{error}</p>
+        <div className="rounded-lg border border-red-200 bg-red-50 dark:bg-red-950/40 dark:border-red-900 p-3 flex items-start gap-2 text-sm text-red-800">
+          <XCircle className="size-4 shrink-0 mt-0.5" />
+          <div className="flex-1">
+            <p className="font-semibold">Connection error</p>
+            <p className="text-red-700 mt-0.5">{error}</p>
           </div>
-          <Button size="sm" variant="outline" onClick={() => fetchEmails(true)} className="shrink-0">
+          <Button size="sm" variant="outline" onClick={() => fetchEmails(true)}>
             Retry
           </Button>
         </div>
@@ -246,7 +283,7 @@ export function InquiriesView() {
       {testResult && (
         <div
           className={cn(
-            'rounded-xl border p-3 flex items-start gap-3 text-sm',
+            'rounded-lg border p-3 flex items-start gap-2 text-sm',
             testResult.ok
               ? 'border-emerald-200 bg-emerald-50 dark:bg-emerald-950/40 dark:border-emerald-900 text-emerald-800 dark:text-emerald-300'
               : 'border-red-200 bg-red-50 dark:bg-red-950/40 dark:border-red-900 text-red-800 dark:text-red-300'
@@ -261,159 +298,327 @@ export function InquiriesView() {
         </div>
       )}
 
-      {/* Main grid: list + detail */}
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.4fr] gap-6">
-        {/* Left: filters + list */}
-        <div className="flex flex-col gap-4 min-w-0">
-          <Card className="border-zinc-200 dark:border-zinc-800">
-            <CardContent className="p-4 space-y-3">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-zinc-400" />
-                <Input
-                  placeholder="Search subject, sender, body, summary…"
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  className="pl-9 bg-white dark:bg-zinc-900"
-                />
-              </div>
-              <div className="flex flex-wrap gap-2 items-center">
-                <span className="text-xs font-medium text-zinc-500 flex items-center gap-1">
-                  <Tag className="size-3" /> Category:
+      {/* Status tabs (ERP-style) */}
+      <div className="border-b border-zinc-200 dark:border-zinc-800">
+        <div className="flex items-center gap-1 overflow-x-auto scrollbar-thin">
+          {[
+            { key: 'all', label: 'All', count: tabCounts.all },
+            { key: 'new', label: 'New', count: tabCounts.new },
+            { key: 'open', label: 'Open', count: tabCounts.open },
+            { key: 'onHold', label: 'On Hold', count: tabCounts.onHold },
+          ].map((t) => {
+            const isActive =
+              (t.key === 'all' && priorityFilter === 'all') ||
+              (t.key === 'new' && (priorityFilter === 'urgent' || priorityFilter === 'high')) ||
+              (t.key === 'open' && priorityFilter === 'medium') ||
+              (t.key === 'onHold' && priorityFilter === 'low');
+            return (
+              <button
+                key={t.key}
+                onClick={() => {
+                  if (t.key === 'all') setPriorityFilter('all');
+                  else if (t.key === 'new') setPriorityFilter('high');
+                  else if (t.key === 'open') setPriorityFilter('medium');
+                  else if (t.key === 'onHold') setPriorityFilter('low');
+                }}
+                className={cn(
+                  'flex items-center gap-1.5 px-3 py-2 text-[13px] font-medium border-b-2 -mb-px whitespace-nowrap transition-colors',
+                  isActive
+                    ? 'border-indigo-600 text-indigo-700 dark:text-indigo-400'
+                    : 'border-transparent text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200'
+                )}
+              >
+                {t.label}
+                <span
+                  className={cn(
+                    'text-[11px] px-1.5 py-0.5 rounded-full',
+                    isActive
+                      ? 'bg-indigo-100 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300'
+                      : 'bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400'
+                  )}
+                >
+                  {t.count}
                 </span>
-                <FilterChip
-                  active={categoryFilter === 'all'}
-                  onClick={() => setCategoryFilter('all')}
-                  label="All"
-                />
-                {categories.map(([cat, n]) => (
-                  <FilterChip
-                    key={cat}
-                    active={categoryFilter === cat}
-                    onClick={() => setCategoryFilter(cat)}
-                    label={`${cat.trim()} (${n})`}
-                  />
-                ))}
-              </div>
-              <div className="flex flex-wrap gap-2 items-center">
-                <span className="text-xs font-medium text-zinc-500 flex items-center gap-1">
-                  <Flag className="size-3" /> Priority:
-                </span>
-                {(['all', 'urgent', 'high', 'medium', 'low'] as const).map((p) => (
-                  <FilterChip
-                    key={p}
-                    active={priorityFilter === p}
-                    onClick={() => setPriorityFilter(p)}
-                    label={p === 'all' ? 'All' : `${p[0].toUpperCase()}${p.slice(1)}`}
-                  />
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+              </button>
+            );
+          })}
+        </div>
+      </div>
 
-          <Card className="flex-1 min-h-[400px] flex flex-col border-zinc-200 dark:border-zinc-800">
-            <CardHeader className="py-3 px-4 border-b border-zinc-100 dark:border-zinc-800 flex-row items-center justify-between">
-              <CardTitle className="text-sm font-semibold text-zinc-700 dark:text-zinc-200 flex items-center gap-2">
-                <Mail className="size-4 text-indigo-600" />
-                Inquiries from techichamps.com
-                <Badge variant="secondary" className="ml-1">{filtered.length}</Badge>
-              </CardTitle>
-              {loading && <Loader2 className="size-4 animate-spin text-indigo-600" />}
-            </CardHeader>
-            <ScrollArea className="flex-1 max-h-[70vh]">
-              {filtered.length === 0 ? (
-                <div className="p-8 text-center text-zinc-500 dark:text-zinc-400">
-                  <Inbox className="size-10 mx-auto mb-2 opacity-30" />
-                  <p className="font-medium">No inquiries found</p>
-                  <p className="text-sm mt-1">
-                    {inquiries.length === 0
-                      ? 'No emails from techichamps.com in the scanned range.'
-                      : 'Try adjusting filters or search.'}
-                  </p>
-                </div>
+      {/* Search + filter row */}
+      <div className="flex items-center gap-2 flex-wrap">
+        <div className="relative flex-1 min-w-[200px] max-w-md">
+          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-4 text-zinc-400" />
+          <Input
+            placeholder="Search ref, subject, sender, body…"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="pl-9 h-9 text-[13px]"
+          />
+        </div>
+        <select
+          value={categoryFilter}
+          onChange={(e) => setCategoryFilter(e.target.value)}
+          className="h-9 px-3 text-[13px] rounded-md border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-200"
+        >
+          <option value="all">All categories</option>
+          {categories.map(([cat]) => (
+            <option key={cat} value={cat}>
+              {cat.trim()}
+            </option>
+          ))}
+        </select>
+        <select
+          value={priorityFilter}
+          onChange={(e) => setPriorityFilter(e.target.value)}
+          className="h-9 px-3 text-[13px] rounded-md border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-200"
+        >
+          <option value="all">All priorities</option>
+          <option value="urgent">Urgent</option>
+          <option value="high">High</option>
+          <option value="medium">Medium</option>
+          <option value="low">Low</option>
+        </select>
+      </div>
+
+      {/* ERP-style Table */}
+      <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg overflow-hidden">
+        <div className="overflow-x-auto scrollbar-thin">
+          <table className="w-full text-[13px]">
+            <thead>
+              <tr className="bg-zinc-50 dark:bg-zinc-800/50 border-b border-zinc-200 dark:border-zinc-800">
+                <th className="text-left font-semibold text-zinc-600 dark:text-zinc-300 px-3 py-2.5 whitespace-nowrap w-[60px]">
+                  Ref
+                </th>
+                <th className="text-left font-semibold text-zinc-600 dark:text-zinc-300 px-3 py-2.5 whitespace-nowrap w-[100px]">
+                  Date
+                </th>
+                <th className="text-left font-semibold text-zinc-600 dark:text-zinc-300 px-3 py-2.5 min-w-[260px]">
+                  Subject
+                </th>
+                <th className="text-left font-semibold text-zinc-600 dark:text-zinc-300 px-3 py-2.5 whitespace-nowrap min-w-[160px]">
+                  Sender
+                </th>
+                <th className="text-left font-semibold text-zinc-600 dark:text-zinc-300 px-3 py-2.5 whitespace-nowrap w-[130px]">
+                  Category
+                </th>
+                <th className="text-left font-semibold text-zinc-600 dark:text-zinc-300 px-3 py-2.5 whitespace-nowrap w-[90px]">
+                  Priority
+                </th>
+                <th className="text-left font-semibold text-zinc-600 dark:text-zinc-300 px-3 py-2.5 whitespace-nowrap w-[100px]">
+                  Status
+                </th>
+                <th className="text-left font-semibold text-zinc-600 dark:text-zinc-300 px-3 py-2.5 whitespace-nowrap w-[110px]">
+                  AI Review
+                </th>
+                <th className="text-right font-semibold text-zinc-600 dark:text-zinc-300 px-3 py-2.5 whitespace-nowrap w-[90px]">
+                  Action
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
+              {loading && inquiries.length === 0 ? (
+                <tr>
+                  <td colSpan={9} className="text-center py-12 text-zinc-500">
+                    <Loader2 className="size-5 animate-spin mx-auto mb-2 text-indigo-500" />
+                    Loading inquiries from IMAP…
+                  </td>
+                </tr>
+              ) : paginated.length === 0 ? (
+                <tr>
+                  <td colSpan={9} className="text-center py-12 text-zinc-500">
+                    <Inbox className="size-8 mx-auto mb-2 opacity-30" />
+                    <p className="font-medium">No inquiries found</p>
+                    <p className="text-xs mt-1">Try adjusting filters or search.</p>
+                  </td>
+                </tr>
               ) : (
-                <div className="divide-y divide-zinc-100 dark:divide-zinc-800">
-                  {filtered.map((e) => (
-                    <button
+                paginated.map((e, i) => {
+                  const refNum = (currentPage - 1) * PAGE_SIZE + i + 1;
+                  const status = STATUS_BY_PRIORITY[e.priority];
+                  return (
+                    <tr
                       key={e.id}
                       onClick={() => setSelectedInquiryId(e.id)}
-                      className={cn(
-                        'w-full text-left p-4 hover:bg-indigo-50/50 dark:hover:bg-zinc-800/50 transition-colors flex gap-3',
-                        selectedInquiryId === e.id && 'bg-emerald-50 dark:bg-zinc-800/70 border-l-2 border-emerald-600'
-                      )}
+                      className="hover:bg-indigo-50/40 dark:hover:bg-zinc-800/40 transition-colors cursor-pointer group"
                     >
-                      <div className="size-9 rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 text-white text-xs font-semibold flex items-center justify-center shrink-0">
-                        {initials(e.fromName || e.from)}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-0.5">
-                          <span className="font-medium text-sm text-zinc-900 dark:text-zinc-100 truncate">
-                            {e.fromName || e.from}
-                          </span>
-                          <span
-                            className={cn(
-                              'text-[10px] font-bold px-1.5 py-0.5 rounded-full uppercase shrink-0',
-                              PRIORITY_COLORS[e.priority]
-                            )}
-                          >
-                            {e.priority}
-                          </span>
-                        </div>
-                        <p className="text-sm font-medium text-zinc-800 dark:text-zinc-200 truncate">
+                      <td className="px-3 py-2.5 font-mono text-[11px] text-zinc-500 whitespace-nowrap">
+                        #{String(refNum).padStart(3, '0')}
+                      </td>
+                      <td className="px-3 py-2.5 text-zinc-600 dark:text-zinc-300 whitespace-nowrap text-[12px]">
+                        {formatDate(e.receivedAt)}
+                      </td>
+                      <td className="px-3 py-2.5">
+                        <div className="font-medium text-zinc-900 dark:text-white truncate max-w-[280px]">
                           {e.subject || '(no subject)'}
-                        </p>
-                        <p className="text-xs text-zinc-500 dark:text-zinc-400 line-clamp-1 mt-0.5">
-                          {e.summary}
-                        </p>
-                        <div className="flex items-center gap-2 mt-1.5 flex-wrap">
-                          <Badge
-                            variant="outline"
-                            className={cn('text-[10px] px-1.5 py-0 h-5 font-medium', CATEGORY_COLORS[e.category])}
-                          >
-                            {e.category.trim()}
-                          </Badge>
-                          {e.hasAttachments && (
-                            <span className="text-zinc-400 flex items-center gap-0.5 text-[10px]">
-                              <Paperclip className="size-3" />
-                            </span>
-                          )}
-                          <span className="text-[10px] text-zinc-400 ml-auto flex items-center gap-1">
-                            <Clock className="size-3" />
-                            {formatRelative(e.receivedAt)}
-                          </span>
                         </div>
-                      </div>
-                    </button>
-                  ))}
-                </div>
+                        <div className="text-[11px] text-zinc-500 truncate max-w-[280px] mt-0.5">
+                          {e.summary}
+                        </div>
+                      </td>
+                      <td className="px-3 py-2.5 whitespace-nowrap">
+                        <div className="flex items-center gap-2">
+                          <div className="size-6 rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 text-white text-[10px] font-semibold flex items-center justify-center shrink-0">
+                            {initials(e.fromName || e.from)}
+                          </div>
+                          <div className="min-w-0">
+                            <div className="text-[12px] font-medium text-zinc-900 dark:text-white truncate">
+                              {e.fromName || e.from}
+                            </div>
+                            <div className="text-[10px] text-zinc-500 truncate max-w-[140px]">
+                              {e.from}
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-3 py-2.5">
+                        <Badge
+                          variant="outline"
+                          className={cn(
+                            'text-[10px] px-1.5 py-0 h-5 font-medium border',
+                            CATEGORY_COLORS[e.category]
+                          )}
+                        >
+                          {e.category.trim()}
+                        </Badge>
+                      </td>
+                      <td className="px-3 py-2.5">
+                        <span
+                          className={cn(
+                            'text-[10px] font-bold px-1.5 py-0.5 rounded uppercase',
+                            PRIORITY_COLORS[e.priority]
+                          )}
+                        >
+                          {e.priority}
+                        </span>
+                      </td>
+                      <td className="px-3 py-2.5">
+                        <Badge
+                          variant="outline"
+                          className={cn(
+                            'text-[10px] px-1.5 py-0 h-5 font-medium border',
+                            status.color
+                          )}
+                        >
+                          {status.label}
+                        </Badge>
+                      </td>
+                      <td className="px-3 py-2.5 text-[11px] text-indigo-700 dark:text-indigo-400 whitespace-nowrap">
+                        {e.keyPoints.length > 0 ? (
+                          <span className="flex items-center gap-1">
+                            <Sparkles className="size-3" />
+                            {e.keyPoints.length} points
+                          </span>
+                        ) : (
+                          <span className="text-zinc-400">—</span>
+                        )}
+                        {e.hasAttachments && (
+                          <Paperclip className="inline size-3 ml-1 text-zinc-400" />
+                        )}
+                      </td>
+                      <td className="px-3 py-2.5 text-right whitespace-nowrap">
+                        <button
+                          onClick={(ev) => {
+                            ev.stopPropagation();
+                            setSelectedInquiryId(e.id);
+                          }}
+                          className="inline-flex items-center gap-1 text-[12px] font-medium text-indigo-700 dark:text-indigo-400 hover:underline"
+                        >
+                          <Eye className="size-3.5" />
+                          View
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })
               )}
-            </ScrollArea>
-          </Card>
+            </tbody>
+          </table>
         </div>
 
-        {/* Right: detail panel */}
-        <Card className="min-h-[400px] flex flex-col border-zinc-200 dark:border-zinc-800">
+        {/* Pagination */}
+        {filtered.length > PAGE_SIZE && (
+          <div className="border-t border-zinc-200 dark:border-zinc-800 px-3 py-2 flex items-center justify-between text-[12px]">
+            <span className="text-zinc-500">
+              Showing {(currentPage - 1) * PAGE_SIZE + 1}–
+              {Math.min(currentPage * PAGE_SIZE, filtered.length)} of {filtered.length}
+            </span>
+            <div className="flex items-center gap-1">
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-7 px-2"
+                disabled={currentPage === 1}
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+              >
+                <ChevronLeft className="size-3.5" />
+                Prev
+              </Button>
+              <span className="text-zinc-600 dark:text-zinc-300 px-2 font-mono">
+                {currentPage} / {totalPages}
+              </span>
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-7 px-2"
+                disabled={currentPage === totalPages}
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              >
+                Next
+                <ChevronRight className="size-3.5" />
+              </Button>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Slide-out Detail Drawer */}
+      <div
+        className={cn(
+          'fixed inset-0 z-50 bg-black/40 transition-opacity',
+          selected ? 'opacity-100' : 'opacity-0 pointer-events-none'
+        )}
+        onClick={() => setSelectedInquiryId(null)}
+      >
+        <div
+          className={cn(
+            'absolute right-0 top-0 h-full w-full max-w-2xl bg-white dark:bg-zinc-900 shadow-xl',
+            'flex flex-col transition-transform duration-300',
+            selected ? 'translate-x-0' : 'translate-x-full'
+          )}
+          onClick={(e) => e.stopPropagation()}
+        >
+          {/* Drawer header */}
+          <div className="flex items-center justify-between px-5 h-14 border-b border-zinc-200 dark:border-zinc-800 shrink-0">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="lg:hidden -ml-2"
+              onClick={() => setSelectedInquiryId(null)}
+            >
+              <ArrowLeft className="size-4 mr-1" /> Back
+            </Button>
+            <h2 className="text-sm font-semibold text-zinc-900 dark:text-white hidden lg:block">
+              Inquiry Detail
+            </h2>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="size-8"
+              onClick={() => setSelectedInquiryId(null)}
+            >
+              <X className="size-4" />
+            </Button>
+          </div>
+
           {!selected ? (
-            <div className="flex-1 flex items-center justify-center p-8 text-center text-zinc-500 dark:text-zinc-400">
-              <div>
-                <Mail className="size-12 mx-auto mb-3 opacity-20" />
-                <p className="font-medium">Select an inquiry to view details</p>
-                <p className="text-sm mt-1">
-                  AI-generated category, priority, summary and suggested action will appear here.
-                </p>
-              </div>
+            <div className="flex-1 flex items-center justify-center text-zinc-500">
+              <Mail className="size-8 opacity-20" />
             </div>
           ) : (
-            <ScrollArea className="flex-1 max-h-[calc(100vh-180px)]">
+            <ScrollArea className="flex-1">
               <div className="p-5 space-y-4">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="lg:hidden -ml-2"
-                  onClick={() => setSelectedInquiryId(null)}
-                >
-                  <ArrowLeft className="size-4 mr-1" /> Back
-                </Button>
-
+                {/* Subject + badges */}
                 <div>
                   <h2 className="text-lg font-bold text-zinc-900 dark:text-white leading-tight">
                     {selected.subject || '(no subject)'}
@@ -440,7 +645,8 @@ export function InquiriesView() {
                   </div>
                 </div>
 
-                <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 p-3 bg-zinc-50/50 dark:bg-zinc-900/50">
+                {/* Sender card */}
+                <div className="rounded-lg border border-zinc-200 dark:border-zinc-800 p-3 bg-zinc-50/50 dark:bg-zinc-800/30">
                   <div className="flex items-start gap-3">
                     <div className="size-10 rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 text-white text-sm font-semibold flex items-center justify-center shrink-0">
                       {initials(selected.fromName || selected.from)}
@@ -463,21 +669,24 @@ export function InquiriesView() {
                       </div>
                       <div className="flex items-center gap-2 text-xs text-zinc-500">
                         <Clock className="size-3.5 shrink-0" />
-                        {formatDate(selected.receivedAt)}
+                        {formatDateTime(selected.receivedAt)}
+                        <span className="text-zinc-300">·</span>
+                        {formatRelative(selected.receivedAt)}
                       </div>
                     </div>
                   </div>
                 </div>
 
-                <div className="rounded-xl border border-indigo-200 dark:border-indigo-900 bg-gradient-to-br from-indigo-50/60 to-violet-50/40 dark:from-indigo-950/30 dark:to-violet-950/20 p-4 space-y-3">
+                {/* AI Analysis */}
+                <div className="rounded-lg border border-indigo-200 dark:border-indigo-900 bg-gradient-to-br from-indigo-50/60 to-violet-50/40 dark:from-indigo-950/30 dark:to-violet-950/20 p-4 space-y-3">
                   <div className="flex items-center gap-2">
                     <Sparkles className="size-4 text-indigo-600 dark:text-indigo-400" />
-                    <h3 className="text-sm font-semibold text-emerald-800 dark:text-emerald-300">
+                    <h3 className="text-sm font-semibold text-indigo-800 dark:text-indigo-300">
                       AI Analysis
                     </h3>
                   </div>
                   <div>
-                    <p className="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide mb-1">
+                    <p className="text-[10px] font-medium text-zinc-500 uppercase tracking-wide mb-1">
                       Summary
                     </p>
                     <p className="text-sm text-zinc-800 dark:text-zinc-200 leading-relaxed">
@@ -486,12 +695,15 @@ export function InquiriesView() {
                   </div>
                   {selected.keyPoints.length > 0 && (
                     <div>
-                      <p className="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide mb-1">
+                      <p className="text-[10px] font-medium text-zinc-500 uppercase tracking-wide mb-1">
                         Key Points
                       </p>
                       <ul className="space-y-1">
                         {selected.keyPoints.map((kp, i) => (
-                          <li key={i} className="text-sm text-zinc-800 dark:text-zinc-200 flex items-start gap-2">
+                          <li
+                            key={i}
+                            className="text-sm text-zinc-800 dark:text-zinc-200 flex items-start gap-2"
+                          >
                             <span className="text-indigo-600 dark:text-indigo-400 mt-1">•</span>
                             <span>{kp}</span>
                           </li>
@@ -499,8 +711,8 @@ export function InquiriesView() {
                       </ul>
                     </div>
                   )}
-                  <div className="pt-2 border-t border-emerald-200/60 dark:border-emerald-900/60">
-                    <p className="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide mb-1 flex items-center gap-1">
+                  <div className="pt-2 border-t border-indigo-200/60 dark:border-indigo-900/60">
+                    <p className="text-[10px] font-medium text-zinc-500 uppercase tracking-wide mb-1 flex items-center gap-1">
                       <TrendingUp className="size-3" />
                       Suggested Action
                     </p>
@@ -510,9 +722,10 @@ export function InquiriesView() {
                   </div>
                 </div>
 
+                {/* Attachments */}
                 {selected.hasAttachments && selected.attachments.length > 0 && (
                   <div>
-                    <p className="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide mb-2">
+                    <p className="text-[10px] font-medium text-zinc-500 uppercase tracking-wide mb-2">
                       Attachments ({selected.attachments.length})
                     </p>
                     <div className="flex flex-wrap gap-2">
@@ -531,19 +744,21 @@ export function InquiriesView() {
 
                 <Separator />
 
+                {/* Email body */}
                 <div>
-                  <p className="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide mb-2">
+                  <p className="text-[10px] font-medium text-zinc-500 uppercase tracking-wide mb-2">
                     Email Body
                   </p>
-                  <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-4">
-                    <pre className="text-sm text-zinc-800 dark:text-zinc-200 whitespace-pre-wrap break-words font-sans leading-relaxed max-h-[400px] overflow-y-auto">
+                  <div className="rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-4">
+                    <pre className="text-sm text-zinc-800 dark:text-zinc-200 whitespace-pre-wrap break-words font-sans leading-relaxed max-h-[400px] overflow-y-auto scrollbar-thin">
                       {selected.text || '(no text body — HTML-only email)'}
                     </pre>
                   </div>
                 </div>
 
+                {/* Metadata */}
                 <details className="text-xs text-zinc-500 dark:text-zinc-400">
-                  <summary className="cursor-pointer hover:text-zinc-700 dark:hover:text-zinc-300">
+                  <summary className="cursor-pointer hover:text-zinc-700 dark:hover:text-zinc-300 font-medium">
                     Technical metadata
                   </summary>
                   <div className="mt-2 space-y-1 font-mono text-[11px]">
@@ -559,32 +774,8 @@ export function InquiriesView() {
               </div>
             </ScrollArea>
           )}
-        </Card>
+        </div>
       </div>
     </div>
-  );
-}
-
-function FilterChip({
-  active,
-  onClick,
-  label,
-}: {
-  active: boolean;
-  onClick: () => void;
-  label: string;
-}) {
-  return (
-    <button
-      onClick={onClick}
-      className={cn(
-        'text-xs px-2.5 py-1 rounded-full border transition-colors',
-        active
-          ? 'bg-emerald-600 border-emerald-600 text-white'
-          : 'bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-300 hover:border-emerald-400 hover:text-indigo-700'
-      )}
-    >
-      {label}
-    </button>
   );
 }

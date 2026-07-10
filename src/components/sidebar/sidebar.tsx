@@ -54,7 +54,7 @@ export function Sidebar() {
     {
       title: 'AI & ADMIN',
       items: [
-        { key: 'ai-reply', label: 'AI Reply', icon: Reply },
+        { key: 'ai-replay', label: 'AI Replay', icon: Reply },
         { key: 'ai-eval', label: 'AI Eval', icon: Sparkles },
         { key: 'audit-log', label: 'Audit Log', icon: ScrollText },
       ],
