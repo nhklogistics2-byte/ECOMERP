@@ -141,8 +141,17 @@ export function InquiryDetailView() {
     [addAuditEntry, addNotification]
   );
 
-  // NOTE: Auto-extraction is disabled to avoid background processing.
-  // Use the "Extract Items" button on each attachment to trigger extraction manually.
+  // Auto-extract first attachment on load if inquiry has attachments
+  useEffect(() => {
+    if (!selected || !selected.hasAttachments) return;
+    if (selected.attachments.length === 0) return;
+    const first = selected.attachments[0];
+    const key = `${selected.uid}:${first.filename}`;
+    if (extractions[key] || extractingKey) return;
+    // Auto-trigger extraction for the first attachment
+    extract(selected.uid, first.filename);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selected?.id]);
 
   if (!selected) {
     return (
@@ -389,8 +398,8 @@ export function InquiryDetailView() {
                   const isImage = a.contentType.startsWith('image/');
                   const isPdf = a.contentType === 'application/pdf';
                   const isText = a.contentType.startsWith('text/');
-                  // All attachments now open inline (no forced download)
-                  const url = `/api/attachment?uid=${selected.uid}&filename=${encodeURIComponent(a.filename)}`;
+                  const isViewable = isImage || isPdf || isText;
+                  const url = `/api/attachment?uid=${selected.uid}&filename=${encodeURIComponent(a.filename)}${isViewable ? '' : '&download=1'}`;
                   return (
                     <div
                       key={i}
