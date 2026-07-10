@@ -31,40 +31,14 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 import { useAppStore } from '@/lib/store';
 import { toast } from 'sonner';
 
-const CATEGORY_COLORS: Record<string, string> = {
-  Sales: 'bg-blue-600 text-white border-zinc-900',
-  Pricing: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
-  Partnership: 'bg-zinc-700/50 text-gray-300 border-[#e5e7eb]',
-  'Technical Support': 'bg-zinc-700/50 text-gray-300 border-[#e5e7eb]',
-  Onboarding: 'bg-blue-500/20 text-blue-600 border-blue-500/30',
-  'Project Update': 'bg-zinc-700/50 text-gray-300 border-[#e5e7eb]',
-  'Bug Report': 'bg-blue-600 text-white border-zinc-900',
-  Billing: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
-  'Meeting Request': 'bg-zinc-700/50 text-gray-300 border-[#e5e7eb]',
-  'General Inquiry': 'bg-zinc-700/50 text-gray-300 border-[#e5e7eb]',
-  ' Spam / Junk': 'bg-zinc-700 text-gray-400 border-[#e5e7eb]',
-};
-
-const PRIORITY_COLORS: Record<string, string> = {
-  urgent: 'bg-blue-600 text-white',
-  high: 'bg-amber-500 text-white',
-  medium: 'bg-amber-500 text-white',
-  low: 'bg-zinc-700 text-zinc-200',
-};
-
-const STATUS_BY_PRIORITY: Record<string, { label: string; color: string }> = {
-  urgent: { label: 'New', color: 'bg-amber-500/20 text-amber-400 border-amber-500/30' },
-  high: { label: 'New', color: 'bg-amber-500/20 text-amber-400 border-amber-500/30' },
-  medium: { label: 'Open', color: 'bg-gray-50 text-gray-500 border-[#e5e7eb]' },
-  low: { label: 'On Hold', color: 'bg-amber-500/20 text-amber-400 border-amber-500/30' },
-};
+// Plain readable text format — no colored badges
+// Categories, priorities, and statuses are shown as normal text for clarity
 
 function formatDate(iso: string): string {
   try {
@@ -448,7 +422,6 @@ export function InquiriesView() {
               ) : (
                 paginated.map((e, i) => {
                   const refNum = (currentPage - 1) * PAGE_SIZE + i + 1;
-                  const status = STATUS_BY_PRIORITY[e.priority];
                   return (
                     <tr
                       key={e.id}
@@ -485,36 +458,23 @@ export function InquiriesView() {
                         </div>
                       </td>
                       <td className="px-3 py-2.5">
-                        <Badge
-                          variant="outline"
-                          className={cn(
-                            'text-[10px] px-1.5 py-0 h-5 font-medium border',
-                            CATEGORY_COLORS[e.category]
-                          )}
-                        >
+                        <span className="text-[12px] text-gray-700">
                           {e.category.trim()}
-                        </Badge>
+                        </span>
                       </td>
                       <td className="px-3 py-2.5">
-                        <span
-                          className={cn(
-                            'text-[10px] font-bold px-1.5 py-0.5 rounded uppercase',
-                            PRIORITY_COLORS[e.priority]
-                          )}
-                        >
+                        <span className="text-[12px] text-gray-700 capitalize">
                           {e.priority}
                         </span>
                       </td>
                       <td className="px-3 py-2.5">
-                        <Badge
-                          variant="outline"
-                          className={cn(
-                            'text-[10px] px-1.5 py-0 h-5 font-medium border',
-                            status.color
-                          )}
-                        >
-                          {status.label}
-                        </Badge>
+                        <span className="text-[12px] text-gray-700">
+                          {e.priority === 'urgent' || e.priority === 'high'
+                            ? 'New'
+                            : e.priority === 'medium'
+                            ? 'Open'
+                            : 'On Hold'}
+                        </span>
                       </td>
                       <td className="px-3 py-2.5 text-[11px] text-blue-600 whitespace-nowrap">
                         {e.keyPoints.length > 0 ? (
@@ -631,30 +591,20 @@ export function InquiriesView() {
           ) : (
             <ScrollArea className="flex-1">
               <div className="p-5 space-y-4">
-                {/* Subject + badges */}
+                {/* Subject + plain text meta */}
                 <div>
                   <h2 className="text-lg font-bold text-gray-900 leading-tight">
                     {selected.subject || '(no subject)'}
                   </h2>
-                  <div className="flex items-center gap-2 mt-2 flex-wrap">
-                    <Badge
-                      variant="outline"
-                      className={cn('text-xs font-medium', CATEGORY_COLORS[selected.category])}
-                    >
-                      <Tag className="size-3 mr-1" />
+                  <div className="flex items-center gap-3 mt-2 flex-wrap text-[13px] text-gray-600">
+                    <span className="flex items-center gap-1">
+                      <Tag className="size-3 text-gray-400" />
                       {selected.category.trim()}
-                    </Badge>
-                    <span
-                      className={cn(
-                        'text-[10px] font-bold px-2 py-0.5 rounded-full uppercase',
-                        PRIORITY_COLORS[selected.priority]
-                      )}
-                    >
-                      {selected.priority} priority
                     </span>
-                    <Badge variant="secondary" className="text-xs">
-                      {selected.language}
-                    </Badge>
+                    <span className="text-gray-300">·</span>
+                    <span className="capitalize">{selected.priority} priority</span>
+                    <span className="text-gray-300">·</span>
+                    <span>{selected.language}</span>
                   </div>
                 </div>
 
