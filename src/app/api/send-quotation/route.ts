@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
 import fs from 'fs';
 import path from 'path';
+import os from 'os';
 import { generateQuotationPdfBuffer, type QuotationPayload } from '@/lib/quotation-pdf';
 
 export const runtime = 'nodejs';
@@ -24,6 +25,24 @@ const SMTP_CONFIG = {
   },
 };
 
+/**
+ * Get a writable directory for storing generated PDFs.
+ * On Vercel serverless, use /tmp (only writable directory).
+ */
+function getQuotationDir(): string {
+  const isVercel = process.env.VERCEL || process.cwd().startsWith('/var/task') || !fs.existsSync(path.join(process.cwd(), 'public'));
+
+  if (isVercel) {
+    const tmpDir = path.join(os.tmpdir(), 'quotations');
+    if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir, { recursive: true });
+    return tmpDir;
+  }
+
+  const publicDir = path.join(process.cwd(), 'public', 'quotations');
+  if (!fs.existsSync(publicDir)) fs.mkdirSync(publicDir, { recursive: true });
+  return publicDir;
+}
+
 export async function POST(req: Request) {
   try {
     const payload = (await req.json()) as QuotationPayload;
@@ -45,10 +64,9 @@ export async function POST(req: Request) {
     // 1. Generate PDF in memory (only includes lines with a price)
     const pdfBuffer = await generateQuotationPdfBuffer(payload);
 
-    // 2. Archive a copy to /public/quotations/
+    // 2. Archive a copy to writable directory (uses /tmp on Vercel)
     try {
-      const outDir = path.join(process.cwd(), 'public', 'quotations');
-      if (!fs.existsSync(outDir)) fs.mkdirSync(outDir, { recursive: true });
+      const outDir = getQuotationDir();
       fs.writeFileSync(path.join(outDir, `${payload.quoteNumber}.pdf`), pdfBuffer);
     } catch (e) {
       console.warn('Failed to archive PDF:', e);
@@ -124,7 +142,7 @@ ${COMPANY.phone}`;
       messageId: info.messageId,
       quoteNumber: payload.quoteNumber,
       sentTo: payload.client.email,
-      downloadUrl: `/quotations/${payload.quoteNumber}.pdf`,
+      downloadUrl: `/api/generate-quotation?download=${encodeURIComponent(payload.quoteNumber)}`,
     });
   } catch (e) {
     console.error('Send quotation error:', e);

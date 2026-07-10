@@ -1,5 +1,4 @@
 import PDFDocument from 'pdfkit/js/pdfkit.standalone.js';
-import type { Response } from 'express';
 
 export interface QuotationLine {
   partNumber: string;
@@ -37,38 +36,83 @@ const COMPANY = {
   phone: '+92-21 36453214',
 };
 
+// Colors matching the original Sea Keepers PDF
+const LIGHT_BLUE = '#3b82f6';      // logo color
+const DARK_BLUE = '#1e3a8a';       // company name + stamp border
+const BLACK = '#000000';
+
 /**
- * Draw a sailboat logo (Sea Keepers style) at the given position.
- * Simple vector drawing using rects and triangles — compatible with pdfkit standalone.
+ * Draw a sailboat logo matching the Sea Keepers original.
+ * Light blue, curved hull, single triangular sail with a boom line.
  */
 function drawSailboatLogo(doc: InstanceType<typeof PDFDocument>, x: number, y: number, size: number) {
-  const blue = '#1e40af';
-  const lightBlue = '#3b82f6';
-
-  // Hull (trapezoid using two rects)
-  doc.rect(x, y + size * 0.7, size, size * 0.15).fill(blue);
-  doc.rect(x + size * 0.2, y + size * 0.85, size * 0.6, size * 0.15).fill(blue);
-
-  // Mast (vertical rect)
-  doc.rect(x + size * 0.48, y, size * 0.04, size * 0.7).fill(blue);
-
-  // Main sail (right triangle — use path with stroke + fill workaround)
-  // Draw as a filled triangle using a small rect + rotation alternative
-  // Simpler: draw a triangle using moveTo/lineTo
+  // Hull — curved boat shape using a path
   doc.save();
-  doc.moveTo(x + size * 0.5, y);
-  doc.lineTo(x + size * 0.85, y + size * 0.65);
-  doc.lineTo(x + size * 0.5, y + size * 0.65);
-  doc.fill(blue);
+  doc.moveTo(x + size * 0.05, y + size * 0.65);
+  doc.lineTo(x + size * 0.95, y + size * 0.65);
+  // Curve down to the keel
+  doc.quadraticCurveTo(x + size * 0.95, y + size * 0.85, x + size * 0.75, y + size * 0.95);
+  doc.lineTo(x + size * 0.25, y + size * 0.95);
+  doc.quadraticCurveTo(x + size * 0.05, y + size * 0.85, x + size * 0.05, y + size * 0.65);
+  doc.fill(LIGHT_BLUE);
   doc.restore();
 
-  // Front sail (left triangle)
+  // Mast (vertical line)
+  doc.rect(x + size * 0.48, y + size * 0.05, size * 0.03, size * 0.6).fill(LIGHT_BLUE);
+
+  // Sail — curved triangular shape (main sail)
   doc.save();
-  doc.moveTo(x + size * 0.5, y + size * 0.1);
-  doc.lineTo(x + size * 0.5, y + size * 0.65);
-  doc.lineTo(x + size * 0.15, y + size * 0.65);
-  doc.fill(lightBlue);
+  doc.moveTo(x + size * 0.51, y + size * 0.08);
+  doc.lineTo(x + size * 0.85, y + size * 0.6);
+  doc.lineTo(x + size * 0.51, y + size * 0.6);
+  doc.fill(LIGHT_BLUE);
   doc.restore();
+
+  // Boom — horizontal line at bottom of sail
+  doc.rect(x + size * 0.48, y + size * 0.58, size * 0.4, size * 0.03).fill(LIGHT_BLUE);
+}
+
+/**
+ * Draw a circular company stamp with the sailboat logo in the center
+ * and company name text curved around the top of the circle.
+ */
+function drawCompanyStamp(doc: InstanceType<typeof PDFDocument>, cx: number, cy: number, radius: number) {
+  // Outer circle
+  doc
+    .circle(cx, cy, radius)
+    .strokeColor(DARK_BLUE)
+    .lineWidth(1.5)
+    .stroke();
+
+  // Inner circle
+  doc
+    .circle(cx, cy, radius - 4)
+    .strokeColor(DARK_BLUE)
+    .lineWidth(0.5)
+    .stroke();
+
+  // Sailboat logo in center (smaller)
+  const logoSize = radius * 0.7;
+  drawSailboatLogo(doc, cx - logoSize / 2, cy - logoSize / 2 - 2, logoSize);
+
+  // Company name text — top arc
+  // pdfkit doesn't support curved text easily, so we place text in a row above center
+  doc
+    .fillColor(DARK_BLUE)
+    .font('Helvetica-Bold')
+    .fontSize(6)
+    .text('SEA KEEPERS (Pvt) Ltd', cx - radius, cy - radius + 2, {
+      width: radius * 2,
+      align: 'center',
+    });
+
+  // Bottom text
+  doc
+    .fontSize(5)
+    .text('KARACHI • PAKISTAN', cx - radius, cy + radius - 8, {
+      width: radius * 2,
+      align: 'center',
+    });
 }
 
 /**
@@ -82,7 +126,7 @@ export function generateQuotationPdfBuffer(payload: QuotationPayload): Promise<B
       const chunks: Buffer[] = [];
       const doc = new PDFDocument({
         size: 'A4',
-        margins: { top: 50, bottom: 50, left: 50, right: 50 },
+        margins: { top: 50, bottom: 60, left: 50, right: 50 },
         bufferPages: true,
       });
       doc.on('data', (chunk) => chunks.push(Buffer.from(chunk)));
@@ -95,24 +139,24 @@ export function generateQuotationPdfBuffer(payload: QuotationPayload): Promise<B
       );
 
       // ── HEADER ──
-      // Logo (top-left)
-      drawSailboatLogo(doc, 50, 45, 36);
+      // Logo (top-left, light blue sailboat)
+      drawSailboatLogo(doc, 50, 40, 40);
 
-      // Company name (centered, blue)
+      // Company name (centered, dark blue)
       doc
-        .fillColor('#1e40af')
+        .fillColor(DARK_BLUE)
         .font('Helvetica-Bold')
         .fontSize(20)
-        .text(COMPANY.name, 50, 55, { width: 495, align: 'center' });
+        .text(COMPANY.name, 50, 50, { width: 495, align: 'center' });
 
-      // Reference number (left, below logo)
+      // Reference number (left)
       doc
-        .fillColor('#000000')
+        .fillColor(BLACK)
         .font('Helvetica')
         .fontSize(10)
         .text(`REF No: ${payload.quoteNumber}`, 50, 95);
 
-      // Date (right, same level as ref)
+      // Date (right)
       const formattedDate = payload.quoteDate
         ? new Date(payload.quoteDate).toLocaleDateString('en-GB', {
             day: '2-digit',
@@ -135,14 +179,14 @@ export function generateQuotationPdfBuffer(payload: QuotationPayload): Promise<B
       doc
         .moveTo(180, 142)
         .lineTo(415, 142)
-        .strokeColor('#000000')
+        .strokeColor(BLACK)
         .lineWidth(1)
         .stroke();
 
       // ── TO SECTION ──
       let y = 160;
       doc
-        .fillColor('#000000')
+        .fillColor(BLACK)
         .font('Helvetica-Bold')
         .fontSize(11)
         .text('To,', 50, y);
@@ -169,28 +213,37 @@ export function generateQuotationPdfBuffer(payload: QuotationPayload): Promise<B
         { key: 'totalPrice', label: 'Total Price', x: 480, w: 65, align: 'right' as const },
       ];
 
-      // Table header
+      const tableTop = y;
+      const tableLeft = 50;
+      const tableWidth = 495;
+
+      // Table header (no background fill — just bold text with border)
       doc
-        .rect(50, y, 495, 20)
-        .fillColor('#1e40af')
-        .fill();
-      doc
-        .fillColor('#FFFFFF')
+        .fillColor(BLACK)
         .font('Helvetica-Bold')
         .fontSize(9);
       for (const c of cols) {
         doc.text(c.label, c.x + 2, y + 6, { width: c.w - 4, align: c.align });
       }
+      // Header bottom border
+      doc
+        .moveTo(tableLeft, y + 20)
+        .lineTo(tableLeft + tableWidth, y + 20)
+        .strokeColor(BLACK)
+        .lineWidth(0.5)
+        .stroke();
+      // Header top border
+      doc
+        .moveTo(tableLeft, y)
+        .lineTo(tableLeft + tableWidth, y)
+        .strokeColor(BLACK)
+        .lineWidth(0.5)
+        .stroke();
       y += 20;
 
       // Data rows
-      doc.font('Helvetica').fontSize(9).fillColor('#000000');
+      doc.font('Helvetica').fontSize(9).fillColor(BLACK);
       if (pricedLines.length === 0) {
-        // No priced items — show a placeholder row
-        doc
-          .rect(50, y, 495, 25)
-          .fillColor('#f9fafb')
-          .fill();
         doc
           .fillColor('#6b7280')
           .text('No items priced yet', 50, y + 8, { width: 495, align: 'center' });
@@ -198,11 +251,7 @@ export function generateQuotationPdfBuffer(payload: QuotationPayload): Promise<B
       } else {
         pricedLines.forEach((line, i) => {
           const rowHeight = 24;
-          // Alternating row background
-          if (i % 2 === 1) {
-            doc.rect(50, y, 495, rowHeight).fillColor('#f3f4f6').fill();
-            doc.fillColor('#000000');
-          }
+
           // Sr
           doc.text(String(i + 1), cols[0].x + 2, y + 8, { width: cols[0].w - 4, align: 'center' });
           // NSN
@@ -217,19 +266,45 @@ export function generateQuotationPdfBuffer(payload: QuotationPayload): Promise<B
           });
           // Qty
           doc.text(line.quantity || '—', cols[4].x + 2, y + 8, { width: cols[4].w - 4, align: 'center' });
-          // Unit Price
-          doc.text(line.pricePerUnit || '0', cols[5].x + 2, y + 8, { width: cols[5].w - 4, align: 'right' });
-          // Total Price
-          doc.text(line.totalPrice || '0', cols[6].x + 2, y + 8, { width: cols[6].w - 4, align: 'right' });
+          // Unit Price (with Rs. prefix)
+          doc.text(`Rs. ${line.pricePerUnit}`, cols[5].x + 2, y + 8, { width: cols[5].w - 4, align: 'right' });
+          // Total Price (with Rs. prefix)
+          doc.text(`Rs. ${line.totalPrice}`, cols[6].x + 2, y + 8, { width: cols[6].w - 4, align: 'right' });
+
+          // Row bottom border
+          doc
+            .moveTo(tableLeft, y + rowHeight)
+            .lineTo(tableLeft + tableWidth, y + rowHeight)
+            .strokeColor(BLACK)
+            .lineWidth(0.3)
+            .stroke();
 
           y += rowHeight;
 
-          // Add a new page if we're near the bottom
           if (y > 700) {
             doc.addPage();
             y = 50;
           }
         });
+      }
+
+      // Table outer border + vertical column lines
+      const tableBottom = y;
+      const tableHeight = tableBottom - tableTop;
+      // Outer rectangle
+      doc
+        .rect(tableLeft, tableTop, tableWidth, tableHeight)
+        .strokeColor(BLACK)
+        .lineWidth(0.5)
+        .stroke();
+      // Vertical column dividers
+      for (let ci = 1; ci < cols.length; ci++) {
+        doc
+          .moveTo(cols[ci].x, tableTop)
+          .lineTo(cols[ci].x, tableBottom)
+          .strokeColor(BLACK)
+          .lineWidth(0.3)
+          .stroke();
       }
 
       // ── TOTALS SECTION ──
@@ -241,41 +316,39 @@ export function generateQuotationPdfBuffer(payload: QuotationPayload): Promise<B
         // Subtotal
         doc
           .rect(totalsX, y, totalsW, 18)
-          .fillColor('#f9fafb')
-          .strokeColor('#000000')
-          .lineWidth(0.5)
-          .fillAndStroke();
+          .strokeColor(BLACK)
+          .lineWidth(0.3)
+          .stroke();
         doc
-          .fillColor('#000000')
+          .fillColor(BLACK)
           .font('Helvetica')
           .fontSize(10)
           .text('Subtotal:', totalsX + 5, y + 4, { width: 100 });
         doc
           .font('Helvetica-Bold')
-          .text(payload.totals.subtotal, totalsX + 105, y + 4, { width: totalsW - 110, align: 'right' });
+          .text(`Rs. ${payload.totals.subtotal}`, totalsX + 105, y + 4, { width: totalsW - 110, align: 'right' });
         y += 18;
 
         // Total GST
         doc
           .rect(totalsX, y, totalsW, 18)
-          .fillColor('#f9fafb')
-          .strokeColor('#000000')
-          .lineWidth(0.5)
-          .fillAndStroke();
+          .strokeColor(BLACK)
+          .lineWidth(0.3)
+          .stroke();
         doc
-          .fillColor('#000000')
+          .fillColor(BLACK)
           .font('Helvetica')
           .fontSize(10)
           .text('GST (18%):', totalsX + 5, y + 4, { width: 100 });
         doc
           .font('Helvetica-Bold')
-          .text(payload.totals.totalGst, totalsX + 105, y + 4, { width: totalsW - 110, align: 'right' });
+          .text(`Rs. ${payload.totals.totalGst}`, totalsX + 105, y + 4, { width: totalsW - 110, align: 'right' });
         y += 18;
 
-        // Grand Total
+        // Grand Total (dark blue box)
         doc
           .rect(totalsX, y, totalsW, 22)
-          .fillColor('#1e40af')
+          .fillColor(DARK_BLUE)
           .fill();
         doc
           .fillColor('#FFFFFF')
@@ -284,7 +357,7 @@ export function generateQuotationPdfBuffer(payload: QuotationPayload): Promise<B
           .text('GRAND TOTAL:', totalsX + 5, y + 6, { width: 100 });
         doc
           .fontSize(12)
-          .text(payload.totals.grandTotal, totalsX + 105, y + 6, { width: totalsW - 110, align: 'right' });
+          .text(`Rs. ${payload.totals.grandTotal}`, totalsX + 105, y + 6, { width: totalsW - 110, align: 'right' });
         y += 30;
       }
 
@@ -295,7 +368,7 @@ export function generateQuotationPdfBuffer(payload: QuotationPayload): Promise<B
       }
 
       doc
-        .fillColor('#000000')
+        .fillColor(BLACK)
         .font('Helvetica-Bold')
         .fontSize(11)
         .text('Terms and Condition:', 50, y);
@@ -304,7 +377,7 @@ export function generateQuotationPdfBuffer(payload: QuotationPayload): Promise<B
       doc
         .font('Helvetica')
         .fontSize(10)
-        .fillColor('#000000');
+        .fillColor(BLACK);
       const terms = [
         `Offer valid for ${payload.validity || '01 month'} only with effect from quotation date.`,
         `Item will be delivered within ${payload.delivery || '12-14 weeks'} of issuance of purchase order.`,
@@ -324,7 +397,7 @@ export function generateQuotationPdfBuffer(payload: QuotationPayload): Promise<B
       }
 
       doc
-        .fillColor('#000000')
+        .fillColor(BLACK)
         .font('Helvetica')
         .fontSize(11)
         .text('BEST REGARDS,', 50, y);
@@ -332,31 +405,10 @@ export function generateQuotationPdfBuffer(payload: QuotationPayload): Promise<B
       doc
         .font('Helvetica-Bold')
         .text(COMPANY.name, 50, y);
-      y += 14;
+      y += 30;
 
-      // Draw a circular seal/stamp to the right
-      const sealX = 90;
-      const sealY = y + 10;
-      const sealR = 28;
-      doc
-        .circle(sealX, sealY, sealR)
-        .strokeColor('#1e40af')
-        .lineWidth(1.5)
-        .stroke();
-      // Inner circle
-      doc
-        .circle(sealX, sealY, sealR - 4)
-        .strokeColor('#1e40af')
-        .lineWidth(0.5)
-        .stroke();
-      // Mini sailboat in seal
-      drawSailboatLogo(doc, sealX - 8, sealY - 10, 16);
-      // Company name text around seal (simplified)
-      doc
-        .fillColor('#1e40af')
-        .font('Helvetica-Bold')
-        .fontSize(5)
-        .text('SEA KEEPERS', sealX - 20, sealY + 8, { width: 40, align: 'center' });
+      // Circular stamp to the right of the signature
+      drawCompanyStamp(doc, 110, y, 30);
 
       // ── FOOTER ──
       const pages = doc.bufferedPageRange();
@@ -366,24 +418,24 @@ export function generateQuotationPdfBuffer(payload: QuotationPayload): Promise<B
         doc
           .moveTo(50, 785)
           .lineTo(545, 785)
-          .strokeColor('#000000')
+          .strokeColor(BLACK)
           .lineWidth(0.5)
           .stroke();
         // Address
         doc
-          .fillColor('#000000')
+          .fillColor(BLACK)
           .font('Helvetica')
           .fontSize(8)
           .text(COMPANY.address, 50, 790, { width: 495, align: 'center' });
         // Website (blue)
         doc
-          .fillColor('#1e40af')
+          .fillColor(DARK_BLUE)
           .text(COMPANY.website, 50, 803, { width: 495, align: 'center' });
         // Email (blue)
         doc.text(COMPANY.email, 50, 813, { width: 495, align: 'center' });
         // Phone (black)
         doc
-          .fillColor('#000000')
+          .fillColor(BLACK)
           .text(COMPANY.phone, 50, 823, { width: 495, align: 'center' });
       }
 
