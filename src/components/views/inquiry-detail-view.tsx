@@ -115,7 +115,23 @@ export function InquiryDetailView() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ uid, filename }),
         });
-        const data: ExtractResult = await res.json();
+
+        // Safe JSON parsing — handle cases where server returns HTML (e.g. Vercel error page)
+        const contentType = res.headers.get('content-type') || '';
+        if (!contentType.includes('application/json')) {
+          throw new Error(
+            `Server returned ${contentType || 'non-JSON'} (HTTP ${res.status}). ` +
+            `This may be a deployment/runtime issue — check function logs.`
+          );
+        }
+
+        let data: ExtractResult;
+        try {
+          data = await res.json();
+        } catch {
+          throw new Error('Server returned invalid JSON. Check function logs for errors.');
+        }
+
         if (!data.ok) throw new Error(data.error || 'Extraction failed');
         setExtractions((prev) => ({ ...prev, [key]: data }));
         addAuditEntry({

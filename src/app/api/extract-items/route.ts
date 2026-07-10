@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import { fetchAttachment } from '@/lib/imap';
-import { PDFParse } from 'pdf-parse';
 import * as XLSX from 'xlsx';
 
 export const runtime = 'nodejs';
@@ -33,6 +32,7 @@ interface ExtractResponse {
   rawText?: string;
   latencyMs?: number;
   error?: string;
+  cached?: boolean;
 }
 
 const SYSTEM_PROMPT = `You are a defense/aerospace procurement data extractor for ecomruns.com.
@@ -59,16 +59,48 @@ Rules:
 - No markdown fences, no commentary, just valid JSON`;
 
 /**
- * Extract text content from a PDF buffer using pdf-parse v2 API.
+ * Extract text content from a PDF buffer using pdfjs-dist (serverless-safe).
+ * Falls back gracefully if the PDF is image-based (scanned).
  */
 async function extractPdfText(buffer: Buffer): Promise<string> {
   try {
-    const parser = new PDFParse({ data: new Uint8Array(buffer) });
-    const result = await parser.getText();
-    await parser.destroy();
-    return result.text || '';
+    // Dynamic import to avoid bundling issues on serverless
+    const pdfjs = await import('pdfjs-dist/legacy/build/pdf.mjs');
+
+    // Disable worker (run inline) for serverless compatibility
+    // @ts-expect-error - GlobalConfig type
+    pdfjs.GlobalWorkerOptions.workerSrc = '';
+
+    const loadingTask = pdfjs.getDocument({
+        data: new Uint8Array(buffer),
+        // Disable worker thread — run inline for serverless
+        disableWorker: true,
+        // Don't try to load external resources
+        isEvalSupported: false,
+        useSystemFonts: true,
+      });
+
+    const pdf = await loadingTask.promise;
+    let fullText = '';
+
+    for (let i = 1; i <= pdf.numPages; i++) {
+      const page = await pdf.getPage(i);
+      const textContent = await page.getTextContent();
+      const pageText = textContent.items
+        .map((item: { str?: string }) => item.str || '')
+        .join(' ');
+      fullText += pageText + '\n';
+    }
+
+    try {
+      await pdf.destroy();
+    } catch {
+      // ignore destroy errors
+    }
+
+    return fullText;
   } catch (e) {
-    console.error('PDF parse failed:', e);
+    console.error('PDF parse failed:', (e as Error).message);
     return '';
   }
 }
@@ -88,7 +120,7 @@ function extractExcelText(buffer: Buffer): string {
     }
     return sheets.join('\n\n');
   } catch (e) {
-    console.error('Excel parse failed:', e);
+    console.error('Excel parse failed:', (e as Error).message);
     return '';
   }
 }
@@ -148,7 +180,6 @@ async function extractItemsWithAI(text: string): Promise<ExtractedItem[]> {
 }
 
 // In-memory cache: key = `${uid}:${filename}`, value = extraction result
-// TTL: 30 minutes (attachments don't change)
 interface CacheEntry {
   result: ExtractResponse;
   fetchedAt: number;
@@ -197,15 +228,17 @@ export async function POST(req: Request) {
     // 2. Extract text based on content-type
     let text = '';
     const ct = attachment.contentType.toLowerCase();
-    if (ct === 'application/pdf' || ct.endsWith('pdf')) {
+    const lowerFilename = attachment.filename.toLowerCase();
+
+    if (ct === 'application/pdf' || ct.endsWith('pdf') || lowerFilename.endsWith('.pdf')) {
       text = await extractPdfText(attachment.buffer);
     } else if (
       ct.includes('sheet') ||
       ct.includes('excel') ||
       ct.includes('csv') ||
-      attachment.filename.toLowerCase().endsWith('.xlsx') ||
-      attachment.filename.toLowerCase().endsWith('.xls') ||
-      attachment.filename.toLowerCase().endsWith('.csv')
+      lowerFilename.endsWith('.xlsx') ||
+      lowerFilename.endsWith('.xls') ||
+      lowerFilename.endsWith('.csv')
     ) {
       text = extractExcelText(attachment.buffer);
     } else if (ct.startsWith('text/') || ct.includes('json') || ct.includes('xml')) {
@@ -225,7 +258,7 @@ export async function POST(req: Request) {
         items: [],
         rawText: '',
         latencyMs: Date.now() - start,
-        error: 'No text could be extracted from this attachment',
+        error: 'No text could be extracted from this attachment (it may be a scanned/image PDF)',
       };
       cache.set(cacheKey, { result, fetchedAt: Date.now() });
       return NextResponse.json(result);
@@ -241,7 +274,7 @@ export async function POST(req: Request) {
       size: attachment.size,
       textLength: text.length,
       items,
-      rawText: text.slice(0, 5000), // include first 5K chars for preview
+      rawText: text.slice(0, 5000),
       latencyMs: Date.now() - start,
     };
 
@@ -249,6 +282,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json(result);
   } catch (e) {
+    console.error('Extract items error:', e);
     return NextResponse.json(
       {
         ok: false,
