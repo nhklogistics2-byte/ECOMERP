@@ -3,10 +3,15 @@
 import {
   LayoutDashboard,
   Inbox,
-  Bell,
-  Reply,
+  Route,
   Sparkles,
+  Repeat2,
   ScrollText,
+  Users,
+  Building2,
+  User,
+  Cpu,
+  Settings,
   Ship,
   LogOut,
   X,
@@ -32,31 +37,37 @@ interface NavSection {
 export function Sidebar() {
   const { view, setView, sidebarOpen, setSidebarOpen, inquiries, notifications } = useAppStore();
   const [openSections, setOpenSections] = useState<Set<string>>(
-    new Set(['INQUIRIES', 'AI & ADMIN'])
+    new Set(['OVERVIEW', 'AI & ADMIN', 'MANAGEMENT'])
   );
 
   const unreadCount = notifications.filter((n) => !n.read).length;
 
   const NAV_SECTIONS: NavSection[] = [
     {
-      title: '',
+      title: 'OVERVIEW',
       items: [
-        { key: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+        { key: 'dashboard', label: 'Overview', icon: LayoutDashboard },
       ],
     },
     {
       title: 'INQUIRIES',
       items: [
         { key: 'inquiries', label: 'Inquiries', icon: Inbox, badge: inquiries.length },
-        { key: 'notifications', label: 'Notifications', icon: Bell, badge: unreadCount },
+        { key: 'notifications', label: 'Notifications', icon: ScrollText, badge: unreadCount },
       ],
     },
     {
       title: 'AI & ADMIN',
       items: [
-        { key: 'ai-replay', label: 'AI Replay', icon: Reply },
-        { key: 'ai-eval', label: 'AI Eval', icon: Sparkles },
+        { key: 'ai-replay', label: 'AI Replay', icon: Repeat2 },
+        { key: 'ai-eval', label: 'AI Evaluation', icon: Sparkles },
         { key: 'audit-log', label: 'Audit Log', icon: ScrollText },
+      ],
+    },
+    {
+      title: 'MANAGEMENT',
+      items: [
+        { key: 'pending-users', label: 'Pending Users', icon: Users },
       ],
     },
   ];
@@ -77,7 +88,6 @@ export function Sidebar() {
 
   return (
     <>
-      {/* Mobile backdrop */}
       {sidebarOpen && (
         <div
           className="fixed inset-0 z-40 bg-black/40 lg:hidden"
@@ -87,27 +97,27 @@ export function Sidebar() {
 
       <aside
         className={cn(
-          'fixed lg:sticky top-0 left-0 z-50 lg:z-30 h-screen w-[240px] shrink-0',
-          'bg-card border-r border-border',
+          'fixed lg:sticky top-0 left-0 z-50 lg:z-30 h-screen w-[220px] shrink-0',
+          'bg-[#f8f9fa] border-r border-[#e5e7eb]',
           'flex flex-col transition-transform duration-200',
           sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         )}
       >
         {/* Logo */}
-        <div className="flex items-center gap-2.5 px-4 h-16 border-b border-border shrink-0">
-          <div className="size-9 rounded-lg bg-gradient-to-br from-teal-600 to-teal-700 flex items-center justify-center shadow-md shadow-zinc-900/20">
+        <div className="flex items-center gap-2.5 px-4 h-16 border-b border-[#e5e7eb] shrink-0">
+          <div className="size-9 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-md shadow-blue-500/20">
             <Ship className="size-5 text-white" />
           </div>
           <div className="flex-1 min-w-0">
-            <div className="font-bold text-[14px] tracking-tight text-foreground leading-tight">
+            <div className="font-bold text-[14px] tracking-tight text-[#111827] leading-tight">
               ECOMRUNS
             </div>
-            <div className="text-[10px] text-teal-400 leading-tight font-medium">
-              Inquiry & AI System
+            <div className="text-[10px] text-blue-600 leading-tight font-medium">
+              (PRIVATE) LTD
             </div>
           </div>
           <button
-            className="lg:hidden text-muted-foreground hover:text-foreground"
+            className="lg:hidden text-gray-500 hover:text-gray-900"
             onClick={() => setSidebarOpen(false)}
           >
             <X className="size-5" />
@@ -115,25 +125,23 @@ export function Sidebar() {
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 overflow-y-auto py-3 px-2.5">
+        <nav className="flex-1 overflow-y-auto scrollbar-thin py-3 px-2.5">
           {NAV_SECTIONS.map((section, si) => {
-            const isOpen = !section.title || openSections.has(section.title);
+            const isOpen = openSections.has(section.title);
             return (
               <div key={si} className="mb-2">
-                {section.title && (
-                  <button
-                    onClick={() => toggleSection(section.title)}
-                    className="w-full flex items-center justify-between px-2 py-1.5 text-[10px] font-semibold tracking-wider text-muted-foreground/70 hover:text-teal-400"
-                  >
-                    <span>{section.title}</span>
-                    <ChevronDown
-                      className={cn(
-                        'size-3 transition-transform',
-                        isOpen ? '' : '-rotate-90'
-                      )}
-                    />
-                  </button>
-                )}
+                <button
+                  onClick={() => toggleSection(section.title)}
+                  className="w-full flex items-center justify-between px-2 py-1.5 text-[10px] font-semibold tracking-wider text-gray-400 hover:text-blue-600"
+                >
+                  <span>{section.title}</span>
+                  <ChevronDown
+                    className={cn(
+                      'size-3 transition-transform',
+                      isOpen ? '' : '-rotate-90'
+                    )}
+                  />
+                </button>
                 {isOpen && (
                   <div className="space-y-0.5 mt-0.5">
                     {section.items.map((item) => {
@@ -146,16 +154,14 @@ export function Sidebar() {
                           className={cn(
                             'w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md text-[13px] font-medium transition-colors group',
                             active
-                              ? 'bg-teal-600/10 text-teal-400 border border-teal-600/30'
-                              : 'text-muted-foreground hover:bg-teal-600/5 hover:text-teal-400'
+                              ? 'bg-[#e0e7ff] text-blue-700'
+                              : 'text-gray-600 hover:bg-blue-50 hover:text-blue-600'
                           )}
                         >
                           <Icon
                             className={cn(
                               'size-4 shrink-0',
-                              active
-                                ? 'text-teal-400'
-                                : 'text-muted-foreground/70 group-hover:text-teal-400'
+                              active ? 'text-blue-600' : 'text-gray-400 group-hover:text-blue-600'
                             )}
                           />
                           <span className="flex-1 text-left truncate">{item.label}</span>
@@ -164,8 +170,8 @@ export function Sidebar() {
                               className={cn(
                                 'text-[10px] font-semibold px-1.5 py-0.5 rounded-full',
                                 active
-                                  ? 'bg-teal-600 text-white'
-                                  : 'bg-zinc-700 text-muted-foreground'
+                                  ? 'bg-blue-600 text-white'
+                                  : 'bg-gray-200 text-gray-600'
                               )}
                             >
                               {item.badge}
@@ -182,20 +188,16 @@ export function Sidebar() {
         </nav>
 
         {/* User profile */}
-        <div className="border-t border-border p-2.5 shrink-0">
-          <div className="flex items-center gap-2.5 px-2 py-1.5 rounded-md hover:bg-muted/60 cursor-pointer group">
-            <div className="size-8 rounded-full bg-gradient-to-br from-teal-600 to-teal-700 text-white text-xs font-semibold flex items-center justify-center shrink-0">
-              CE
+        <div className="border-t border-[#e5e7eb] p-2.5 shrink-0">
+          <div className="flex items-center gap-2.5 px-2 py-1.5 rounded-md hover:bg-blue-50 cursor-pointer group">
+            <div className="size-8 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 text-white text-xs font-semibold flex items-center justify-center shrink-0">
+              C
             </div>
             <div className="flex-1 min-w-0">
-              <div className="text-[13px] font-medium text-foreground truncate">
-                CEO
-              </div>
-              <div className="text-[10px] text-muted-foreground truncate">
-                ceo@ecomruns.com
-              </div>
+              <div className="text-[13px] font-medium text-[#111827] truncate">CEO</div>
+              <div className="text-[10px] text-gray-500 truncate">ceo@ecomruns.com</div>
             </div>
-            <LogOut className="size-4 text-muted-foreground/70 group-hover:text-red-500 transition-colors" />
+            <LogOut className="size-4 text-gray-400 group-hover:text-red-500 transition-colors" />
           </div>
         </div>
       </aside>

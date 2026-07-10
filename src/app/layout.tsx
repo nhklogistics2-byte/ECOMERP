@@ -31,7 +31,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${inter.variable} ${jetbrains.variable} antialiased bg-background text-foreground`}
+        className={`${inter.variable} ${jetbrains.variable} antialiased bg-background text-gray-900`}
       >
         {children}
         <Toaster richColors position="top-right" />

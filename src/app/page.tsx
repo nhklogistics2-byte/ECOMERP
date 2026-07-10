@@ -43,7 +43,7 @@ export default function Page() {
   }, [openInquiryTab]);
 
   return (
-    <div className="min-h-screen flex bg-background">
+    <div className="min-h-screen flex bg-gray-50">
       <Sidebar />
       <div className="flex-1 flex flex-col min-w-0">
         <Topbar />
@@ -58,21 +58,21 @@ export default function Page() {
           {view === 'audit-log' && <AuditLogView />}
           {view === 'inquiry-detail' && <InquiryDetailView />}
         </main>
-        <footer className="mt-auto border-t border-border bg-background/60 py-3 px-4 sm:px-6 text-xs text-muted-foreground flex items-center justify-between flex-wrap gap-2">
+        <footer className="mt-auto border-t border-[#e5e7eb] bg-gray-50/60 py-3 px-4 sm:px-6 text-xs text-gray-500 flex items-center justify-between flex-wrap gap-2">
           <span>
             IMAP:{' '}
-            <code className="px-1 py-0.5 bg-muted rounded">
+            <code className="px-1 py-0.5 bg-gray-50 rounded">
               imap.hostinger.com:993
             </code>{' '}
             · Filtering:{' '}
-            <code className="px-1 py-0.5 bg-muted rounded">
+            <code className="px-1 py-0.5 bg-gray-50 rounded">
               @techichamps.com
             </code>
           </span>
           <span>
             Powered by OpenRouter · DeepSeek V3.1
             {openTabs.length > 0 && (
-              <span className="ml-2 text-muted-foreground">· {openTabs.length} tab{openTabs.length !== 1 ? 's' : ''} open</span>
+              <span className="ml-2 text-gray-500">· {openTabs.length} tab{openTabs.length !== 1 ? 's' : ''} open</span>
             )}
           </span>
         </footer>

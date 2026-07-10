@@ -15,7 +15,7 @@ export function TabBar() {
   if (openTabs.length === 0) return null;
 
   return (
-    <div className="border-b border-border bg-background px-2 pt-1.5 flex items-end gap-1 overflow-x-auto scrollbar-thin">
+    <div className="border-b border-[#e5e7eb] bg-background px-2 pt-1.5 flex items-end gap-1 overflow-x-auto scrollbar-thin">
       {openTabs.map((tab) => {
         const active = tab.id === activeTabId;
         return (
@@ -25,11 +25,11 @@ export function TabBar() {
             className={cn(
               'group flex items-center gap-1.5 px-3 py-1.5 rounded-t-md cursor-pointer min-w-[140px] max-w-[240px] border border-b-0 transition-colors',
               active
-                ? 'bg-card border-border text-foreground'
-                : 'bg-muted/50 border-transparent text-muted-foreground hover:bg-muted/60'
+                ? 'bg-white border-[#e5e7eb] text-gray-900'
+                : 'bg-gray-50 border-transparent text-gray-500 hover:bg-gray-100'
             )}
           >
-            <Inbox className="size-3.5 shrink-0 text-muted-foreground" />
+            <Inbox className="size-3.5 shrink-0 text-gray-500" />
             <span className="text-[12px] font-medium truncate flex-1" title={tab.title}>
               {tab.title}
             </span>
@@ -38,7 +38,7 @@ export function TabBar() {
                 e.stopPropagation();
                 closeTab(tab.id);
               }}
-              className="size-4 rounded flex items-center justify-center text-muted-foreground hover:bg-muted hover:text-foreground shrink-0"
+              className="size-4 rounded flex items-center justify-center text-gray-500 hover:bg-gray-50 hover:text-gray-900 shrink-0"
               aria-label="Close tab"
             >
               <X className="size-3" />
@@ -49,7 +49,7 @@ export function TabBar() {
       {/* "New tab" / back to inquiries button */}
       <button
         onClick={() => setView('inquiries')}
-        className="px-2.5 py-1.5 text-[12px] text-muted-foreground hover:text-foreground dark:hover:text-white shrink-0"
+        className="px-2.5 py-1.5 text-[12px] text-gray-500 hover:text-gray-900 dark:hover:text-white shrink-0"
         title="Back to Inquiries list"
       >
         +

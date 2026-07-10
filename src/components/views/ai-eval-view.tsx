@@ -127,27 +127,27 @@ export function AiEvalView() {
     <div className="p-4 sm:p-6 space-y-4">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
-          <Sparkles className="size-6 text-foreground" />
+        <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+          <Sparkles className="size-6 text-gray-900" />
           AI Model Evaluation Console
         </h1>
-        <p className="text-sm text-muted-foreground mt-0.5">
+        <p className="text-sm text-gray-500 mt-0.5">
           Compare extraction quality, latency, and cost across OpenRouter models.
         </p>
       </div>
 
       {/* Active configuration banner */}
-      <div className="rounded-lg border border-border bg-gradient-to-r from-zinc-100 to-zinc-200 dark:from-zinc-800/40 dark:to-zinc-800/20 px-4 py-2.5 text-[13px] text-foreground flex items-center gap-4 flex-wrap">
+      <div className="rounded-lg border border-[#e5e7eb] bg-gradient-to-r from-zinc-100 to-zinc-200 dark:from-zinc-800/40 dark:to-zinc-800/20 px-4 py-2.5 text-[13px] text-gray-900 flex items-center gap-4 flex-wrap">
         <span className="font-medium">Active configuration:</span>
         <span>
           Primary:{' '}
-          <code className="font-mono text-foreground">
+          <code className="font-mono text-gray-900">
             deepseek/deepseek-chat-v3.1
           </code>
         </span>
         <span>
           Fallback:{' '}
-          <code className="font-mono text-foreground">
+          <code className="font-mono text-gray-900">
             anthropic/claude-haiku-4.5
           </code>
         </span>
@@ -156,30 +156,30 @@ export function AiEvalView() {
       {/* Stats */}
       {results.length > 0 && (
         <div className="grid grid-cols-3 gap-3">
-          <Card className="border-border">
+          <Card className="border-[#e5e7eb]">
             <CardContent className="p-3 flex items-center gap-2">
-              <Cpu className="size-5 text-foreground" />
+              <Cpu className="size-5 text-gray-900" />
               <div>
-                <p className="text-[10px] text-muted-foreground">Models Run</p>
-                <p className="text-lg font-bold text-foreground">{results.length}</p>
+                <p className="text-[10px] text-gray-500">Models Run</p>
+                <p className="text-lg font-bold text-gray-900">{results.length}</p>
               </div>
             </CardContent>
           </Card>
-          <Card className="border-border">
+          <Card className="border-[#e5e7eb]">
             <CardContent className="p-3 flex items-center gap-2">
-              <CheckCircle2 className="size-5 text-foreground" />
+              <CheckCircle2 className="size-5 text-gray-900" />
               <div>
-                <p className="text-[10px] text-muted-foreground">Succeeded</p>
-                <p className="text-lg font-bold text-foreground">{okCount}/{results.length}</p>
+                <p className="text-[10px] text-gray-500">Succeeded</p>
+                <p className="text-lg font-bold text-gray-900">{okCount}/{results.length}</p>
               </div>
             </CardContent>
           </Card>
-          <Card className="border-border">
+          <Card className="border-[#e5e7eb]">
             <CardContent className="p-3 flex items-center gap-2">
-              <Clock className="size-5 text-foreground" />
+              <Clock className="size-5 text-gray-900" />
               <div>
-                <p className="text-[10px] text-muted-foreground">Avg Latency</p>
-                <p className="text-lg font-bold text-foreground">{avgLatency}ms</p>
+                <p className="text-[10px] text-gray-500">Avg Latency</p>
+                <p className="text-lg font-bold text-gray-900">{avgLatency}ms</p>
               </div>
             </CardContent>
           </Card>
@@ -188,15 +188,15 @@ export function AiEvalView() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Email input */}
-        <Card className="border-border">
-          <CardHeader className="py-3 px-4 border-b border-border/50">
-            <CardTitle className="text-sm font-semibold text-muted-foreground">
+        <Card className="border-[#e5e7eb]">
+          <CardHeader className="py-3 px-4 border-b border-[#e5e7eb]">
+            <CardTitle className="text-sm font-semibold text-gray-500">
               Email Input
             </CardTitle>
           </CardHeader>
           <CardContent className="p-4 space-y-3">
             <div>
-              <label className="text-xs font-medium text-muted-foreground mb-1 block">Email Subject</label>
+              <label className="text-xs font-medium text-gray-500 mb-1 block">Email Subject</label>
               <Input
                 value={subject}
                 onChange={(e) => setSubject(e.target.value)}
@@ -205,7 +205,7 @@ export function AiEvalView() {
               />
             </div>
             <div>
-              <label className="text-xs font-medium text-muted-foreground mb-1 block">Email Body</label>
+              <label className="text-xs font-medium text-gray-500 mb-1 block">Email Body</label>
               <Textarea
                 value={body}
                 onChange={(e) => setBody(e.target.value)}
@@ -218,9 +218,9 @@ export function AiEvalView() {
         </Card>
 
         {/* Models + Run */}
-        <Card className="border-border">
-          <CardHeader className="py-3 px-4 border-b border-border/50">
-            <CardTitle className="text-sm font-semibold text-muted-foreground">
+        <Card className="border-[#e5e7eb]">
+          <CardHeader className="py-3 px-4 border-b border-[#e5e7eb]">
+            <CardTitle className="text-sm font-semibold text-gray-500">
               Models to Evaluate
             </CardTitle>
           </CardHeader>
@@ -229,15 +229,15 @@ export function AiEvalView() {
               {models.map((m) => (
                 <label
                   key={m.id}
-                  className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-muted/40 dark:hover:bg-zinc-800 cursor-pointer"
+                  className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-gray-50 dark:hover:bg-zinc-800 cursor-pointer"
                 >
                   <input
                     type="checkbox"
                     checked={!!m.selected}
                     onChange={() => toggleModel(m.id)}
-                    className="size-3.5 accent-teal-600"
+                    className="size-3.5 accent-blue-600"
                   />
-                  <span className="text-[13px] font-mono text-muted-foreground flex-1 truncate">
+                  <span className="text-[13px] font-mono text-gray-500 flex-1 truncate">
                     {m.label}
                   </span>
                   {m.badge && (
@@ -247,7 +247,7 @@ export function AiEvalView() {
                         'text-[10px] px-1.5 py-0 h-4',
                         m.badge === 'Primary'
                           ? 'bg-amber-500/20 text-amber-400 border-amber-500/30'
-                          : 'bg-muted text-muted-foreground border-border'
+                          : 'bg-gray-50 text-gray-500 border-[#e5e7eb]'
                       )}
                     >
                       {m.badge}
@@ -267,14 +267,14 @@ export function AiEvalView() {
                 <Plus className="size-3.5" />
               </Button>
             </div>
-            <p className="text-[11px] text-muted-foreground">
+            <p className="text-[11px] text-gray-500">
               {selectedCount} model{selectedCount !== 1 ? 's' : ''} selected.{' '}
               {selectedCount > 0 && 'All will run in parallel.'}
             </p>
             <Button
               onClick={runEval}
               disabled={running || selectedCount === 0}
-              className="w-full bg-gradient-to-r from-teal-600 to-teal-700 hover:from-zinc-800 hover:to-zinc-700 text-white gap-2"
+              className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-zinc-800 hover:to-zinc-700 text-white gap-2"
             >
               {running ? <Loader2 className="size-4 animate-spin" /> : <Play className="size-4" />}
               Run Evaluation ({selectedCount} model{selectedCount !== 1 ? 's' : ''})
@@ -284,17 +284,17 @@ export function AiEvalView() {
 
         {/* Results */}
         {(results.length > 0 || running) && (
-          <Card className="lg:col-span-2 border-border">
-            <CardHeader className="py-3 px-4 border-b border-border/50">
-              <CardTitle className="text-sm font-semibold text-muted-foreground">
+          <Card className="lg:col-span-2 border-[#e5e7eb]">
+            <CardHeader className="py-3 px-4 border-b border-[#e5e7eb]">
+              <CardTitle className="text-sm font-semibold text-gray-500">
                 Results
               </CardTitle>
             </CardHeader>
             <CardContent className="p-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                 {running && results.length === 0 && (
-                  <div className="md:col-span-2 text-sm text-muted-foreground flex items-center gap-2 py-4">
-                    <Loader2 className="size-4 animate-spin text-muted-foreground" />
+                  <div className="md:col-span-2 text-sm text-gray-500 flex items-center gap-2 py-4">
+                    <Loader2 className="size-4 animate-spin text-gray-500" />
                     Running evaluation across {selectedCount} models…
                   </div>
                 )}
@@ -304,14 +304,14 @@ export function AiEvalView() {
                     className={cn(
                       'border rounded-lg p-3',
                       r.ok
-                        ? 'border-border bg-muted/30'
+                        ? 'border-[#e5e7eb] bg-gray-50'
                         : 'border-red-200 bg-red-50/40 dark:bg-red-950/20'
                     )}
                   >
                     <div className="flex items-center justify-between gap-2 mb-1">
                       <div className="flex items-center gap-2 min-w-0">
                         {r.ok ? (
-                          <CheckCircle2 className="size-4 text-foreground shrink-0" />
+                          <CheckCircle2 className="size-4 text-gray-900 shrink-0" />
                         ) : (
                           <XCircle className="size-4 text-red-600 shrink-0" />
                         )}
@@ -319,15 +319,15 @@ export function AiEvalView() {
                           {r.model}
                         </code>
                       </div>
-                      <span className="text-[11px] text-muted-foreground shrink-0">{r.latencyMs}ms</span>
+                      <span className="text-[11px] text-gray-500 shrink-0">{r.latencyMs}ms</span>
                     </div>
                     {r.ok ? (
-                      <div className="text-[12px] text-muted-foreground mt-1 space-y-0.5">
+                      <div className="text-[12px] text-gray-500 mt-1 space-y-0.5">
                         <div>
                           <span className="font-medium">Category:</span> {r.category} ·{' '}
                           <span className="font-medium">Priority:</span> {r.priority}
                         </div>
-                        <div className="text-muted-foreground">{r.summary}</div>
+                        <div className="text-gray-500">{r.summary}</div>
                       </div>
                     ) : (
                       <div className="text-[12px] text-red-700 dark:text-red-400 mt-1">{r.error}</div>

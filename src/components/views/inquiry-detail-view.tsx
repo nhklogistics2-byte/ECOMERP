@@ -40,24 +40,24 @@ import type { CategorizedInquiry, ExtractResult, ExtractedItem } from '@/lib/typ
 import { QuotationForm } from '@/components/views/quotation-form';
 
 const PRIORITY_COLORS: Record<string, string> = {
-  urgent: 'bg-teal-600 text-white',
+  urgent: 'bg-blue-600 text-white',
   high: 'bg-amber-500 text-white',
   medium: 'bg-amber-500 text-white',
   low: 'bg-zinc-700 text-zinc-200',
 };
 
 const CATEGORY_COLORS: Record<string, string> = {
-  Sales: 'bg-teal-500/20 text-teal-400 border-teal-500/30',
+  Sales: 'bg-blue-500/20 text-blue-600 border-blue-500/30',
   Pricing: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
-  Partnership: 'bg-zinc-700/50 text-muted-foreground/50 border-border',
-  'Technical Support': 'bg-zinc-700/50 text-muted-foreground/50 border-border',
-  Onboarding: 'bg-teal-500/20 text-teal-400 border-teal-500/30',
-  'Project Update': 'bg-zinc-700/50 text-muted-foreground/50 border-border',
+  Partnership: 'bg-zinc-700/50 text-gray-300 border-[#e5e7eb]',
+  'Technical Support': 'bg-zinc-700/50 text-gray-300 border-[#e5e7eb]',
+  Onboarding: 'bg-blue-500/20 text-blue-600 border-blue-500/30',
+  'Project Update': 'bg-zinc-700/50 text-gray-300 border-[#e5e7eb]',
   'Bug Report': 'bg-red-500/20 text-red-400 border-red-500/30',
   Billing: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
-  'Meeting Request': 'bg-zinc-700/50 text-muted-foreground/50 border-border',
-  'General Inquiry': 'bg-zinc-700/50 text-muted-foreground/50 border-border',
-  'Spam / Junk': 'bg-zinc-700 text-muted-foreground/70 border-border',
+  'Meeting Request': 'bg-zinc-700/50 text-gray-300 border-[#e5e7eb]',
+  'General Inquiry': 'bg-zinc-700/50 text-gray-300 border-[#e5e7eb]',
+  'Spam / Junk': 'bg-zinc-700 text-gray-400 border-[#e5e7eb]',
 };
 
 function formatDateTime(iso: string): string {
@@ -155,7 +155,7 @@ export function InquiryDetailView() {
 
   if (!selected) {
     return (
-      <div className="p-8 text-center text-muted-foreground">
+      <div className="p-8 text-center text-gray-500">
         <Mail className="size-10 mx-auto mb-3 opacity-20" />
         <p className="font-medium">Inquiry not found</p>
         <Button
@@ -230,17 +230,17 @@ export function InquiryDetailView() {
               <ChevronRight className="size-4" />
             </Button>
             {tabPosition && (
-              <span className="text-[11px] text-muted-foreground font-mono px-1.5 hidden sm:inline">
+              <span className="text-[11px] text-gray-500 font-mono px-1.5 hidden sm:inline">
                 {tabPosition}
               </span>
             )}
           </div>
 
           <div className="min-w-0">
-            <h1 className="text-xl font-bold text-foreground truncate">
+            <h1 className="text-xl font-bold text-gray-900 truncate">
               {selected.subject || '(no subject)'}
             </h1>
-            <p className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1.5 flex-wrap">
+            <p className="text-xs text-gray-500 mt-0.5 flex items-center gap-1.5 flex-wrap">
               <span className="font-mono">#{selected.uid}</span>
               <span>·</span>
               <span>{formatDateTime(selected.receivedAt)}</span>
@@ -292,38 +292,38 @@ export function InquiryDetailView() {
         {/* Left: Inquiry context + AI Analysis */}
         <div className="space-y-4">
           {/* Sender card */}
-          <Card className="border-border">
-            <CardHeader className="py-3 px-4 border-b border-border/50">
-              <CardTitle className="text-sm font-semibold text-muted-foreground">
+          <Card className="border-[#e5e7eb]">
+            <CardHeader className="py-3 px-4 border-b border-[#e5e7eb]">
+              <CardTitle className="text-sm font-semibold text-gray-500">
                 Sender Information
               </CardTitle>
             </CardHeader>
             <CardContent className="p-4">
               <div className="flex items-start gap-3">
-                <div className="size-11 rounded-full bg-gradient-to-br from-teal-600 to-teal-700 text-white text-sm font-semibold flex items-center justify-center shrink-0">
+                <div className="size-11 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 text-white text-sm font-semibold flex items-center justify-center shrink-0">
                   {initials(selected.fromName || selected.from)}
                 </div>
                 <div className="flex-1 min-w-0 space-y-1.5">
                   <div className="flex items-center gap-2 text-sm">
-                    <User className="size-3.5 text-muted-foreground/70 shrink-0" />
-                    <span className="font-medium text-foreground truncate">
+                    <User className="size-3.5 text-gray-400 shrink-0" />
+                    <span className="font-medium text-gray-900 truncate">
                       {selected.fromName || '(no name)'}
                     </span>
                   </div>
                   <div className="flex items-center gap-2 text-sm">
-                    <Mail className="size-3.5 text-muted-foreground/70 shrink-0" />
+                    <Mail className="size-3.5 text-gray-400 shrink-0" />
                     <a
                       href={`mailto:${selected.from}`}
-                      className="text-foreground hover:underline truncate"
+                      className="text-gray-900 hover:underline truncate"
                     >
                       {selected.from}
                     </a>
                   </div>
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <div className="flex items-center gap-2 text-xs text-gray-500">
                     <Clock className="size-3.5 shrink-0" />
                     {formatDateTime(selected.receivedAt)}
                   </div>
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <div className="flex items-center gap-2 text-xs text-gray-500">
                     <Building2 className="size-3.5 shrink-0" />
                     {selected.fromDomain}
                   </div>
@@ -333,46 +333,46 @@ export function InquiryDetailView() {
           </Card>
 
           {/* AI Analysis */}
-          <Card className="border-border">
-            <CardHeader className="py-3 px-4 border-b border-border/50">
-              <CardTitle className="text-sm font-semibold text-foreground flex items-center gap-2">
+          <Card className="border-[#e5e7eb]">
+            <CardHeader className="py-3 px-4 border-b border-[#e5e7eb]">
+              <CardTitle className="text-sm font-semibold text-gray-900 flex items-center gap-2">
                 <Sparkles className="size-4" />
                 AI Analysis
               </CardTitle>
             </CardHeader>
             <CardContent className="p-4 space-y-3">
               <div>
-                <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide mb-1">
+                <p className="text-[10px] font-medium text-gray-500 uppercase tracking-wide mb-1">
                   Summary
                 </p>
-                <p className="text-sm text-foreground leading-relaxed">
+                <p className="text-sm text-gray-900 leading-relaxed">
                   {selected.summary}
                 </p>
               </div>
               {selected.keyPoints.length > 0 && (
                 <div>
-                  <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide mb-1">
+                  <p className="text-[10px] font-medium text-gray-500 uppercase tracking-wide mb-1">
                     Key Points
                   </p>
                   <ul className="space-y-1">
                     {selected.keyPoints.map((kp, i) => (
                       <li
                         key={i}
-                        className="text-sm text-foreground flex items-start gap-2"
+                        className="text-sm text-gray-900 flex items-start gap-2"
                       >
-                        <span className="text-foreground mt-1">•</span>
+                        <span className="text-gray-900 mt-1">•</span>
                         <span>{kp}</span>
                       </li>
                     ))}
                   </ul>
                 </div>
               )}
-              <div className="pt-2 border-t border-border/50">
-                <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide mb-1 flex items-center gap-1">
+              <div className="pt-2 border-t border-[#e5e7eb]">
+                <p className="text-[10px] font-medium text-gray-500 uppercase tracking-wide mb-1 flex items-center gap-1">
                   <TrendingUp className="size-3" />
                   Suggested Action
                 </p>
-                <p className="text-sm text-foreground leading-relaxed">
+                <p className="text-sm text-gray-900 leading-relaxed">
                   {selected.suggestedAction}
                 </p>
               </div>
@@ -380,16 +380,16 @@ export function InquiryDetailView() {
           </Card>
 
           {/* Attachments */}
-          <Card className="border-border">
-            <CardHeader className="py-3 px-4 border-b border-border/50 flex-row items-center justify-between">
-              <CardTitle className="text-sm font-semibold text-muted-foreground flex items-center gap-2">
+          <Card className="border-[#e5e7eb]">
+            <CardHeader className="py-3 px-4 border-b border-[#e5e7eb] flex-row items-center justify-between">
+              <CardTitle className="text-sm font-semibold text-gray-500 flex items-center gap-2">
                 <Paperclip className="size-4" />
                 Attachments ({selected.attachments.length})
               </CardTitle>
             </CardHeader>
             <CardContent className="p-3 space-y-2">
               {selected.attachments.length === 0 ? (
-                <p className="text-sm text-muted-foreground text-center py-4">No attachments</p>
+                <p className="text-sm text-gray-500 text-center py-4">No attachments</p>
               ) : (
                 selected.attachments.map((a, i) => {
                   const key = `${selected.uid}:${a.filename}`;
@@ -403,26 +403,26 @@ export function InquiryDetailView() {
                   return (
                     <div
                       key={i}
-                      className="border border-border rounded-lg p-2.5 space-y-2"
+                      className="border border-[#e5e7eb] rounded-lg p-2.5 space-y-2"
                     >
                       <div className="flex items-center gap-2">
                         {isImage ? (
-                          <ImageIcon className="size-4 text-muted-foreground shrink-0" />
+                          <ImageIcon className="size-4 text-gray-500 shrink-0" />
                         ) : isPdf ? (
-                          <FileText className="size-4 text-muted-foreground shrink-0" />
+                          <FileText className="size-4 text-gray-500 shrink-0" />
                         ) : (
-                          <Download className="size-4 text-muted-foreground shrink-0" />
+                          <Download className="size-4 text-gray-500 shrink-0" />
                         )}
                         <a
                           href={url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-[13px] font-medium text-foreground hover:underline truncate flex-1 min-w-0"
+                          className="text-[13px] font-medium text-gray-900 hover:underline truncate flex-1 min-w-0"
                           title={a.filename}
                         >
                           {a.filename}
                         </a>
-                        <span className="text-[10px] text-muted-foreground shrink-0">
+                        <span className="text-[10px] text-gray-500 shrink-0">
                           {a.size > 1024 ? `${Math.round(a.size / 1024)} KB` : `${a.size} B`}
                         </span>
                       </div>
@@ -442,10 +442,10 @@ export function InquiryDetailView() {
                           {isExtracting ? 'Extracting…' : ext ? 'Re-extract' : 'Extract Items'}
                         </Button>
                         {ext && (
-                          <span className="text-[11px] text-muted-foreground flex items-center gap-1">
-                            <CheckCircle2 className="size-3 text-muted-foreground" />
+                          <span className="text-[11px] text-gray-500 flex items-center gap-1">
+                            <CheckCircle2 className="size-3 text-gray-500" />
                             {ext.items?.length || 0} items
-                            {ext.cached && <span className="text-muted-foreground/70">(cached)</span>}
+                            {ext.cached && <span className="text-gray-400">(cached)</span>}
                           </span>
                         )}
                       </div>
@@ -464,16 +464,16 @@ export function InquiryDetailView() {
         </div>
 
         {/* Right: Extracted Line Items Table + Build Quotation */}
-        <Card className="border-border">
-          <CardHeader className="py-3 px-4 border-b border-border/50 flex-row items-center justify-between">
-            <CardTitle className="text-sm font-semibold text-muted-foreground flex items-center gap-2">
+        <Card className="border-[#e5e7eb]">
+          <CardHeader className="py-3 px-4 border-b border-[#e5e7eb] flex-row items-center justify-between">
+            <CardTitle className="text-sm font-semibold text-gray-500 flex items-center gap-2">
               <Boxes className="size-4" />
               Extracted Line Items
               <Badge variant="secondary" className="ml-1 text-[11px]">{allItems.length}</Badge>
             </CardTitle>
             <div className="flex items-center gap-2">
               {extractingKey && (
-                <span className="text-[11px] text-muted-foreground flex items-center gap-1">
+                <span className="text-[11px] text-gray-500 flex items-center gap-1">
                   <Loader2 className="size-3 animate-spin" />
                   Processing…
                 </span>
@@ -481,7 +481,7 @@ export function InquiryDetailView() {
               {allItems.length > 0 && (
                 <Button
                   size="sm"
-                  className="h-7 text-[12px] gap-1.5 bg-teal-600 hover:bg-teal-700 text-white"
+                  className="h-7 text-[12px] gap-1.5 bg-blue-600 hover:bg-blue-700 text-white"
                   onClick={() => setShowQuotationForm(true)}
                 >
                   <FileText className="size-3.5" />
@@ -492,11 +492,11 @@ export function InquiryDetailView() {
           </CardHeader>
           <CardContent className="p-0">
             {allItems.length === 0 ? (
-              <div className="p-8 text-center text-muted-foreground">
+              <div className="p-8 text-center text-gray-500">
                 {extractingKey ? (
                   <>
-                    <Loader2 className="size-8 mx-auto mb-3 animate-spin text-muted-foreground/70" />
-                    <p className="font-medium text-muted-foreground">Extracting items with AI…</p>
+                    <Loader2 className="size-8 mx-auto mb-3 animate-spin text-gray-400" />
+                    <p className="font-medium text-gray-500">Extracting items with AI…</p>
                     <p className="text-xs mt-1">
                       Fetching attachment → parsing content → OpenRouter AI extraction
                     </p>
@@ -516,85 +516,85 @@ export function InquiryDetailView() {
             ) : (
               <>
                 {/* Horizontal slider hint */}
-                <div className="px-3 py-1.5 bg-muted/30 border-b border-border/50 text-[10px] text-muted-foreground flex items-center gap-1.5">
+                <div className="px-3 py-1.5 bg-gray-50 border-b border-[#e5e7eb] text-[10px] text-gray-500 flex items-center gap-1.5">
                   <ChevronRight className="size-3" />
                   Use the scrollbar arrows below (← →) to see all columns
                 </div>
                 <div className="scrollbar-visible" style={{ maxWidth: '100%' }}>
                   <table className="text-[13px]" style={{ minWidth: '900px' }}>
                     <thead>
-                      <tr className="bg-muted/50 border-b border-border">
-                        <th className="text-left font-semibold text-muted-foreground px-3 py-2.5 whitespace-nowrap" style={{ width: '40px' }}>
+                      <tr className="bg-gray-50 border-b border-[#e5e7eb]">
+                        <th className="text-left font-semibold text-gray-500 px-3 py-2.5 whitespace-nowrap" style={{ width: '40px' }}>
                           #
                         </th>
-                        <th className="text-left font-semibold text-muted-foreground px-3 py-2.5 whitespace-nowrap" style={{ width: '150px' }}>
+                        <th className="text-left font-semibold text-gray-500 px-3 py-2.5 whitespace-nowrap" style={{ width: '150px' }}>
                           <Hash className="size-3 inline mr-1" />
                           Part Number
                         </th>
-                        <th className="text-left font-semibold text-muted-foreground px-3 py-2.5 whitespace-nowrap" style={{ width: '140px' }}>
+                        <th className="text-left font-semibold text-gray-500 px-3 py-2.5 whitespace-nowrap" style={{ width: '140px' }}>
                           <Barcode className="size-3 inline mr-1" />
                           NSN
                         </th>
-                        <th className="text-left font-semibold text-muted-foreground px-3 py-2.5 whitespace-nowrap" style={{ width: '240px' }}>
+                        <th className="text-left font-semibold text-gray-500 px-3 py-2.5 whitespace-nowrap" style={{ width: '240px' }}>
                           <Package className="size-3 inline mr-1" />
                           Description
                         </th>
-                        <th className="text-right font-semibold text-muted-foreground px-3 py-2.5 whitespace-nowrap" style={{ width: '80px' }}>
+                        <th className="text-right font-semibold text-gray-500 px-3 py-2.5 whitespace-nowrap" style={{ width: '80px' }}>
                           Qty
                         </th>
-                        <th className="text-left font-semibold text-muted-foreground px-3 py-2.5 whitespace-nowrap" style={{ width: '70px' }}>
+                        <th className="text-left font-semibold text-gray-500 px-3 py-2.5 whitespace-nowrap" style={{ width: '70px' }}>
                           UOM
                         </th>
-                        <th className="text-left font-semibold text-muted-foreground px-3 py-2.5 whitespace-nowrap" style={{ width: '130px' }}>
+                        <th className="text-left font-semibold text-gray-500 px-3 py-2.5 whitespace-nowrap" style={{ width: '130px' }}>
                           <HashIcon className="size-3 inline mr-1" />
                           Serial No
                         </th>
-                        <th className="text-left font-semibold text-muted-foreground px-3 py-2.5 whitespace-nowrap" style={{ width: '150px' }}>
+                        <th className="text-left font-semibold text-gray-500 px-3 py-2.5 whitespace-nowrap" style={{ width: '150px' }}>
                           Source
                         </th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-border">
+                    <tbody className="divide-y divide-gray-100">
                       {allItems.map((item, i) => (
                         <tr
                           key={i}
-                          className="hover:bg-muted/50 hover:bg-muted/40 transition-colors"
+                          className="hover:bg-gray-50 hover:bg-gray-50 transition-colors"
                         >
-                          <td className="px-3 py-2.5 text-[11px] text-muted-foreground font-mono whitespace-nowrap">
+                          <td className="px-3 py-2.5 text-[11px] text-gray-500 font-mono whitespace-nowrap">
                             {String(i + 1).padStart(2, '0')}
                           </td>
                           <td className="px-3 py-2.5 whitespace-nowrap">
-                            <span className="font-mono text-[12px] font-medium text-foreground">
+                            <span className="font-mono text-[12px] font-medium text-gray-900">
                               {item.partNumber || '—'}
                             </span>
                           </td>
                           <td className="px-3 py-2.5 whitespace-nowrap">
-                            <span className="font-mono text-[12px] text-muted-foreground">
+                            <span className="font-mono text-[12px] text-gray-500">
                               {item.nsn || '—'}
                             </span>
                           </td>
                           <td className="px-3 py-2.5">
-                            <span className="text-[12px] text-foreground">
+                            <span className="text-[12px] text-gray-900">
                               {item.description || '—'}
                             </span>
                           </td>
                           <td className="px-3 py-2.5 text-right whitespace-nowrap">
-                            <span className="font-mono text-[12px] font-bold text-foreground">
+                            <span className="font-mono text-[12px] font-bold text-gray-900">
                               {item.quantity || '—'}
                             </span>
                           </td>
                           <td className="px-3 py-2.5 whitespace-nowrap">
-                            <span className="text-[11px] text-muted-foreground uppercase">
+                            <span className="text-[11px] text-gray-500 uppercase">
                               {item.uom || '—'}
                             </span>
                           </td>
                           <td className="px-3 py-2.5 whitespace-nowrap">
-                            <span className="font-mono text-[12px] text-muted-foreground">
+                            <span className="font-mono text-[12px] text-gray-500">
                               {item.serialNumber || '—'}
                             </span>
                           </td>
                           <td className="px-3 py-2.5">
-                            <span className="text-[10px] text-muted-foreground truncate block max-w-[140px]" title={item.source}>
+                            <span className="text-[10px] text-gray-500 truncate block max-w-[140px]" title={item.source}>
                               {item.source}
                             </span>
                           </td>
@@ -610,22 +610,22 @@ export function InquiryDetailView() {
       </div>
 
       {/* Email body */}
-      <Card className="border-border">
-        <CardHeader className="py-3 px-4 border-b border-border/50">
-          <CardTitle className="text-sm font-semibold text-muted-foreground">
+      <Card className="border-[#e5e7eb]">
+        <CardHeader className="py-3 px-4 border-b border-[#e5e7eb]">
+          <CardTitle className="text-sm font-semibold text-gray-500">
             Email Body
           </CardTitle>
         </CardHeader>
         <CardContent className="p-4">
-          <pre className="text-sm text-foreground whitespace-pre-wrap break-words font-sans leading-relaxed max-h-[300px] overflow-y-auto scrollbar-thin">
+          <pre className="text-sm text-gray-900 whitespace-pre-wrap break-words font-sans leading-relaxed max-h-[300px] overflow-y-auto scrollbar-thin">
             {selected.text || '(no text body — HTML-only email)'}
           </pre>
         </CardContent>
       </Card>
 
       {/* Technical metadata */}
-      <details className="text-xs text-muted-foreground">
-        <summary className="cursor-pointer hover:text-muted-foreground dark:hover:text-muted-foreground/50 font-medium">
+      <details className="text-xs text-gray-500">
+        <summary className="cursor-pointer hover:text-gray-500 dark:hover:text-gray-300 font-medium">
           Technical metadata
         </summary>
         <div className="mt-2 space-y-1 font-mono text-[11px]">
@@ -663,16 +663,16 @@ function StatChip({
   sub?: string;
 }) {
   return (
-    <div className="bg-card border border-border rounded-lg p-3 flex items-center gap-2.5">
-      <div className="size-8 rounded-md bg-muted text-muted-foreground flex items-center justify-center shrink-0">
+    <div className="bg-white border border-[#e5e7eb] rounded-lg p-3 flex items-center gap-2.5">
+      <div className="size-8 rounded-md bg-gray-50 text-gray-500 flex items-center justify-center shrink-0">
         {icon}
       </div>
       <div className="min-w-0">
-        <p className="text-[10px] text-muted-foreground truncate uppercase tracking-wide">{label}</p>
-        <p className="text-[15px] font-bold text-foreground leading-tight truncate">
+        <p className="text-[10px] text-gray-500 truncate uppercase tracking-wide">{label}</p>
+        <p className="text-[15px] font-bold text-gray-900 leading-tight truncate">
           {value}
         </p>
-        {sub && <p className="text-[10px] text-muted-foreground/70 truncate">{sub}</p>}
+        {sub && <p className="text-[10px] text-gray-400 truncate">{sub}</p>}
       </div>
     </div>
   );
