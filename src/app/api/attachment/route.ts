@@ -50,8 +50,10 @@ export async function GET(req: Request) {
       );
     }
 
-    // Build response headers
-    const disposition = download ? 'attachment' : 'inline';
+    // Always use 'inline' so attachments open in the browser tab instead of
+    // auto-downloading (which can disrupt the preview environment).
+    // Users can right-click → Save As if they want to download.
+    const disposition = 'inline';
     const safeFilename = encodeURIComponent(result.filename).replace(/'/g, '%27');
 
     const headers = new Headers();
