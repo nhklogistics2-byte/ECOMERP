@@ -207,4 +207,42 @@
   .scrollbar-visible::-webkit-scrollbar-button:horizontal:increment {
     background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'><path d='M3 1 L7 5 L3 9' stroke='%23666' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>");
   }
+
+  /* Always-visible prominent VERTICAL scrollbar (for modal bodies) */
+  .scrollbar-visible-y {
+    scrollbar-width: auto;
+    scrollbar-color: oklch(0.40 0 0) oklch(0.92 0 0);
+  }
+  .scrollbar-visible-y::-webkit-scrollbar {
+    width: 14px;
+    height: 14px;
+    -webkit-appearance: none;
+  }
+  .scrollbar-visible-y::-webkit-scrollbar-track {
+    background: oklch(0.93 0 0);
+    border-left: 1px solid oklch(0.88 0 0);
+  }
+  .scrollbar-visible-y::-webkit-scrollbar-thumb {
+    background-color: oklch(0.50 0 0);
+    border-radius: 7px;
+    border: 3px solid oklch(0.93 0 0);
+    min-height: 40px;
+  }
+  .scrollbar-visible-y::-webkit-scrollbar-thumb:hover {
+    background-color: oklch(0.25 0 0);
+  }
+  .scrollbar-visible-y::-webkit-scrollbar-button {
+    display: block;
+    height: 14px;
+    width: 14px;
+    background-color: oklch(0.93 0 0);
+    background-repeat: no-repeat;
+    background-position: center;
+  }
+  .scrollbar-visible-y::-webkit-scrollbar-button:vertical:decrement {
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'><path d='M1 7 L5 3 L9 7' stroke='%23666' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+  }
+  .scrollbar-visible-y::-webkit-scrollbar-button:vertical:increment {
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'><path d='M1 3 L5 7 L9 3' stroke='%23666' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+  }
 }

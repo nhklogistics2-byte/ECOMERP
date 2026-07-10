@@ -18,7 +18,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { useAppStore } from '@/lib/store';
 import { toast } from 'sonner';
@@ -250,7 +249,7 @@ export function QuotationForm({ inquiry, items, onClose }: QuotationFormProps) {
           </button>
         </div>
 
-        <ScrollArea className="flex-1">
+        <div className="flex-1 scrollbar-visible-y" style={{ overflowY: 'auto', overflowX: 'hidden' }}>
           <div className="p-5 space-y-4">
             {/* Quotation meta */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -503,7 +502,7 @@ export function QuotationForm({ inquiry, items, onClose }: QuotationFormProps) {
               </div>
             )}
           </div>
-        </ScrollArea>
+        </div>
 
         {/* Footer actions */}
         <div className="flex items-center justify-between gap-2 px-5 py-3 border-t border-zinc-200 dark:border-zinc-800 shrink-0">
