@@ -57,12 +57,12 @@ export function Topbar({
       <div className="flex-1 sm:flex-none" />
 
       {/* AI Model badge */}
-      <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800">
-        <div className="size-1.5 rounded-full bg-indigo-500 animate-pulse" />
-        <span className="text-[11px] font-medium text-indigo-700 dark:text-indigo-400 hidden sm:inline">
+      <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-zinc-100 dark:bg-zinc-800/60 border border-zinc-300 dark:border-zinc-700">
+        <div className="size-1.5 rounded-full bg-zinc-900 animate-pulse" />
+        <span className="text-[11px] font-medium text-zinc-900 dark:text-zinc-200 hidden sm:inline">
           DeepSeek V3.1
         </span>
-        <span className="text-[11px] font-medium text-indigo-700 dark:text-indigo-400 sm:hidden">
+        <span className="text-[11px] font-medium text-zinc-900 dark:text-zinc-200 sm:hidden">
           AI
         </span>
       </div>
@@ -77,7 +77,7 @@ export function Topbar({
           disabled={loading}
         >
           {loading ? (
-            <Loader2 className="size-4 animate-spin text-indigo-600" />
+            <Loader2 className="size-4 animate-spin text-zinc-900" />
           ) : (
             <RefreshCw className="size-4 text-zinc-500" />
           )}

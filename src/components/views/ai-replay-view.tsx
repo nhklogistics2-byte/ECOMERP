@@ -129,7 +129,7 @@ export function AiReplayView() {
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-zinc-900 dark:text-white flex items-center gap-2">
-          <Reply className="size-6 text-indigo-600" />
+          <Reply className="size-6 text-zinc-900" />
           AI Replay Generator
         </h1>
         <p className="text-sm text-zinc-500 mt-1">
@@ -142,7 +142,7 @@ export function AiReplayView() {
         <Card className="border-zinc-200 dark:border-zinc-800 flex flex-col">
           <CardHeader className="py-3 px-4 border-b border-zinc-100 dark:border-zinc-800">
             <CardTitle className="text-sm font-semibold text-zinc-700 dark:text-zinc-200 flex items-center gap-2">
-              <Inbox className="size-4 text-indigo-600" />
+              <Inbox className="size-4 text-zinc-900" />
               Pick an Inquiry
               <Badge variant="secondary" className="ml-auto">{inquiries.length}</Badge>
             </CardTitle>
@@ -165,11 +165,11 @@ export function AiReplayView() {
                         setResult(null);
                       }}
                       className={cn(
-                        'w-full text-left p-3 hover:bg-indigo-50/40 dark:hover:bg-zinc-800/40 transition-colors flex gap-2.5',
-                        active && 'bg-indigo-50 dark:bg-zinc-800/70 border-l-2 border-indigo-600'
+                        'w-full text-left p-3 hover:bg-zinc-100/50 dark:hover:bg-zinc-800/40 transition-colors flex gap-2.5',
+                        active && 'bg-zinc-100 dark:bg-zinc-800/70 border-l-2 border-zinc-900'
                       )}
                     >
-                      <div className="size-8 rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 text-white text-[11px] font-semibold flex items-center justify-center shrink-0">
+                      <div className="size-8 rounded-full bg-gradient-to-br from-zinc-900 to-zinc-800 text-white text-[11px] font-semibold flex items-center justify-center shrink-0">
                         {initials(e.fromName || e.from)}
                       </div>
                       <div className="flex-1 min-w-0">
@@ -219,7 +219,7 @@ export function AiReplayView() {
                 </CardHeader>
                 <CardContent className="p-4 space-y-3">
                   <div className="flex items-start gap-3">
-                    <div className="size-9 rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 text-white text-xs font-semibold flex items-center justify-center shrink-0">
+                    <div className="size-9 rounded-full bg-gradient-to-br from-zinc-900 to-zinc-800 text-white text-xs font-semibold flex items-center justify-center shrink-0">
                       {initials(selected.fromName || selected.from)}
                     </div>
                     <div className="flex-1 min-w-0 space-y-1">
@@ -233,7 +233,7 @@ export function AiReplayView() {
                         <Mail className="size-3.5 text-zinc-400 shrink-0" />
                         <a
                           href={`mailto:${selected.from}`}
-                          className="text-indigo-700 dark:text-indigo-400 hover:underline truncate"
+                          className="text-zinc-900 dark:text-zinc-200 hover:underline truncate"
                         >
                           {selected.from}
                         </a>
@@ -274,7 +274,7 @@ export function AiReplayView() {
               <Card className="border-zinc-200 dark:border-zinc-800">
                 <CardHeader className="py-3 px-4 border-b border-zinc-100 dark:border-zinc-800">
                   <CardTitle className="text-sm font-semibold text-zinc-700 dark:text-zinc-200 flex items-center gap-2">
-                    <Sparkles className="size-4 text-indigo-600" />
+                    <Sparkles className="size-4 text-zinc-900" />
                     Reply Tone
                   </CardTitle>
                 </CardHeader>
@@ -287,8 +287,8 @@ export function AiReplayView() {
                         className={cn(
                           'text-left border rounded-md p-2.5 transition-all',
                           tone === t.key
-                            ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-950/40 ring-1 ring-indigo-500'
-                            : 'border-zinc-200 dark:border-zinc-800 hover:border-indigo-300'
+                            ? 'border-zinc-900 bg-zinc-100 dark:bg-zinc-800/60 ring-1 ring-zinc-900'
+                            : 'border-zinc-200 dark:border-zinc-800 hover:border-zinc-400'
                         )}
                       >
                         <div className="text-[13px] font-semibold text-zinc-900 dark:text-white">
@@ -306,7 +306,7 @@ export function AiReplayView() {
                 <Button
                   onClick={generate}
                   disabled={generating}
-                  className="gap-2 bg-indigo-600 hover:bg-indigo-700 text-white"
+                  className="gap-2 bg-zinc-900 hover:bg-zinc-800 text-white"
                 >
                   {generating ? (
                     <Loader2 className="size-4 animate-spin" />
@@ -330,9 +330,9 @@ export function AiReplayView() {
 
               {/* Result */}
               {result && (
-                <Card className="border-indigo-200 dark:border-indigo-900">
-                  <CardHeader className="py-3 px-4 border-b border-indigo-100 dark:border-indigo-900 flex-row items-center justify-between">
-                    <CardTitle className="text-sm font-semibold text-indigo-800 dark:text-indigo-300 flex items-center gap-2">
+                <Card className="border-zinc-300 dark:border-zinc-700">
+                  <CardHeader className="py-3 px-4 border-b border-zinc-200 dark:border-zinc-700 flex-row items-center justify-between">
+                    <CardTitle className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
                       <Reply className="size-4" />
                       Generated Reply
                       <span className="text-[11px] text-zinc-500 font-normal">
@@ -347,7 +347,7 @@ export function AiReplayView() {
                     >
                       {copied ? (
                         <>
-                          <Check className="size-3 text-indigo-600" />
+                          <Check className="size-3 text-zinc-900" />
                           Copied
                         </>
                       ) : (

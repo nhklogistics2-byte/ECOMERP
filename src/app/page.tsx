@@ -9,9 +9,11 @@ import { AiReplayView } from '@/components/views/ai-replay-view';
 import { AiEvalView } from '@/components/views/ai-eval-view';
 import { AuditLogView } from '@/components/views/audit-log-view';
 import { useAppStore } from '@/lib/store';
+import { useAutoSync } from '@/lib/use-auto-sync';
 
 export default function Page() {
   const { view } = useAppStore();
+  useAutoSync();
 
   return (
     <div className="min-h-screen flex bg-slate-50 dark:bg-zinc-950">

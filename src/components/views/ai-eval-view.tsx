@@ -128,7 +128,7 @@ export function AiEvalView() {
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-zinc-900 dark:text-white flex items-center gap-2">
-          <Sparkles className="size-6 text-indigo-600" />
+          <Sparkles className="size-6 text-zinc-900" />
           AI Model Evaluation Console
         </h1>
         <p className="text-sm text-zinc-500 mt-0.5">
@@ -137,17 +137,17 @@ export function AiEvalView() {
       </div>
 
       {/* Active configuration banner */}
-      <div className="rounded-lg border border-indigo-200 dark:border-indigo-900 bg-gradient-to-r from-indigo-50 to-violet-50 dark:from-indigo-950/30 dark:to-violet-950/20 px-4 py-2.5 text-[13px] text-indigo-800 dark:text-indigo-300 flex items-center gap-4 flex-wrap">
+      <div className="rounded-lg border border-zinc-300 dark:border-zinc-700 bg-gradient-to-r from-zinc-100 to-zinc-200 dark:from-zinc-800/40 dark:to-zinc-800/20 px-4 py-2.5 text-[13px] text-zinc-900 dark:text-zinc-100 flex items-center gap-4 flex-wrap">
         <span className="font-medium">Active configuration:</span>
         <span>
           Primary:{' '}
-          <code className="font-mono text-indigo-900 dark:text-indigo-200">
+          <code className="font-mono text-zinc-900 dark:text-zinc-100">
             deepseek/deepseek-chat-v3.1
           </code>
         </span>
         <span>
           Fallback:{' '}
-          <code className="font-mono text-indigo-900 dark:text-indigo-200">
+          <code className="font-mono text-zinc-900 dark:text-zinc-100">
             anthropic/claude-haiku-4.5
           </code>
         </span>
@@ -158,7 +158,7 @@ export function AiEvalView() {
         <div className="grid grid-cols-3 gap-3">
           <Card className="border-zinc-200 dark:border-zinc-800">
             <CardContent className="p-3 flex items-center gap-2">
-              <Cpu className="size-5 text-indigo-600" />
+              <Cpu className="size-5 text-zinc-900" />
               <div>
                 <p className="text-[10px] text-zinc-500">Models Run</p>
                 <p className="text-lg font-bold text-zinc-900 dark:text-white">{results.length}</p>
@@ -167,7 +167,7 @@ export function AiEvalView() {
           </Card>
           <Card className="border-zinc-200 dark:border-zinc-800">
             <CardContent className="p-3 flex items-center gap-2">
-              <CheckCircle2 className="size-5 text-indigo-600" />
+              <CheckCircle2 className="size-5 text-zinc-900" />
               <div>
                 <p className="text-[10px] text-zinc-500">Succeeded</p>
                 <p className="text-lg font-bold text-zinc-900 dark:text-white">{okCount}/{results.length}</p>
@@ -176,7 +176,7 @@ export function AiEvalView() {
           </Card>
           <Card className="border-zinc-200 dark:border-zinc-800">
             <CardContent className="p-3 flex items-center gap-2">
-              <Clock className="size-5 text-indigo-600" />
+              <Clock className="size-5 text-zinc-900" />
               <div>
                 <p className="text-[10px] text-zinc-500">Avg Latency</p>
                 <p className="text-lg font-bold text-zinc-900 dark:text-white">{avgLatency}ms</p>
@@ -229,13 +229,13 @@ export function AiEvalView() {
               {models.map((m) => (
                 <label
                   key={m.id}
-                  className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-indigo-50/50 dark:hover:bg-zinc-800 cursor-pointer"
+                  className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-zinc-100/60 dark:hover:bg-zinc-800 cursor-pointer"
                 >
                   <input
                     type="checkbox"
                     checked={!!m.selected}
                     onChange={() => toggleModel(m.id)}
-                    className="size-3.5 accent-indigo-600"
+                    className="size-3.5 accent-zinc-900"
                   />
                   <span className="text-[13px] font-mono text-zinc-700 dark:text-zinc-300 flex-1 truncate">
                     {m.label}
@@ -246,7 +246,7 @@ export function AiEvalView() {
                       className={cn(
                         'text-[10px] px-1.5 py-0 h-4',
                         m.badge === 'Primary'
-                          ? 'bg-indigo-100 text-indigo-700 border-indigo-200'
+                          ? 'bg-zinc-200 text-zinc-800 border-zinc-300'
                           : 'bg-zinc-100 text-zinc-500 border-zinc-200'
                       )}
                     >
@@ -274,7 +274,7 @@ export function AiEvalView() {
             <Button
               onClick={runEval}
               disabled={running || selectedCount === 0}
-              className="w-full bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white gap-2"
+              className="w-full bg-gradient-to-r from-zinc-900 to-zinc-800 hover:from-zinc-800 hover:to-zinc-700 text-white gap-2"
             >
               {running ? <Loader2 className="size-4 animate-spin" /> : <Play className="size-4" />}
               Run Evaluation ({selectedCount} model{selectedCount !== 1 ? 's' : ''})
@@ -294,7 +294,7 @@ export function AiEvalView() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                 {running && results.length === 0 && (
                   <div className="md:col-span-2 text-sm text-zinc-500 flex items-center gap-2 py-4">
-                    <Loader2 className="size-4 animate-spin text-indigo-500" />
+                    <Loader2 className="size-4 animate-spin text-zinc-500" />
                     Running evaluation across {selectedCount} models…
                   </div>
                 )}
@@ -304,14 +304,14 @@ export function AiEvalView() {
                     className={cn(
                       'border rounded-lg p-3',
                       r.ok
-                        ? 'border-indigo-200 bg-indigo-50/40 dark:bg-indigo-950/20'
+                        ? 'border-zinc-300 bg-zinc-100/50 dark:bg-zinc-800/30'
                         : 'border-red-200 bg-red-50/40 dark:bg-red-950/20'
                     )}
                   >
                     <div className="flex items-center justify-between gap-2 mb-1">
                       <div className="flex items-center gap-2 min-w-0">
                         {r.ok ? (
-                          <CheckCircle2 className="size-4 text-indigo-600 shrink-0" />
+                          <CheckCircle2 className="size-4 text-zinc-900 shrink-0" />
                         ) : (
                           <XCircle className="size-4 text-red-600 shrink-0" />
                         )}

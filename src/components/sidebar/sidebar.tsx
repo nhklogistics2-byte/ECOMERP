@@ -95,14 +95,14 @@ export function Sidebar() {
       >
         {/* Logo */}
         <div className="flex items-center gap-2.5 px-4 h-16 border-b border-zinc-200 dark:border-zinc-800 shrink-0">
-          <div className="size-9 rounded-lg bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center shadow-md shadow-indigo-500/20">
+          <div className="size-9 rounded-lg bg-gradient-to-br from-zinc-900 to-zinc-800 flex items-center justify-center shadow-md shadow-zinc-900/20">
             <Ship className="size-5 text-white" />
           </div>
           <div className="flex-1 min-w-0">
             <div className="font-bold text-[14px] tracking-tight text-zinc-900 dark:text-white leading-tight">
               ECOMRUNS
             </div>
-            <div className="text-[10px] text-indigo-600 dark:text-indigo-400 leading-tight font-medium">
+            <div className="text-[10px] text-zinc-900 dark:text-zinc-200 leading-tight font-medium">
               Inquiry & AI System
             </div>
           </div>
@@ -123,7 +123,7 @@ export function Sidebar() {
                 {section.title && (
                   <button
                     onClick={() => toggleSection(section.title)}
-                    className="w-full flex items-center justify-between px-2 py-1.5 text-[10px] font-semibold tracking-wider text-zinc-400 dark:text-zinc-500 hover:text-indigo-700 dark:hover:text-indigo-400"
+                    className="w-full flex items-center justify-between px-2 py-1.5 text-[10px] font-semibold tracking-wider text-zinc-400 dark:text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-200"
                   >
                     <span>{section.title}</span>
                     <ChevronDown
@@ -146,16 +146,16 @@ export function Sidebar() {
                           className={cn(
                             'w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md text-[13px] font-medium transition-colors group',
                             active
-                              ? 'bg-gradient-to-r from-indigo-50 to-violet-50 dark:from-indigo-950/40 dark:to-violet-950/30 text-indigo-700 dark:text-indigo-300 border border-indigo-200/60 dark:border-indigo-900/60'
-                              : 'text-zinc-600 dark:text-zinc-300 hover:bg-indigo-50/50 dark:hover:bg-zinc-800/50 hover:text-indigo-700 dark:hover:text-indigo-300'
+                              ? 'bg-gradient-to-r from-zinc-100 to-zinc-200 dark:from-zinc-800/40 dark:to-zinc-800/30 text-zinc-900 dark:text-zinc-100 border border-zinc-300/60 dark:border-zinc-700/60'
+                              : 'text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100/60 dark:hover:bg-zinc-800/50 hover:text-zinc-900 dark:hover:text-zinc-100'
                           )}
                         >
                           <Icon
                             className={cn(
                               'size-4 shrink-0',
                               active
-                                ? 'text-indigo-600 dark:text-indigo-400'
-                                : 'text-zinc-400 dark:text-zinc-500 group-hover:text-indigo-600'
+                                ? 'text-zinc-900 dark:text-zinc-200'
+                                : 'text-zinc-400 dark:text-zinc-500 group-hover:text-zinc-900'
                             )}
                           />
                           <span className="flex-1 text-left truncate">{item.label}</span>
@@ -164,7 +164,7 @@ export function Sidebar() {
                               className={cn(
                                 'text-[10px] font-semibold px-1.5 py-0.5 rounded-full',
                                 active
-                                  ? 'bg-indigo-600 text-white'
+                                  ? 'bg-zinc-900 text-white'
                                   : 'bg-zinc-200 dark:bg-zinc-700 text-zinc-600 dark:text-zinc-300'
                               )}
                             >
@@ -183,8 +183,8 @@ export function Sidebar() {
 
         {/* User profile */}
         <div className="border-t border-zinc-200 dark:border-zinc-800 p-2.5 shrink-0">
-          <div className="flex items-center gap-2.5 px-2 py-1.5 rounded-md hover:bg-indigo-50/50 dark:hover:bg-zinc-800/50 cursor-pointer group">
-            <div className="size-8 rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 text-white text-xs font-semibold flex items-center justify-center shrink-0">
+          <div className="flex items-center gap-2.5 px-2 py-1.5 rounded-md hover:bg-zinc-100/60 dark:hover:bg-zinc-800/50 cursor-pointer group">
+            <div className="size-8 rounded-full bg-gradient-to-br from-zinc-900 to-zinc-800 text-white text-xs font-semibold flex items-center justify-center shrink-0">
               CE
             </div>
             <div className="flex-1 min-w-0">

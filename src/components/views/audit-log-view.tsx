@@ -24,11 +24,11 @@ function formatTimestamp(iso: string): string {
 }
 
 function actionColor(action: string): string {
-  if (action.startsWith('ai.')) return 'bg-purple-100 text-purple-700 border-purple-200';
-  if (action.startsWith('imap.')) return 'bg-indigo-100 text-indigo-700 border-indigo-200';
-  if (action.startsWith('auth.')) return 'bg-blue-100 text-blue-700 border-blue-200';
-  if (action.startsWith('notification.')) return 'bg-amber-100 text-amber-700 border-amber-200';
-  if (action.startsWith('routing.')) return 'bg-cyan-100 text-cyan-700 border-cyan-200';
+  if (action.startsWith('ai.')) return 'bg-zinc-100 text-zinc-700 border-zinc-300';
+  if (action.startsWith('imap.')) return 'bg-zinc-200 text-zinc-800 border-zinc-300';
+  if (action.startsWith('auth.')) return 'bg-zinc-200 text-zinc-800 border-zinc-300';
+  if (action.startsWith('notification.')) return 'bg-zinc-200 text-zinc-800 border-zinc-300';
+  if (action.startsWith('routing.')) return 'bg-zinc-100 text-zinc-700 border-zinc-300';
   return 'bg-zinc-100 text-zinc-700 border-zinc-200';
 }
 
@@ -59,7 +59,7 @@ export function AuditLogView() {
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-zinc-900 dark:text-white flex items-center gap-2">
-          <ScrollText className="size-6 text-indigo-600" />
+          <ScrollText className="size-6 text-zinc-900" />
           Audit Log
         </h1>
         <p className="text-sm text-zinc-500 mt-0.5">
@@ -153,7 +153,7 @@ export function AuditLogView() {
                   filtered.map((e) => (
                     <tr
                       key={e.id}
-                      className="hover:bg-indigo-50/30 dark:hover:bg-zinc-800/30 transition-colors"
+                      className="hover:bg-zinc-100/40 dark:hover:bg-zinc-800/30 transition-colors"
                     >
                       <td className="px-3 py-2.5 text-zinc-600 dark:text-zinc-300 whitespace-nowrap font-mono text-[12px]">
                         {formatTimestamp(e.timestamp)}
