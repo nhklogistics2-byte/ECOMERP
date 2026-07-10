@@ -333,7 +333,7 @@ export function QuotationForm({ inquiry, items, onClose }: QuotationFormProps) {
                   <Calculator className="size-3.5" />
                   Line Items ({lines.length})
                   <span className="text-[11px] text-gray-500 font-normal ml-2">
-                    Top half: extracted from attachment · Bottom half: fill the price fields
+                    Fill the Price/Unit to include in PDF · items with no price are excluded
                   </span>
                 </h3>
               </div>
