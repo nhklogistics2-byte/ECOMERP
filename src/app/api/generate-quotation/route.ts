@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
-import fs from 'fs';
-import path from 'path';
-import os from 'os';
-import { generateQuotationPdfBuffer, type QuotationPayload } from '@/lib/quotation-pdf';
+import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs';
+import { join } from 'node:path';
+import { tmpdir } from 'node:os';
+import { generateQuotationPdfBuffer, type QuotationPayload, type PdfImages } from '@/lib/quotation-pdf';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -16,15 +16,43 @@ export const maxDuration = 60;
 function getQuotationDir(): string {
   // On Vercel, use /tmp (read-only filesystem elsewhere)
   if (process.env.VERCEL || process.cwd().startsWith('/var/task')) {
-    const tmpDir = path.join(os.tmpdir(), 'quotations');
-    if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir, { recursive: true });
+    const tmpDir = join(tmpdir(), 'quotations');
+    if (!existsSync(tmpDir)) mkdirSync(tmpDir, { recursive: true });
     return tmpDir;
   }
 
   // Local dev — use public/quotations
-  const publicDir = path.join(process.cwd(), 'public', 'quotations');
-  if (!fs.existsSync(publicDir)) fs.mkdirSync(publicDir, { recursive: true });
+  const publicDir = join(process.cwd(), 'public', 'quotations');
+  if (!existsSync(publicDir)) mkdirSync(publicDir, { recursive: true });
   return publicDir;
+}
+
+/**
+ * Load logo and stamp images from the assets directory.
+ */
+function loadImages(): PdfImages {
+  const logoPaths = [
+    join(process.cwd(), 'public', 'assets', 'sea-keepers-logo.jpg'),
+    join(process.cwd(), 'public', 'assets', 'sea-keepers-logo.png'),
+    join(process.cwd(), 'assets', 'sea-keepers-logo.jpg'),
+  ];
+  const stampPaths = [
+    join(process.cwd(), 'public', 'assets', 'sea-keepers-stamp.jpg'),
+    join(process.cwd(), 'public', 'assets', 'sea-keepers-stamp.png'),
+    join(process.cwd(), 'assets', 'sea-keepers-stamp.jpg'),
+  ];
+
+  let logo: Buffer | null = null;
+  for (const p of logoPaths) {
+    if (existsSync(p)) { logo = readFileSync(p); break; }
+  }
+
+  let stamp: Buffer | null = null;
+  for (const p of stampPaths) {
+    if (existsSync(p)) { stamp = readFileSync(p); break; }
+  }
+
+  return { logo, stamp };
 }
 
 export async function POST(req: Request) {
@@ -44,8 +72,8 @@ export async function POST(req: Request) {
     // Save to writable directory
     const dir = getQuotationDir();
     const filename = `${payload.quoteNumber}.pdf`;
-    const filepath = path.join(dir, filename);
-    fs.writeFileSync(filepath, pdfBuffer);
+    const filepath = join(dir, filename);
+    writeFileSync(filepath, pdfBuffer);
 
     // Always use the API endpoint to serve the PDF (works on both local + Vercel)
     const downloadUrl = `/api/generate-quotation?download=${encodeURIComponent(payload.quoteNumber)}`;
@@ -83,12 +111,12 @@ export async function GET(req: Request) {
     }
 
     // Check both possible locations
-    const tmpPath = path.join(os.tmpdir(), 'quotations', `${quoteNumber}.pdf`);
-    const publicPath = path.join(process.cwd(), 'public', 'quotations', `${quoteNumber}.pdf`);
+    const tmpPath = join(tmpdir(), 'quotations', `${quoteNumber}.pdf`);
+    const publicPath = join(process.cwd(), 'public', 'quotations', `${quoteNumber}.pdf`);
 
     let filepath: string | null = null;
-    if (fs.existsSync(tmpPath)) filepath = tmpPath;
-    else if (fs.existsSync(publicPath)) filepath = publicPath;
+    if (existsSync(tmpPath)) filepath = tmpPath;
+    else if (existsSync(publicPath)) filepath = publicPath;
 
     if (!filepath) {
       return NextResponse.json(
@@ -97,7 +125,7 @@ export async function GET(req: Request) {
       );
     }
 
-    const buffer = fs.readFileSync(filepath);
+    const buffer = readFileSync(filepath);
 
     const headers = new Headers();
     headers.set('Content-Type', 'application/pdf');

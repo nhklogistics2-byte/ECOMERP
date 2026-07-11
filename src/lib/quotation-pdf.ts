@@ -1,4 +1,6 @@
 import PDFDocument from 'pdfkit/js/pdfkit.standalone.js';
+import { readFileSync, existsSync } from 'node:fs';
+import { join } from 'node:path';
 
 export interface QuotationLine {
   partNumber: string;
@@ -28,6 +30,11 @@ export interface QuotationPayload {
   totals: { subtotal: string; totalGst: string; grandTotal: string; itemCount: number };
 }
 
+export interface PdfImages {
+  logo: Buffer | null;
+  stamp: Buffer | null;
+}
+
 const COMPANY = {
   name: 'SEA KEEPERS (Pvt) Ltd',
   address: 'OFFICE #102, GROUND FLOOR, BAHRIA COMPLEX-1, MT KHAN ROAD, KARACHI 74000',
@@ -36,97 +43,66 @@ const COMPANY = {
   phone: '+92-21 36453214',
 };
 
-// Colors matching the original Sea Keepers PDF
-const TEAL_BLUE = '#0080A0';        // logo color (teal blue, matching original)
-const DARK_BLUE = '#1e3a8a';       // company name + stamp border
+const DARK_BLUE = '#1e3a8a';
 const BLACK = '#000000';
 
+// Page dimensions (A4 portrait)
+const PAGE_WIDTH = 595;
+const PAGE_HEIGHT = 842;
+const MARGIN = 50;
+
 /**
- * Draw a sailboat logo matching the Sea Keepers original.
- * Teal blue, curved hull with pointed bow, single triangular sail with a boom line.
+ * Load the logo image as a base64 data URL.
+ * Using data URL bypasses pdfkit's broken fs.readFileSync in standalone build.
  */
-function drawSailboatLogo(doc: InstanceType<typeof PDFDocument>, x: number, y: number, size: number) {
-  // Hull — curved boat shape with pointed bow (front) and rounded stern (back)
-  // Using quadratic curves for a smooth, boat-like hull
-  doc.save();
-  doc.moveTo(x + size * 0.05, y + size * 0.62);            // left side (stern top)
-  doc.quadraticCurveTo(x + size * 0.5, y + size * 0.95, x + size * 0.92, y + size * 0.65); // bottom curve to bow
-  doc.lineTo(x + size * 0.98, y + size * 0.62);            // bow point
-  doc.quadraticCurveTo(x + size * 0.5, y + size * 0.75, x + size * 0.05, y + size * 0.62); // back to stern
-  doc.fill(TEAL_BLUE);
-  doc.restore();
-
-  // Mast (vertical line from top of sail to deck)
-  doc.rect(x + size * 0.46, y + size * 0.05, size * 0.025, size * 0.58).fill(TEAL_BLUE);
-
-  // Sail — triangular, filled, angled slightly to the right
-  doc.save();
-  doc.moveTo(x + size * 0.485, y + size * 0.05);           // top of sail (peak)
-  doc.lineTo(x + size * 0.88, y + size * 0.55);            // right edge (down to boom)
-  doc.lineTo(x + size * 0.485, y + size * 0.55);           // bottom-left of sail
-  doc.fill(TEAL_BLUE);
-  doc.restore();
-
-  // Boom — horizontal line across the sail (thicker, ~1/3 down from top)
-  doc.rect(x + size * 0.46, y + size * 0.2, size * 0.44, size * 0.04).fill(TEAL_BLUE);
+function getLogoDataUrl(): string | null {
+  const paths = [
+    join(process.cwd(), 'public', 'assets', 'sea-keepers-logo.jpg'),
+    join(process.cwd(), 'public', 'assets', 'sea-keepers-logo.png'),
+    join(process.cwd(), 'assets', 'sea-keepers-logo.jpg'),
+  ];
+  for (const p of paths) {
+    if (existsSync(p)) {
+      const buf = readFileSync(p);
+      const ext = p.endsWith('.png') ? 'png' : 'jpeg';
+      return `data:image/${ext};base64,${buf.toString('base64')}`;
+    }
+  }
+  return null;
 }
 
 /**
- * Draw a circular company stamp matching the Sea Keepers original.
- * Double border (outer + inner circle), "SEA KEEPERS" text at top,
- * "(Pvt.) Ltd" text at bottom, sailboat logo centered inside.
+ * Load the stamp image as a base64 data URL.
  */
-function drawCompanyStamp(doc: InstanceType<typeof PDFDocument>, cx: number, cy: number, radius: number) {
-  // Outer circle (black, thicker)
-  doc
-    .circle(cx, cy, radius)
-    .strokeColor(BLACK)
-    .lineWidth(1.5)
-    .stroke();
-
-  // Inner circle (black, thinner)
-  doc
-    .circle(cx, cy, radius - 4)
-    .strokeColor(BLACK)
-    .lineWidth(0.7)
-    .stroke();
-
-  // Sailboat logo in center (teal blue)
-  const logoSize = radius * 0.8;
-  drawSailboatLogo(doc, cx - logoSize / 2, cy - logoSize / 2 + 2, logoSize);
-
-  // "SEA KEEPERS" text — top of circle (along the upper arc area)
-  doc
-    .fillColor(BLACK)
-    .font('Helvetica-Bold')
-    .fontSize(6)
-    .text('SEA KEEPERS', cx - radius, cy - radius + 3, {
-      width: radius * 2,
-      align: 'center',
-    });
-
-  // "(Pvt.) Ltd" text — bottom of circle
-  doc
-    .fontSize(5)
-    .text('(Pvt.) Ltd', cx - radius, cy + radius - 9, {
-      width: radius * 2,
-      align: 'center',
-    });
+function getStampDataUrl(): string | null {
+  const paths = [
+    join(process.cwd(), 'public', 'assets', 'sea-keepers-stamp.jpg'),
+    join(process.cwd(), 'public', 'assets', 'sea-keepers-stamp.png'),
+    join(process.cwd(), 'assets', 'sea-keepers-stamp.jpg'),
+  ];
+  for (const p of paths) {
+    if (existsSync(p)) {
+      const buf = readFileSync(p);
+      const ext = p.endsWith('.png') ? 'png' : 'jpeg';
+      return `data:image/${ext};base64,${buf.toString('base64')}`;
+    }
+  }
+  return null;
 }
 
 /**
  * Generate the quotation PDF matching the Sea Keepers format.
+ * Uses actual logo and stamp images extracted from the original PDF.
  * Only includes lines that have a non-empty pricePerUnit.
- * Returns a Promise<Buffer>.
  */
 export function generateQuotationPdfBuffer(payload: QuotationPayload): Promise<Buffer> {
   return new Promise((resolve, reject) => {
     try {
       const chunks: Buffer[] = [];
       const doc = new PDFDocument({
-        size: 'A4',
-        margins: { top: 50, bottom: 60, left: 50, right: 50 },
-        bufferPages: true,
+        size: [PAGE_WIDTH, PAGE_HEIGHT],
+        margins: { top: MARGIN, bottom: MARGIN, left: MARGIN, right: MARGIN },
+        bufferPages: false,
       });
       doc.on('data', (chunk) => chunks.push(Buffer.from(chunk)));
       doc.on('end', () => resolve(Buffer.concat(chunks)));
@@ -137,23 +113,32 @@ export function generateQuotationPdfBuffer(payload: QuotationPayload): Promise<B
         (l) => l.pricePerUnit && parseFloat(l.pricePerUnit.replace(/[^0-9.]/g, '')) > 0
       );
 
-      // ── HEADER ──
-      // Logo (top-left, light blue sailboat)
-      drawSailboatLogo(doc, 50, 40, 40);
+      // Load image assets as data URLs (bypasses pdfkit's broken fs in standalone)
+      const logoDataUrl = getLogoDataUrl();
+      const stampDataUrl = getStampDataUrl();
+
+      // ═══════════════════════════════════════════════
+      // HEADER
+      // ═══════════════════════════════════════════════
+
+      // Logo at top-left (x=50, y=35, width=50px)
+      if (logoDataUrl) {
+        doc.image(logoDataUrl, 50, 35, { width: 50 });
+      }
 
       // Company name (centered, dark blue)
       doc
         .fillColor(DARK_BLUE)
         .font('Helvetica-Bold')
         .fontSize(20)
-        .text(COMPANY.name, 50, 50, { width: 495, align: 'center' });
+        .text(COMPANY.name, 50, 50, { width: PAGE_WIDTH - 100, align: 'center' });
 
-      // Reference number (left)
+      // Ref number (left)
       doc
         .fillColor(BLACK)
         .font('Helvetica')
         .fontSize(10)
-        .text(`REF No: ${payload.quoteNumber}`, 50, 95);
+        .text(`REF No: ${payload.quoteNumber}`, 50, 100);
 
       // Date (right)
       const formattedDate = payload.quoteDate
@@ -167,23 +152,27 @@ export function generateQuotationPdfBuffer(payload: QuotationPayload): Promise<B
             month: 'short',
             year: 'numeric',
           });
-      doc.text(formattedDate, 350, 95, { width: 195, align: 'right' });
+      doc.text(formattedDate, 300, 100, { width: 245, align: 'right' });
 
-      // ── TITLE ──
+      // ═══════════════════════════════════════════════
+      // TITLE
+      // ═══════════════════════════════════════════════
       doc
         .font('Helvetica-Bold')
         .fontSize(16)
-        .text('COMMERCIAL QUOTATION', 50, 120, { width: 495, align: 'center' });
+        .text('COMMERCIAL QUOTATION', 50, 125, { width: PAGE_WIDTH - 100, align: 'center' });
       // Underline
       doc
-        .moveTo(180, 142)
-        .lineTo(415, 142)
+        .moveTo(175, 147)
+        .lineTo(420, 147)
         .strokeColor(BLACK)
         .lineWidth(1)
         .stroke();
 
-      // ── TO SECTION ──
-      let y = 160;
+      // ═══════════════════════════════════════════════
+      // TO SECTION
+      // ═══════════════════════════════════════════════
+      let y = 165;
       doc
         .fillColor(BLACK)
         .font('Helvetica-Bold')
@@ -192,31 +181,33 @@ export function generateQuotationPdfBuffer(payload: QuotationPayload): Promise<B
       doc
         .font('Helvetica')
         .fontSize(11)
-        .text(payload.client.name, 50, y + 16);
-      doc.text(payload.client.email, 50, y + 30);
+        .text(payload.client.name, 50, y + 15);
+      doc.text(payload.client.email, 50, y + 29);
       if (payload.client.subject) {
-        doc.text(`Ref: ${payload.client.subject}`, 50, y + 44, { width: 300 });
+        doc.text(`Ref: ${payload.client.subject}`, 50, y + 43, { width: 300 });
       }
 
-      y = y + 70;
+      y = y + 65;
 
-      // ── TABLE ──
-      // Column layout matching Sea Keepers format
+      // ═══════════════════════════════════════════════
+      // TABLE
+      // ═══════════════════════════════════════════════
+      // Fixed column widths matching the original
       const cols = [
-        { key: 'sr', label: 'S.N#', x: 50, w: 30, align: 'center' as const },
-        { key: 'nsn', label: 'NSN', x: 80, w: 70, align: 'center' as const },
-        { key: 'partNumber', label: 'PART NO', x: 150, w: 60, align: 'center' as const },
-        { key: 'description', label: 'DESCRIPTION', x: 210, w: 175, align: 'left' as const },
-        { key: 'quantity', label: 'QTY', x: 385, w: 35, align: 'center' as const },
-        { key: 'pricePerUnit', label: 'Unit Price', x: 420, w: 60, align: 'right' as const },
-        { key: 'totalPrice', label: 'Total Price', x: 480, w: 65, align: 'right' as const },
+        { label: 'S.N#', x: 50, w: 30, align: 'center' as const },
+        { label: 'NSN', x: 80, w: 70, align: 'center' as const },
+        { label: 'PART NO', x: 150, w: 60, align: 'center' as const },
+        { label: 'DESCRIPTION', x: 210, w: 175, align: 'left' as const },
+        { label: 'QTY', x: 385, w: 35, align: 'center' as const },
+        { label: 'Unit Price', x: 420, w: 60, align: 'right' as const },
+        { label: 'Total Price', x: 480, w: 65, align: 'right' as const },
       ];
 
-      const tableTop = y;
       const tableLeft = 50;
       const tableWidth = 495;
+      const tableTop = y;
 
-      // Table header (no background fill — just bold text with border)
+      // Table header (bold text, black borders)
       doc
         .fillColor(BLACK)
         .font('Helvetica-Bold')
@@ -224,17 +215,16 @@ export function generateQuotationPdfBuffer(payload: QuotationPayload): Promise<B
       for (const c of cols) {
         doc.text(c.label, c.x + 2, y + 6, { width: c.w - 4, align: c.align });
       }
-      // Header bottom border
+      // Header borders
       doc
-        .moveTo(tableLeft, y + 20)
-        .lineTo(tableLeft + tableWidth, y + 20)
+        .rect(tableLeft, y, tableWidth, 20)
         .strokeColor(BLACK)
         .lineWidth(0.5)
         .stroke();
-      // Header top border
+      // Header bottom line (separates header from data)
       doc
-        .moveTo(tableLeft, y)
-        .lineTo(tableLeft + tableWidth, y)
+        .moveTo(tableLeft, y + 20)
+        .lineTo(tableLeft + tableWidth, y + 20)
         .strokeColor(BLACK)
         .lineWidth(0.5)
         .stroke();
@@ -245,30 +235,30 @@ export function generateQuotationPdfBuffer(payload: QuotationPayload): Promise<B
       if (pricedLines.length === 0) {
         doc
           .fillColor('#6b7280')
-          .text('No items priced yet', 50, y + 8, { width: 495, align: 'center' });
+          .text('No items priced yet', 50, y + 8, { width: tableWidth, align: 'center' });
         y += 25;
       } else {
         pricedLines.forEach((line, i) => {
-          const rowHeight = 24;
+          const rowHeight = 22;
 
           // Sr
-          doc.text(String(i + 1), cols[0].x + 2, y + 8, { width: cols[0].w - 4, align: 'center' });
+          doc.text(String(i + 1), cols[0].x + 2, y + 7, { width: cols[0].w - 4, align: 'center' });
           // NSN
-          doc.text(line.nsn || '—', cols[1].x + 2, y + 8, { width: cols[1].w - 4, align: 'center' });
+          doc.text(line.nsn || '—', cols[1].x + 2, y + 7, { width: cols[1].w - 4, align: 'center' });
           // Part Number
-          doc.text(line.partNumber || '—', cols[2].x + 2, y + 8, { width: cols[2].w - 4, align: 'center' });
+          doc.text(line.partNumber || '—', cols[2].x + 2, y + 7, { width: cols[2].w - 4, align: 'center' });
           // Description
-          doc.text(line.description || '—', cols[3].x + 2, y + 5, {
+          doc.text(line.description || '—', cols[3].x + 2, y + 4, {
             width: cols[3].w - 4,
             height: rowHeight - 6,
             ellipsis: true,
           });
           // Qty
-          doc.text(line.quantity || '—', cols[4].x + 2, y + 8, { width: cols[4].w - 4, align: 'center' });
-          // Unit Price (with Rs. prefix)
-          doc.text(`Rs. ${line.pricePerUnit}`, cols[5].x + 2, y + 8, { width: cols[5].w - 4, align: 'right' });
-          // Total Price (with Rs. prefix)
-          doc.text(`Rs. ${line.totalPrice}`, cols[6].x + 2, y + 8, { width: cols[6].w - 4, align: 'right' });
+          doc.text(line.quantity || '—', cols[4].x + 2, y + 7, { width: cols[4].w - 4, align: 'center' });
+          // Unit Price
+          doc.text(`Rs. ${line.pricePerUnit}`, cols[5].x + 2, y + 7, { width: cols[5].w - 4, align: 'right' });
+          // Total Price
+          doc.text(`Rs. ${line.totalPrice}`, cols[6].x + 2, y + 7, { width: cols[6].w - 4, align: 'right' });
 
           // Row bottom border
           doc
@@ -279,24 +269,17 @@ export function generateQuotationPdfBuffer(payload: QuotationPayload): Promise<B
             .stroke();
 
           y += rowHeight;
-
-          if (y > 700) {
-            doc.addPage();
-            y = 50;
-          }
         });
       }
 
-      // Table outer border + vertical column lines
+      // Table outer border + vertical column dividers
       const tableBottom = y;
       const tableHeight = tableBottom - tableTop;
-      // Outer rectangle
       doc
         .rect(tableLeft, tableTop, tableWidth, tableHeight)
         .strokeColor(BLACK)
         .lineWidth(0.5)
         .stroke();
-      // Vertical column dividers
       for (let ci = 1; ci < cols.length; ci++) {
         doc
           .moveTo(cols[ci].x, tableTop)
@@ -306,8 +289,10 @@ export function generateQuotationPdfBuffer(payload: QuotationPayload): Promise<B
           .stroke();
       }
 
-      // ── TOTALS SECTION ──
-      y += 15;
+      // ═══════════════════════════════════════════════
+      // TOTALS (right side, below table)
+      // ═══════════════════════════════════════════════
+      y += 10;
       const totalsX = 320;
       const totalsW = 225;
 
@@ -328,7 +313,7 @@ export function generateQuotationPdfBuffer(payload: QuotationPayload): Promise<B
           .text(`Rs. ${payload.totals.subtotal}`, totalsX + 125, y + 4, { width: totalsW - 130, align: 'right' });
         y += 18;
 
-        // Total GST
+        // GST
         doc
           .rect(totalsX, y, totalsW, 18)
           .strokeColor(BLACK)
@@ -360,18 +345,16 @@ export function generateQuotationPdfBuffer(payload: QuotationPayload): Promise<B
         y += 30;
       }
 
-      // ── TERMS AND CONDITIONS ──
-      if (y > 650) {
-        doc.addPage();
-        y = 50;
-      }
-
+      // ═══════════════════════════════════════════════
+      // TERMS AND CONDITIONS
+      // ═══════════════════════════════════════════════
+      y += 5;
       doc
         .fillColor(BLACK)
         .font('Helvetica-Bold')
         .fontSize(11)
         .text('Terms and Condition:', 50, y);
-      y += 18;
+      y += 16;
 
       doc
         .font('Helvetica')
@@ -385,58 +368,60 @@ export function generateQuotationPdfBuffer(payload: QuotationPayload): Promise<B
       ];
       for (const t of terms) {
         doc.text(`•  ${t}`, 60, y, { width: 485 });
-        y += 15;
+        y += 14;
       }
 
-      // ── SIGNATURE BLOCK ──
-      y += 20;
-      if (y > 700) {
-        doc.addPage();
-        y = 50;
-      }
-
+      // ═══════════════════════════════════════════════
+      // SIGNATURE + STAMP
+      // ═══════════════════════════════════════════════
+      y += 15;
       doc
         .fillColor(BLACK)
         .font('Helvetica')
         .fontSize(11)
         .text('BEST REGARDS,', 50, y);
-      y += 16;
+      y += 15;
       doc
         .font('Helvetica-Bold')
         .text(COMPANY.name, 50, y);
-      y += 30;
 
-      // Circular stamp to the right of the signature
-      drawCompanyStamp(doc, 110, y, 30);
-
-      // ── FOOTER ──
-      const pages = doc.bufferedPageRange();
-      for (let i = 0; i < pages.count; i++) {
-        doc.switchToPage(i);
-        // Footer line
-        doc
-          .moveTo(50, 785)
-          .lineTo(545, 785)
-          .strokeColor(BLACK)
-          .lineWidth(0.5)
-          .stroke();
-        // Address
-        doc
-          .fillColor(BLACK)
-          .font('Helvetica')
-          .fontSize(8)
-          .text(COMPANY.address, 50, 790, { width: 495, align: 'center' });
-        // Website (blue)
-        doc
-          .fillColor(DARK_BLUE)
-          .text(COMPANY.website, 50, 803, { width: 495, align: 'center' });
-        // Email (blue)
-        doc.text(COMPANY.email, 50, 813, { width: 495, align: 'center' });
-        // Phone (black)
-        doc
-          .fillColor(BLACK)
-          .text(COMPANY.phone, 50, 823, { width: 495, align: 'center' });
+      // Stamp image — placed to the right of the signature, not overlapping text
+      if (stampDataUrl) {
+        const stampSize = 60;
+        const stampX = 200;
+        const stampY = y - 5;
+        doc.image(stampDataUrl, stampX, stampY, { width: stampSize, height: stampSize });
       }
+
+      // ═══════════════════════════════════════════════
+      // FOOTER (fixed at bottom of same page — never split)
+      // ═══════════════════════════════════════════════
+      const footerY = PAGE_HEIGHT - 65;
+
+      // Footer line
+      doc
+        .moveTo(50, footerY)
+        .lineTo(PAGE_WIDTH - 50, footerY)
+        .strokeColor(BLACK)
+        .lineWidth(0.5)
+        .stroke();
+
+      // Address
+      doc
+        .fillColor(BLACK)
+        .font('Helvetica')
+        .fontSize(8)
+        .text(COMPANY.address, 50, footerY + 5, { width: PAGE_WIDTH - 100, align: 'center' });
+      // Website (blue)
+      doc
+        .fillColor(DARK_BLUE)
+        .text(COMPANY.website, 50, footerY + 16, { width: PAGE_WIDTH - 100, align: 'center' });
+      // Email (blue)
+      doc.text(COMPANY.email, 50, footerY + 26, { width: PAGE_WIDTH - 100, align: 'center' });
+      // Phone (black)
+      doc
+        .fillColor(BLACK)
+        .text(COMPANY.phone, 50, footerY + 36, { width: PAGE_WIDTH - 100, align: 'center' });
 
       doc.end();
     } catch (e) {

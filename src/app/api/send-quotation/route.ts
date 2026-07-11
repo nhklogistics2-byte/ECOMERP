@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
-import fs from 'fs';
-import path from 'path';
-import os from 'os';
-import { generateQuotationPdfBuffer, type QuotationPayload } from '@/lib/quotation-pdf';
+import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs';
+import { join } from 'node:path';
+import { tmpdir } from 'node:os';
+import { generateQuotationPdfBuffer, type QuotationPayload, type PdfImages } from '@/lib/quotation-pdf';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -30,17 +30,45 @@ const SMTP_CONFIG = {
  * On Vercel serverless, use /tmp (only writable directory).
  */
 function getQuotationDir(): string {
-  const isVercel = process.env.VERCEL || process.cwd().startsWith('/var/task') || !fs.existsSync(path.join(process.cwd(), 'public'));
+  const isVercel = process.env.VERCEL || process.cwd().startsWith('/var/task') || !existsSync(join(process.cwd(), 'public'));
 
   if (isVercel) {
-    const tmpDir = path.join(os.tmpdir(), 'quotations');
-    if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir, { recursive: true });
+    const tmpDir = join(tmpdir(), 'quotations');
+    if (!existsSync(tmpDir)) mkdirSync(tmpDir, { recursive: true });
     return tmpDir;
   }
 
-  const publicDir = path.join(process.cwd(), 'public', 'quotations');
-  if (!fs.existsSync(publicDir)) fs.mkdirSync(publicDir, { recursive: true });
+  const publicDir = join(process.cwd(), 'public', 'quotations');
+  if (!existsSync(publicDir)) mkdirSync(publicDir, { recursive: true });
   return publicDir;
+}
+
+/**
+ * Load logo and stamp images from the assets directory.
+ */
+function loadImages(): PdfImages {
+  const logoPaths = [
+    join(process.cwd(), 'public', 'assets', 'sea-keepers-logo.jpg'),
+    join(process.cwd(), 'public', 'assets', 'sea-keepers-logo.png'),
+    join(process.cwd(), 'assets', 'sea-keepers-logo.jpg'),
+  ];
+  const stampPaths = [
+    join(process.cwd(), 'public', 'assets', 'sea-keepers-stamp.jpg'),
+    join(process.cwd(), 'public', 'assets', 'sea-keepers-stamp.png'),
+    join(process.cwd(), 'assets', 'sea-keepers-stamp.jpg'),
+  ];
+
+  let logo: Buffer | null = null;
+  for (const p of logoPaths) {
+    if (existsSync(p)) { logo = readFileSync(p); break; }
+  }
+
+  let stamp: Buffer | null = null;
+  for (const p of stampPaths) {
+    if (existsSync(p)) { stamp = readFileSync(p); break; }
+  }
+
+  return { logo, stamp };
 }
 
 export async function POST(req: Request) {
@@ -67,7 +95,7 @@ export async function POST(req: Request) {
     // 2. Archive a copy to writable directory (uses /tmp on Vercel)
     try {
       const outDir = getQuotationDir();
-      fs.writeFileSync(path.join(outDir, `${payload.quoteNumber}.pdf`), pdfBuffer);
+      writeFileSync(join(outDir, `${payload.quoteNumber}.pdf`), pdfBuffer);
     } catch (e) {
       console.warn('Failed to archive PDF:', e);
     }
