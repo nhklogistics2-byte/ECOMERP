@@ -37,79 +37,78 @@ const COMPANY = {
 };
 
 // Colors matching the original Sea Keepers PDF
-const LIGHT_BLUE = '#3b82f6';      // logo color
+const TEAL_BLUE = '#0080A0';        // logo color (teal blue, matching original)
 const DARK_BLUE = '#1e3a8a';       // company name + stamp border
 const BLACK = '#000000';
 
 /**
  * Draw a sailboat logo matching the Sea Keepers original.
- * Light blue, curved hull, single triangular sail with a boom line.
+ * Teal blue, curved hull with pointed bow, single triangular sail with a boom line.
  */
 function drawSailboatLogo(doc: InstanceType<typeof PDFDocument>, x: number, y: number, size: number) {
-  // Hull — curved boat shape using a path
+  // Hull — curved boat shape with pointed bow (front) and rounded stern (back)
+  // Using quadratic curves for a smooth, boat-like hull
   doc.save();
-  doc.moveTo(x + size * 0.05, y + size * 0.65);
-  doc.lineTo(x + size * 0.95, y + size * 0.65);
-  // Curve down to the keel
-  doc.quadraticCurveTo(x + size * 0.95, y + size * 0.85, x + size * 0.75, y + size * 0.95);
-  doc.lineTo(x + size * 0.25, y + size * 0.95);
-  doc.quadraticCurveTo(x + size * 0.05, y + size * 0.85, x + size * 0.05, y + size * 0.65);
-  doc.fill(LIGHT_BLUE);
+  doc.moveTo(x + size * 0.05, y + size * 0.62);            // left side (stern top)
+  doc.quadraticCurveTo(x + size * 0.5, y + size * 0.95, x + size * 0.92, y + size * 0.65); // bottom curve to bow
+  doc.lineTo(x + size * 0.98, y + size * 0.62);            // bow point
+  doc.quadraticCurveTo(x + size * 0.5, y + size * 0.75, x + size * 0.05, y + size * 0.62); // back to stern
+  doc.fill(TEAL_BLUE);
   doc.restore();
 
-  // Mast (vertical line)
-  doc.rect(x + size * 0.48, y + size * 0.05, size * 0.03, size * 0.6).fill(LIGHT_BLUE);
+  // Mast (vertical line from top of sail to deck)
+  doc.rect(x + size * 0.46, y + size * 0.05, size * 0.025, size * 0.58).fill(TEAL_BLUE);
 
-  // Sail — curved triangular shape (main sail)
+  // Sail — triangular, filled, angled slightly to the right
   doc.save();
-  doc.moveTo(x + size * 0.51, y + size * 0.08);
-  doc.lineTo(x + size * 0.85, y + size * 0.6);
-  doc.lineTo(x + size * 0.51, y + size * 0.6);
-  doc.fill(LIGHT_BLUE);
+  doc.moveTo(x + size * 0.485, y + size * 0.05);           // top of sail (peak)
+  doc.lineTo(x + size * 0.88, y + size * 0.55);            // right edge (down to boom)
+  doc.lineTo(x + size * 0.485, y + size * 0.55);           // bottom-left of sail
+  doc.fill(TEAL_BLUE);
   doc.restore();
 
-  // Boom — horizontal line at bottom of sail
-  doc.rect(x + size * 0.48, y + size * 0.58, size * 0.4, size * 0.03).fill(LIGHT_BLUE);
+  // Boom — horizontal line across the sail (thicker, ~1/3 down from top)
+  doc.rect(x + size * 0.46, y + size * 0.2, size * 0.44, size * 0.04).fill(TEAL_BLUE);
 }
 
 /**
- * Draw a circular company stamp with the sailboat logo in the center
- * and company name text curved around the top of the circle.
+ * Draw a circular company stamp matching the Sea Keepers original.
+ * Double border (outer + inner circle), "SEA KEEPERS" text at top,
+ * "(Pvt.) Ltd" text at bottom, sailboat logo centered inside.
  */
 function drawCompanyStamp(doc: InstanceType<typeof PDFDocument>, cx: number, cy: number, radius: number) {
-  // Outer circle
+  // Outer circle (black, thicker)
   doc
     .circle(cx, cy, radius)
-    .strokeColor(DARK_BLUE)
+    .strokeColor(BLACK)
     .lineWidth(1.5)
     .stroke();
 
-  // Inner circle
+  // Inner circle (black, thinner)
   doc
     .circle(cx, cy, radius - 4)
-    .strokeColor(DARK_BLUE)
-    .lineWidth(0.5)
+    .strokeColor(BLACK)
+    .lineWidth(0.7)
     .stroke();
 
-  // Sailboat logo in center (smaller)
-  const logoSize = radius * 0.7;
-  drawSailboatLogo(doc, cx - logoSize / 2, cy - logoSize / 2 - 2, logoSize);
+  // Sailboat logo in center (teal blue)
+  const logoSize = radius * 0.8;
+  drawSailboatLogo(doc, cx - logoSize / 2, cy - logoSize / 2 + 2, logoSize);
 
-  // Company name text — top arc
-  // pdfkit doesn't support curved text easily, so we place text in a row above center
+  // "SEA KEEPERS" text — top of circle (along the upper arc area)
   doc
-    .fillColor(DARK_BLUE)
+    .fillColor(BLACK)
     .font('Helvetica-Bold')
     .fontSize(6)
-    .text('SEA KEEPERS (Pvt) Ltd', cx - radius, cy - radius + 2, {
+    .text('SEA KEEPERS', cx - radius, cy - radius + 3, {
       width: radius * 2,
       align: 'center',
     });
 
-  // Bottom text
+  // "(Pvt.) Ltd" text — bottom of circle
   doc
     .fontSize(5)
-    .text('KARACHI • PAKISTAN', cx - radius, cy + radius - 8, {
+    .text('(Pvt.) Ltd', cx - radius, cy + radius - 9, {
       width: radius * 2,
       align: 'center',
     });
@@ -309,8 +308,8 @@ export function generateQuotationPdfBuffer(payload: QuotationPayload): Promise<B
 
       // ── TOTALS SECTION ──
       y += 15;
-      const totalsX = 350;
-      const totalsW = 195;
+      const totalsX = 320;
+      const totalsW = 225;
 
       if (pricedLines.length > 0) {
         // Subtotal
@@ -323,10 +322,10 @@ export function generateQuotationPdfBuffer(payload: QuotationPayload): Promise<B
           .fillColor(BLACK)
           .font('Helvetica')
           .fontSize(10)
-          .text('Subtotal:', totalsX + 5, y + 4, { width: 100 });
+          .text('Subtotal:', totalsX + 5, y + 4, { width: 120 });
         doc
           .font('Helvetica-Bold')
-          .text(`Rs. ${payload.totals.subtotal}`, totalsX + 105, y + 4, { width: totalsW - 110, align: 'right' });
+          .text(`Rs. ${payload.totals.subtotal}`, totalsX + 125, y + 4, { width: totalsW - 130, align: 'right' });
         y += 18;
 
         // Total GST
@@ -339,10 +338,10 @@ export function generateQuotationPdfBuffer(payload: QuotationPayload): Promise<B
           .fillColor(BLACK)
           .font('Helvetica')
           .fontSize(10)
-          .text('GST (18%):', totalsX + 5, y + 4, { width: 100 });
+          .text('GST (18%):', totalsX + 5, y + 4, { width: 120 });
         doc
           .font('Helvetica-Bold')
-          .text(`Rs. ${payload.totals.totalGst}`, totalsX + 105, y + 4, { width: totalsW - 110, align: 'right' });
+          .text(`Rs. ${payload.totals.totalGst}`, totalsX + 125, y + 4, { width: totalsW - 130, align: 'right' });
         y += 18;
 
         // Grand Total (dark blue box)
@@ -354,10 +353,10 @@ export function generateQuotationPdfBuffer(payload: QuotationPayload): Promise<B
           .fillColor('#FFFFFF')
           .font('Helvetica-Bold')
           .fontSize(11)
-          .text('GRAND TOTAL:', totalsX + 5, y + 6, { width: 100 });
+          .text('GRAND TOTAL:', totalsX + 5, y + 6, { width: 120 });
         doc
           .fontSize(12)
-          .text(`Rs. ${payload.totals.grandTotal}`, totalsX + 105, y + 6, { width: totalsW - 110, align: 'right' });
+          .text(`Rs. ${payload.totals.grandTotal}`, totalsX + 125, y + 6, { width: totalsW - 130, align: 'right' });
         y += 30;
       }
 
