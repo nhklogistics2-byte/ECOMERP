@@ -10,24 +10,21 @@ export const maxDuration = 60;
 
 /**
  * Get a writable directory for storing generated PDFs.
- * On Vercel serverless, the filesystem is read-only except /tmp.
- * In local dev, use public/quotations so the PDF is directly downloadable.
+ * On Vercel serverless, use /tmp (the only writable directory).
+ * In local dev, use public/quotations.
  */
-function getQuotationDir(): { dir: string; isPublic: boolean } {
-  // Check if we're on Vercel (serverless) — /var/task is the function root
-  const isVercel = process.env.VERCEL || process.cwd().startsWith('/var/task') || !fs.existsSync(path.join(process.cwd(), 'public'));
-
-  if (isVercel) {
-    // Use /tmp on Vercel (the only writable directory)
+function getQuotationDir(): string {
+  // On Vercel, use /tmp (read-only filesystem elsewhere)
+  if (process.env.VERCEL || process.cwd().startsWith('/var/task')) {
     const tmpDir = path.join(os.tmpdir(), 'quotations');
     if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir, { recursive: true });
-    return { dir: tmpDir, isPublic: false };
+    return tmpDir;
   }
 
-  // Local dev — use public/quotations for direct download
+  // Local dev — use public/quotations
   const publicDir = path.join(process.cwd(), 'public', 'quotations');
   if (!fs.existsSync(publicDir)) fs.mkdirSync(publicDir, { recursive: true });
-  return { dir: publicDir, isPublic: true };
+  return publicDir;
 }
 
 export async function POST(req: Request) {
@@ -45,15 +42,13 @@ export async function POST(req: Request) {
     const pdfBuffer = await generateQuotationPdfBuffer(payload);
 
     // Save to writable directory
-    const { dir, isPublic } = getQuotationDir();
+    const dir = getQuotationDir();
     const filename = `${payload.quoteNumber}.pdf`;
     const filepath = path.join(dir, filename);
     fs.writeFileSync(filepath, pdfBuffer);
 
-    // Return appropriate download URL
-    const downloadUrl = isPublic
-      ? `/quotations/${filename}`
-      : `/api/quotation-pdf/${encodeURIComponent(payload.quoteNumber)}`;
+    // Always use the API endpoint to serve the PDF (works on both local + Vercel)
+    const downloadUrl = `/api/generate-quotation?download=${encodeURIComponent(payload.quoteNumber)}`;
 
     return NextResponse.json({
       ok: true,
@@ -72,7 +67,7 @@ export async function POST(req: Request) {
 }
 
 /**
- * GET handler — serves the PDF file from /tmp on Vercel
+ * GET handler — serves the PDF file from either /tmp or public/quotations.
  * Route: /api/generate-quotation?download=<quoteNumber>
  */
 export async function GET(req: Request) {
@@ -81,7 +76,10 @@ export async function GET(req: Request) {
     const quoteNumber = url.searchParams.get('download');
 
     if (!quoteNumber) {
-      return NextResponse.json({ ok: false, error: 'download query param required' }, { status: 400 });
+      return NextResponse.json(
+        { ok: false, error: 'download query param required' },
+        { status: 400 }
+      );
     }
 
     // Check both possible locations
@@ -93,18 +91,29 @@ export async function GET(req: Request) {
     else if (fs.existsSync(publicPath)) filepath = publicPath;
 
     if (!filepath) {
-      return NextResponse.json({ ok: false, error: 'PDF not found' }, { status: 404 });
+      return NextResponse.json(
+        { ok: false, error: `PDF "${quoteNumber}.pdf" not found` },
+        { status: 404 }
+      );
     }
 
     const buffer = fs.readFileSync(filepath);
 
     const headers = new Headers();
     headers.set('Content-Type', 'application/pdf');
-    headers.set('Content-Disposition', `inline; filename="${quoteNumber}.pdf"`);
+    headers.set(
+      'Content-Disposition',
+      `inline; filename="${quoteNumber}.pdf"`
+    );
     headers.set('Cache-Control', 'private, max-age=3600');
+    headers.set('Content-Length', String(buffer.length));
 
     return new NextResponse(new Uint8Array(buffer), { status: 200, headers });
   } catch (e) {
-    return NextResponse.json({ ok: false, error: (e as Error).message }, { status: 500 });
+    console.error('PDF download error:', e);
+    return NextResponse.json(
+      { ok: false, error: (e as Error).message },
+      { status: 500 }
+    );
   }
 }
