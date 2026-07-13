@@ -19,6 +19,18 @@ const VIEW_LABELS: Record<ViewKey, { label: string; sub: string }> = {
   'hr-employees': { label: 'Employees', sub: 'HR' },
   'hr-leaves': { label: 'Leave Requests', sub: 'HR' },
   'hr-attendance': { label: 'Attendance', sub: 'HR' },
+  // Design department
+  'design-overview': { label: 'Overview', sub: 'Design' },
+  'design-projects': { label: 'Projects', sub: 'Design' },
+  'design-team': { label: 'Team', sub: 'Design' },
+  // Sales department
+  'sales-overview': { label: 'Overview', sub: 'Sales' },
+  'sales-leads': { label: 'Leads Pipeline', sub: 'Sales' },
+  'sales-team': { label: 'Team', sub: 'Sales' },
+  // Operations department
+  'ops-overview': { label: 'Overview', sub: 'Operations' },
+  'ops-shipments': { label: 'Shipments', sub: 'Operations' },
+  'ops-team': { label: 'Team', sub: 'Operations' },
 };
 
 export function Topbar({
@@ -29,7 +41,8 @@ export function Topbar({
   onRefresh?: () => void;
 }) {
   const { view, setSidebarOpen, notifications, setView } = useAppStore();
-  const meta = VIEW_LABELS[view];
+  // Defensive fallback so a missing VIEW_LABELS entry never crashes the topbar
+  const meta = VIEW_LABELS[view] || { label: view, sub: 'ERP' };
   const unread = notifications.filter((n) => !n.read).length;
 
   const now = new Date();
