@@ -1,9 +1,6 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -29,4 +26,56 @@ model Post {
   authorId  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+// ── HR Models ──
+
+model Employee {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  phone        String   @default("")
+  role         String   @default("")
+  department   String   @default("")
+  status       String   @default("active") // active | on-leave | inactive
+  joinDate     String   @default("")
+  salary       Int      @default(0)
+  leaveBalance Int      @default(20)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  leaveRequests LeaveRequest[]
+  attendance    AttendanceRecord[]
+}
+
+model LeaveRequest {
+  id         String   @id @default(cuid())
+  employeeId String
+  type       String   @default("annual") // annual | sick | casual | unpaid
+  fromDate   String
+  toDate     String
+  days       Int      @default(1)
+  reason     String   @default("")
+  status     String   @default("pending") // pending | approved | rejected
+  reviewedBy String   @default("")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  employee Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+}
+
+model AttendanceRecord {
+  id         String   @id @default(cuid())
+  employeeId String
+  date       String   // YYYY-MM-DD
+  checkIn    String?  // HH:MM
+  checkOut   String?  // HH:MM
+  status     String   @default("present") // present | late | absent | half-day | remote
+  workHours  Float    @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  employee Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  @@unique([employeeId, date])
 }

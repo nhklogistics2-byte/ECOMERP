@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import {
   UserCircle,
   Search,
@@ -10,6 +10,7 @@ import {
   Calendar,
   TrendingUp,
   X,
+  Loader2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -42,7 +43,8 @@ function formatDate(iso: string): string {
 }
 
 export function HrEmployeesView() {
-  const { employees, addEmployee, updateEmployee, removeEmployee, addAuditEntry } = useAppStore();
+  const { employees, fetchEmployees, addEmployee, updateEmployee, removeEmployee, addAuditEntry } = useAppStore();
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [deptFilter, setDeptFilter] = useState('all');
   const [showAddForm, setShowAddForm] = useState(false);
@@ -55,6 +57,15 @@ export function HrEmployeesView() {
     salary: 0,
     leaveBalance: 20,
   });
+
+  // Fetch real data from database on mount
+  useEffect(() => {
+    (async () => {
+      setLoading(true);
+      await fetchEmployees();
+      setLoading(false);
+    })();
+  }, [fetchEmployees]);
 
   const departments = useMemo(() => {
     const s = new Set(employees.map((e) => e.department));
@@ -82,39 +93,47 @@ export function HrEmployeesView() {
     };
   }, [employees]);
 
-  const handleAdd = () => {
+  const handleAdd = async () => {
     if (!newEmp.name || !newEmp.email) {
       toast.warning('Name and email are required');
       return;
     }
-    addEmployee({
-      ...newEmp,
-      phone: newEmp.phone || '',
-      status: 'active',
-      joinDate: new Date().toISOString().slice(0, 10),
-    });
-    addAuditEntry({
-      actor: 'ceo@ecomruns.com',
-      action: 'hr.employee_add',
-      entity: 'employee',
-      entityId: `emp-${Date.now()}`,
-      note: `Added employee ${newEmp.name} as ${newEmp.role}`,
-    });
-    toast.success(`Employee ${newEmp.name} added`);
-    setNewEmp({ name: '', email: '', phone: '', role: '', department: 'Sales', salary: 0, leaveBalance: 20 });
-    setShowAddForm(false);
+    try {
+      await addEmployee({
+        ...newEmp,
+        phone: newEmp.phone || '',
+        status: 'active',
+        joinDate: new Date().toISOString().slice(0, 10),
+      });
+      addAuditEntry({
+        actor: 'ceo@ecomruns.com',
+        action: 'hr.employee_add',
+        entity: 'employee',
+        entityId: `emp-${Date.now()}`,
+        note: `Added employee ${newEmp.name} as ${newEmp.role}`,
+      });
+      toast.success(`Employee ${newEmp.name} added`);
+      setNewEmp({ name: '', email: '', phone: '', role: '', department: 'Sales', salary: 0, leaveBalance: 20 });
+      setShowAddForm(false);
+    } catch (e) {
+      toast.error('Failed to add employee', { description: (e as Error).message });
+    }
   };
 
-  const handleStatusChange = (id: string, name: string, status: Employee['status']) => {
-    updateEmployee(id, { status });
-    addAuditEntry({
-      actor: 'ceo@ecomruns.com',
-      action: 'hr.employee_status',
-      entity: 'employee',
-      entityId: id,
-      note: `Changed ${name} status to ${status}`,
-    });
-    toast.success(`${name} status updated to ${status}`);
+  const handleStatusChange = async (id: string, name: string, status: Employee['status']) => {
+    try {
+      await updateEmployee(id, { status });
+      addAuditEntry({
+        actor: 'ceo@ecomruns.com',
+        action: 'hr.employee_status',
+        entity: 'employee',
+        entityId: id,
+        note: `Changed ${name} status to ${status}`,
+      });
+      toast.success(`${name} status updated to ${status}`);
+    } catch (e) {
+      toast.error('Failed to update status', { description: (e as Error).message });
+    }
   };
 
   return (
@@ -219,7 +238,14 @@ export function HrEmployeesView() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {filtered.length === 0 ? (
+              {loading ? (
+                <tr>
+                  <td colSpan={9} className="text-center py-12 text-gray-500">
+                    <Loader2 className="size-5 animate-spin mx-auto mb-2 text-blue-500" />
+                    Loading employees…
+                  </td>
+                </tr>
+              ) : filtered.length === 0 ? (
                 <tr>
                   <td colSpan={9} className="text-center py-12 text-gray-500">
                     <UserCircle className="size-8 mx-auto mb-2 opacity-30" />

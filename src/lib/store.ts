@@ -50,19 +50,22 @@ interface AppState {
 
   // HR — Employees
   employees: Employee[];
-  addEmployee: (e: Omit<Employee, 'id' | 'avatar'>) => void;
-  updateEmployee: (id: string, patch: Partial<Employee>) => void;
-  removeEmployee: (id: string) => void;
+  fetchEmployees: () => Promise<void>;
+  addEmployee: (e: Omit<Employee, 'id' | 'avatar'>) => Promise<void>;
+  updateEmployee: (id: string, patch: Partial<Employee>) => Promise<void>;
+  removeEmployee: (id: string) => Promise<void>;
 
   // HR — Leave Requests
   leaveRequests: LeaveRequest[];
-  addLeaveRequest: (r: Omit<LeaveRequest, 'id' | 'appliedAt' | 'status'>) => void;
-  reviewLeaveRequest: (id: string, status: 'approved' | 'rejected', reviewer: string) => void;
+  fetchLeaves: () => Promise<void>;
+  addLeaveRequest: (r: Omit<LeaveRequest, 'id' | 'appliedAt' | 'status' | 'employeeName'>) => Promise<void>;
+  reviewLeaveRequest: (id: string, status: 'approved' | 'rejected', reviewer: string) => Promise<void>;
 
   // HR — Attendance
   attendance: AttendanceRecord[];
-  checkIn: (employeeId: string, employeeName: string) => void;
-  checkOut: (employeeId: string, employeeName: string) => void;
+  fetchAttendance: () => Promise<void>;
+  checkIn: (employeeId: string) => Promise<void>;
+  checkOut: (employeeId: string) => Promise<void>;
 }
 
 const SEED_NOTIFICATIONS: AppNotification[] = [
@@ -148,7 +151,7 @@ const SEED_AUDIT: AuditEntry[] = [
   },
 ];
 
-// ── HR Seed Data ──
+// ── HR helpers ──
 
 function initials(name: string): string {
   const parts = name.split(' ').filter(Boolean);
@@ -157,42 +160,21 @@ function initials(name: string): string {
   return (parts[0][0] + parts[1][0]).toUpperCase();
 }
 
-const SEED_EMPLOYEES: Employee[] = [
-  { id: 'emp-001', name: 'Ahsan Iqbal', email: 'ahsan@ecomruns.com', phone: '+92-300-1111111', role: 'CEO', department: 'Management', status: 'active', joinDate: '2020-01-15', salary: 500000, leaveBalance: 18, avatar: 'AI' },
-  { id: 'emp-002', name: 'Bilal Ahmed', email: 'bilal@ecomruns.com', phone: '+92-300-2222222', role: 'Sales Manager', department: 'Sales', status: 'active', joinDate: '2021-03-10', salary: 250000, leaveBalance: 14, avatar: 'BA' },
-  { id: 'emp-003', name: 'Muhammad Moizuddin', email: 'moiz@ecomruns.com', phone: '+92-300-3333333', role: 'Sales Agent', department: 'Sales', status: 'active', joinDate: '2022-06-01', salary: 120000, leaveBalance: 20, avatar: 'MM' },
-  { id: 'emp-004', name: 'Naveed Syed', email: 'naveed@ecomruns.com', phone: '+92-300-4444444', role: 'Sales Agent', department: 'Sales', status: 'on-leave', joinDate: '2022-08-15', salary: 115000, leaveBalance: 5, avatar: 'NS' },
-  { id: 'emp-005', name: 'Zargham Khan', email: 'zargham@ecomruns.com', phone: '+92-300-5555555', role: 'Operations Manager', department: 'Operations', status: 'active', joinDate: '2021-01-20', salary: 220000, leaveBalance: 16, avatar: 'ZK' },
-  { id: 'emp-006', name: 'Fatima Zahra', email: 'fatima@ecomruns.com', phone: '+92-300-6666666', role: 'HR Manager', department: 'HR', status: 'active', joinDate: '2021-09-05', salary: 180000, leaveBalance: 19, avatar: 'FZ' },
-  { id: 'emp-007', name: 'Hassan Raza', email: 'hassan@ecomruns.com', phone: '+92-300-7777777', role: 'Finance Officer', department: 'Finance', status: 'active', joinDate: '2022-02-14', salary: 160000, leaveBalance: 21, avatar: 'HR' },
-  { id: 'emp-008', name: 'Ayesha Malik', email: 'ayesha@ecomruns.com', phone: '+92-300-8888888', role: 'Design Lead', department: 'Design', status: 'active', joinDate: '2022-04-10', salary: 150000, leaveBalance: 17, avatar: 'AM' },
-  { id: 'emp-009', name: 'Usman Tariq', email: 'usman@ecomruns.com', phone: '+92-300-9999999', role: 'IT Support', department: 'IT', status: 'active', joinDate: '2023-01-05', salary: 130000, leaveBalance: 22, avatar: 'UT' },
-  { id: 'emp-010', name: 'Sana Bibi', email: 'sana@ecomruns.com', phone: '+92-301-1111111', role: 'Procurement Officer', department: 'Operations', status: 'inactive', joinDate: '2021-11-20', salary: 140000, leaveBalance: 0, avatar: 'SB' },
-  { id: 'emp-011', name: 'Kamran Akmal', email: 'kamran@ecomruns.com', phone: '+92-301-2222222', role: 'Warehouse Supervisor', department: 'Operations', status: 'active', joinDate: '2022-07-01', salary: 125000, leaveBalance: 15, avatar: 'KA' },
-  { id: 'emp-012', name: 'Rabia Anwar', email: 'rabia@ecomruns.com', phone: '+92-301-3333333', role: 'Customer Support', department: 'Sales', status: 'active', joinDate: '2023-03-15', salary: 100000, leaveBalance: 23, avatar: 'RA' },
-];
-
-const SEED_LEAVE_REQUESTS: LeaveRequest[] = [
-  { id: 'lv-001', employeeId: 'emp-004', employeeName: 'Naveed Syed', type: 'annual', fromDate: '2026-07-08', toDate: '2026-07-14', days: 7, reason: 'Family vacation — pre-planned trip to northern areas', status: 'approved', appliedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 5).toISOString(), reviewedBy: 'Ahsan Iqbal' },
-  { id: 'lv-002', employeeId: 'emp-003', employeeName: 'Muhammad Moizuddin', type: 'sick', fromDate: '2026-07-12', toDate: '2026-07-13', days: 2, reason: 'Fever and flu — medical rest advised', status: 'pending', appliedAt: new Date(Date.now() - 1000 * 60 * 60 * 3).toISOString() },
-  { id: 'lv-003', employeeId: 'emp-008', employeeName: 'Ayesha Malik', type: 'casual', fromDate: '2026-07-15', toDate: '2026-07-15', days: 1, reason: 'Personal errand — bank and passport renewal', status: 'pending', appliedAt: new Date(Date.now() - 1000 * 60 * 60 * 1).toISOString() },
-  { id: 'lv-004', employeeId: 'emp-007', employeeName: 'Hassan Raza', type: 'annual', fromDate: '2026-08-01', toDate: '2026-08-10', days: 10, reason: 'Eid holidays extended leave', status: 'pending', appliedAt: new Date(Date.now() - 1000 * 60 * 30).toISOString() },
-  { id: 'lv-005', employeeId: 'emp-012', employeeName: 'Rabia Anwar', type: 'sick', fromDate: '2026-07-05', toDate: '2026-07-06', days: 2, reason: 'Migraine — unable to work', status: 'rejected', appliedAt: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString(), reviewedBy: 'Fatima Zahra' },
-];
-
-const today = new Date().toISOString().slice(0, 10);
-const SEED_ATTENDANCE: AttendanceRecord[] = [
-  { id: 'att-001', employeeId: 'emp-001', employeeName: 'Ahsan Iqbal', date: today, checkIn: '08:45', checkOut: '17:30', status: 'present', workHours: 8.75 },
-  { id: 'att-002', employeeId: 'emp-002', employeeName: 'Bilal Ahmed', date: today, checkIn: '09:05', checkOut: null, status: 'late', workHours: 0 },
-  { id: 'att-003', employeeId: 'emp-003', employeeName: 'Muhammad Moizuddin', date: today, checkIn: '08:50', checkOut: null, status: 'present', workHours: 0 },
-  { id: 'att-004', employeeId: 'emp-005', employeeName: 'Zargham Khan', date: today, checkIn: '08:30', checkOut: '17:15', status: 'present', workHours: 8.75 },
-  { id: 'att-005', employeeId: 'emp-006', employeeName: 'Fatima Zahra', date: today, checkIn: '08:40', checkOut: null, status: 'present', workHours: 0 },
-  { id: 'att-006', employeeId: 'emp-007', employeeName: 'Hassan Raza', date: today, checkIn: '09:15', checkOut: null, status: 'late', workHours: 0 },
-  { id: 'att-007', employeeId: 'emp-008', employeeName: 'Ayesha Malik', date: today, checkIn: '08:55', checkOut: null, status: 'present', workHours: 0 },
-  { id: 'att-008', employeeId: 'emp-009', employeeName: 'Usman Tariq', date: today, checkIn: null, checkOut: null, status: 'remote', workHours: 0 },
-  { id: 'att-009', employeeId: 'emp-011', employeeName: 'Kamran Akmal', date: today, checkIn: '08:35', checkOut: null, status: 'present', workHours: 0 },
-  { id: 'att-010', employeeId: 'emp-012', employeeName: 'Rabia Anwar', date: today, checkIn: '09:20', checkOut: null, status: 'late', workHours: 0 },
-];
+function mapEmployee(e: Record<string, unknown>): Employee {
+  return {
+    id: String(e.id),
+    name: String(e.name || ''),
+    email: String(e.email || ''),
+    phone: String(e.phone || ''),
+    role: String(e.role || ''),
+    department: String(e.department || ''),
+    status: (e.status as Employee['status']) || 'active',
+    joinDate: String(e.joinDate || ''),
+    salary: Number(e.salary || 0),
+    leaveBalance: Number(e.leaveBalance || 0),
+    avatar: initials(String(e.name || '')),
+  };
+}
 
 export const useAppStore = create<AppState>((set, get) => ({
   view: 'dashboard',
@@ -335,106 +317,100 @@ export const useAppStore = create<AppState>((set, get) => ({
     })),
 
   // ── HR — Employees ──
-  employees: SEED_EMPLOYEES,
-  addEmployee: (e) =>
-    set((s) => ({
-      employees: [
-        ...s.employees,
-        {
-          id: `emp-${Date.now()}`,
-          avatar: initials(e.name),
-          ...e,
-        },
-      ],
-    })),
-  updateEmployee: (id, patch) =>
-    set((s) => ({
-      employees: s.employees.map((emp) =>
-        emp.id === id ? { ...emp, ...patch } : emp
-      ),
-    })),
-  removeEmployee: (id) =>
-    set((s) => ({
-      employees: s.employees.filter((emp) => emp.id !== id),
-    })),
-
-  // ── HR — Leave Requests ──
-  leaveRequests: SEED_LEAVE_REQUESTS,
-  addLeaveRequest: (r) =>
-    set((s) => ({
-      leaveRequests: [
-        {
-          id: `lv-${Date.now()}`,
-          appliedAt: new Date().toISOString(),
-          status: 'pending',
-          ...r,
-        },
-        ...s.leaveRequests,
-      ],
-    })),
-  reviewLeaveRequest: (id, status, reviewer) =>
-    set((s) => ({
-      leaveRequests: s.leaveRequests.map((r) =>
-        r.id === id ? { ...r, status, reviewedBy: reviewer } : r
-      ),
-    })),
-
-  // ── HR — Attendance ──
-  attendance: SEED_ATTENDANCE,
-  checkIn: (employeeId, employeeName) =>
-    set((s) => {
-      const todayStr = new Date().toISOString().slice(0, 10);
-      const existing = s.attendance.find(
-        (a) => a.employeeId === employeeId && a.date === todayStr
-      );
-      const now = new Date();
-      const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-      const isLate = now.getHours() > 9 || (now.getHours() === 9 && now.getMinutes() > 0);
-      if (existing) {
-        return {
-          attendance: s.attendance.map((a) =>
-            a.employeeId === employeeId && a.date === todayStr
-              ? { ...a, checkIn: timeStr, status: isLate ? 'late' as const : 'present' as const }
-              : a
-          ),
-        };
+  // ── HR — Employees (real database via API) ──
+  employees: [],
+  fetchEmployees: async () => {
+    try {
+      const res = await fetch('/api/hr/employees', { cache: 'no-store' });
+      const data = await res.json();
+      if (data.ok && data.employees) {
+        set({ employees: data.employees.map(mapEmployee) });
       }
-      return {
-        attendance: [
-          ...s.attendance,
-          {
-            id: `att-${Date.now()}`,
-            employeeId,
-            employeeName,
-            date: todayStr,
-            checkIn: timeStr,
-            checkOut: null,
-            status: isLate ? 'late' as const : 'present' as const,
-            workHours: 0,
-          },
-        ],
-      };
-    }),
-  checkOut: (employeeId, employeeName) =>
-    set((s) => {
-      const todayStr = new Date().toISOString().slice(0, 10);
-      const now = new Date();
-      const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-      const existing = s.attendance.find(
-        (a) => a.employeeId === employeeId && a.date === todayStr
-      );
-      if (!existing || !existing.checkIn) return {};
-      // Calculate work hours
-      const [inH, inM] = existing.checkIn.split(':').map(Number);
-      const inMinutes = inH * 60 + inM;
-      const outMinutes = now.getHours() * 60 + now.getMinutes();
-      const workHours = Math.round(((outMinutes - inMinutes) / 60) * 100) / 100;
-      return {
-        attendance: s.attendance.map((a) =>
-          a.employeeId === employeeId && a.date === todayStr
-            ? { ...a, checkOut: timeStr, workHours }
-            : a
-        ),
-      };
-    }),
+    } catch (e) {
+      console.error('fetchEmployees failed:', e);
+    }
+  },
+  addEmployee: async (e) => {
+    const res = await fetch('/api/hr/employees', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(e),
+    });
+    const data = await res.json();
+    if (!data.ok) throw new Error(data.error);
+    await get().fetchEmployees();
+  },
+  updateEmployee: async (id, patch) => {
+    await fetch('/api/hr/employees', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, ...patch }),
+    });
+    await get().fetchEmployees();
+  },
+  removeEmployee: async (id) => {
+    await fetch(`/api/hr/employees?id=${id}`, { method: 'DELETE' });
+    await get().fetchEmployees();
+  },
+
+  // ── HR — Leave Requests (real database via API) ──
+  leaveRequests: [],
+  fetchLeaves: async () => {
+    try {
+      const res = await fetch('/api/hr/leaves', { cache: 'no-store' });
+      const data = await res.json();
+      if (data.ok && data.leaves) {
+        set({ leaveRequests: data.leaves });
+      }
+    } catch (e) {
+      console.error('fetchLeaves failed:', e);
+    }
+  },
+  addLeaveRequest: async (r) => {
+    await fetch('/api/hr/leaves', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(r),
+    });
+    await get().fetchLeaves();
+  },
+  reviewLeaveRequest: async (id, status, reviewer) => {
+    await fetch('/api/hr/leaves', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, status, reviewedBy: reviewer }),
+    });
+    await get().fetchLeaves();
+    await get().fetchEmployees(); // refresh leave balances
+  },
+
+  // ── HR — Attendance (real database via API) ──
+  attendance: [],
+  fetchAttendance: async () => {
+    try {
+      const res = await fetch('/api/hr/attendance', { cache: 'no-store' });
+      const data = await res.json();
+      if (data.ok && data.attendance) {
+        set({ attendance: data.attendance });
+      }
+    } catch (e) {
+      console.error('fetchAttendance failed:', e);
+    }
+  },
+  checkIn: async (employeeId) => {
+    await fetch('/api/hr/attendance', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ employeeId, action: 'checkIn' }),
+    });
+    await get().fetchAttendance();
+  },
+  checkOut: async (employeeId) => {
+    await fetch('/api/hr/attendance', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ employeeId, action: 'checkOut' }),
+    });
+    await get().fetchAttendance();
+  },
 }));

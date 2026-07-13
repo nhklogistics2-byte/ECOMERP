@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import {
   CalendarCheck,
   LogIn,
@@ -8,6 +8,7 @@ import {
   Search,
   Clock,
   Users,
+  Loader2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -35,8 +36,18 @@ function todayStr(): string {
 }
 
 export function HrAttendanceView() {
-  const { employees, attendance, checkIn, checkOut, addAuditEntry } = useAppStore();
+  const { employees, attendance, fetchEmployees, fetchAttendance, checkIn, checkOut, addAuditEntry } = useAppStore();
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+
+  // Fetch real data from database on mount
+  useEffect(() => {
+    (async () => {
+      setLoading(true);
+      await Promise.all([fetchEmployees(), fetchAttendance()]);
+      setLoading(false);
+    })();
+  }, [fetchEmployees, fetchAttendance]);
 
   const today = new Date().toISOString().slice(0, 10);
 
@@ -70,28 +81,36 @@ export function HrAttendanceView() {
     return { present, late, remote, absent, total: employees.filter((e) => e.status !== 'inactive').length };
   }, [todayRecords, employees, todayMap]);
 
-  const handleCheckIn = (employeeId: string, name: string) => {
-    checkIn(employeeId, name);
-    addAuditEntry({
-      actor: name,
-      action: 'hr.check_in',
-      entity: 'attendance',
-      entityId: employeeId,
-      note: `${name} checked in`,
-    });
-    toast.success(`${name} checked in`);
+  const handleCheckIn = async (employeeId: string, name: string) => {
+    try {
+      await checkIn(employeeId);
+      addAuditEntry({
+        actor: name,
+        action: 'hr.check_in',
+        entity: 'attendance',
+        entityId: employeeId,
+        note: `${name} checked in`,
+      });
+      toast.success(`${name} checked in`);
+    } catch (e) {
+      toast.error('Check-in failed', { description: (e as Error).message });
+    }
   };
 
-  const handleCheckOut = (employeeId: string, name: string) => {
-    checkOut(employeeId, name);
-    addAuditEntry({
-      actor: name,
-      action: 'hr.check_out',
-      entity: 'attendance',
-      entityId: employeeId,
-      note: `${name} checked out`,
-    });
-    toast.success(`${name} checked out`);
+  const handleCheckOut = async (employeeId: string, name: string) => {
+    try {
+      await checkOut(employeeId);
+      addAuditEntry({
+        actor: name,
+        action: 'hr.check_out',
+        entity: 'attendance',
+        entityId: employeeId,
+        note: `${name} checked out`,
+      });
+      toast.success(`${name} checked out`);
+    } catch (e) {
+      toast.error('Check-out failed', { description: (e as Error).message });
+    }
   };
 
   return (
@@ -190,7 +209,14 @@ export function HrAttendanceView() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {activeEmployees.length === 0 ? (
+              {loading ? (
+                <tr>
+                  <td colSpan={7} className="text-center py-12 text-gray-500">
+                    <Loader2 className="size-5 animate-spin mx-auto mb-2 text-blue-500" />
+                    Loading attendance…
+                  </td>
+                </tr>
+              ) : activeEmployees.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="text-center py-12 text-gray-500">
                     <CalendarCheck className="size-8 mx-auto mb-2 opacity-30" />

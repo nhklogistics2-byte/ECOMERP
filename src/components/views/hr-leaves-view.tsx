@@ -1,12 +1,13 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import {
   CalendarDays,
   Check,
   X,
   Clock,
   Search,
+  Loader2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -54,9 +55,19 @@ function formatRelative(iso: string): string {
 }
 
 export function HrLeavesView() {
-  const { leaveRequests, reviewLeaveRequest, addAuditEntry, addNotification } = useAppStore();
+  const { leaveRequests, fetchLeaves, reviewLeaveRequest, addAuditEntry, addNotification } = useAppStore();
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | LeaveStatus>('all');
+
+  // Fetch real data from database on mount
+  useEffect(() => {
+    (async () => {
+      setLoading(true);
+      await fetchLeaves();
+      setLoading(false);
+    })();
+  }, [fetchLeaves]);
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -79,21 +90,25 @@ export function HrLeavesView() {
     };
   }, [leaveRequests]);
 
-  const handleReview = (id: string, status: 'approved' | 'rejected', name: string) => {
-    reviewLeaveRequest(id, status, 'CEO');
-    addAuditEntry({
-      actor: 'ceo@ecomruns.com',
-      action: 'hr.leave_review',
-      entity: 'leave_request',
-      entityId: id,
-      note: `${status === 'approved' ? 'Approved' : 'Rejected'} leave for ${name}`,
-    });
-    addNotification({
-      type: 'system',
-      title: `Leave ${status}`,
-      message: `${name}'s leave request has been ${status}`,
-    });
-    toast.success(`Leave ${status} for ${name}`);
+  const handleReview = async (id: string, status: 'approved' | 'rejected', name: string) => {
+    try {
+      await reviewLeaveRequest(id, status, 'CEO');
+      addAuditEntry({
+        actor: 'ceo@ecomruns.com',
+        action: 'hr.leave_review',
+        entity: 'leave_request',
+        entityId: id,
+        note: `${status === 'approved' ? 'Approved' : 'Rejected'} leave for ${name}`,
+      });
+      addNotification({
+        type: 'system',
+        title: `Leave ${status}`,
+        message: `${name}'s leave request has been ${status}`,
+      });
+      toast.success(`Leave ${status} for ${name}`);
+    } catch (e) {
+      toast.error('Failed to review leave', { description: (e as Error).message });
+    }
   };
 
   return (
@@ -185,7 +200,14 @@ export function HrLeavesView() {
 
       {/* Leave requests list */}
       <div className="space-y-2">
-        {filtered.length === 0 ? (
+        {loading ? (
+          <Card className="border-[#e5e7eb]">
+            <CardContent className="p-8 text-center text-gray-500">
+              <Loader2 className="size-5 animate-spin mx-auto mb-2 text-blue-500" />
+              Loading leave requests…
+            </CardContent>
+          </Card>
+        ) : filtered.length === 0 ? (
           <Card className="border-[#e5e7eb]">
             <CardContent className="p-8 text-center text-gray-500">
               <CalendarDays className="size-8 mx-auto mb-2 opacity-30" />
