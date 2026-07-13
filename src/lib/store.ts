@@ -343,8 +343,9 @@ export const useAppStore = create<AppState>((set, get) => ({
   fetchEmployees: async () => {
     try {
       const res = await fetch('/api/hr/employees', { cache: 'no-store' });
+      if (!res.ok) return;
       const data = await res.json();
-      if (data.ok && data.employees) {
+      if (data && data.ok && Array.isArray(data.employees)) {
         set({ employees: data.employees.map(mapEmployee) });
       }
     } catch (e) {
@@ -379,8 +380,9 @@ export const useAppStore = create<AppState>((set, get) => ({
   fetchLeaves: async () => {
     try {
       const res = await fetch('/api/hr/leaves', { cache: 'no-store' });
+      if (!res.ok) return;
       const data = await res.json();
-      if (data.ok && data.leaves) {
+      if (data && data.ok && Array.isArray(data.leaves)) {
         set({ leaveRequests: data.leaves });
       }
     } catch (e) {
@@ -410,8 +412,9 @@ export const useAppStore = create<AppState>((set, get) => ({
   fetchAttendance: async () => {
     try {
       const res = await fetch('/api/hr/attendance', { cache: 'no-store' });
+      if (!res.ok) return;
       const data = await res.json();
-      if (data.ok && data.attendance) {
+      if (data && data.ok && Array.isArray(data.attendance)) {
         set({ attendance: data.attendance });
       }
     } catch (e) {
@@ -440,8 +443,9 @@ export const useAppStore = create<AppState>((set, get) => ({
   fetchDesignProjects: async () => {
     try {
       const res = await fetch('/api/design/projects', { cache: 'no-store' });
+      if (!res.ok) return;
       const data = await res.json();
-      if (data.ok && data.projects) {
+      if (data && data.ok && Array.isArray(data.projects)) {
         set({ designProjects: data.projects });
       }
     } catch (e) {
@@ -454,8 +458,8 @@ export const useAppStore = create<AppState>((set, get) => ({
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(p),
     });
-    const data = await res.json();
-    if (!data.ok) throw new Error(data.error);
+    const data = await res.json().catch(() => ({}));
+    if (!data || !data.ok) throw new Error(data?.error || 'Failed to create project');
     await get().fetchDesignProjects();
   },
   updateDesignProject: async (id, patch) => {
@@ -476,8 +480,9 @@ export const useAppStore = create<AppState>((set, get) => ({
   fetchSalesLeads: async () => {
     try {
       const res = await fetch('/api/sales/leads', { cache: 'no-store' });
+      if (!res.ok) return;
       const data = await res.json();
-      if (data.ok && data.leads) {
+      if (data && data.ok && Array.isArray(data.leads)) {
         set({ salesLeads: data.leads });
       }
     } catch (e) {
@@ -490,8 +495,8 @@ export const useAppStore = create<AppState>((set, get) => ({
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(l),
     });
-    const data = await res.json();
-    if (!data.ok) throw new Error(data.error);
+    const data = await res.json().catch(() => ({}));
+    if (!data || !data.ok) throw new Error(data?.error || 'Failed to create lead');
     await get().fetchSalesLeads();
   },
   updateSalesLead: async (id, patch) => {
@@ -512,8 +517,9 @@ export const useAppStore = create<AppState>((set, get) => ({
   fetchShipments: async () => {
     try {
       const res = await fetch('/api/ops/shipments', { cache: 'no-store' });
+      if (!res.ok) return;
       const data = await res.json();
-      if (data.ok && data.shipments) {
+      if (data && data.ok && Array.isArray(data.shipments)) {
         set({ shipments: data.shipments });
       }
     } catch (e) {
@@ -526,8 +532,8 @@ export const useAppStore = create<AppState>((set, get) => ({
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(s),
     });
-    const data = await res.json();
-    if (!data.ok) throw new Error(data.error);
+    const data = await res.json().catch(() => ({}));
+    if (!data || !data.ok) throw new Error(data?.error || 'Failed to create shipment');
     await get().fetchShipments();
   },
   updateShipment: async (id, patch) => {

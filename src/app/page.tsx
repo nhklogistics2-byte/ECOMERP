@@ -24,6 +24,7 @@ import { SalesTeamView } from '@/components/views/sales-team-view';
 import { OpsOverviewView } from '@/components/views/ops-overview-view';
 import { OpsShipmentsView } from '@/components/views/ops-shipments-view';
 import { OpsTeamView } from '@/components/views/ops-team-view';
+import { ErrorBoundary } from '@/components/error-boundary';
 import { useAppStore } from '@/lib/store';
 import { useAutoSync } from '@/lib/use-auto-sync';
 
@@ -63,26 +64,28 @@ export default function Page() {
         {/* In-app tab bar (only shows when there are open tabs) */}
         <TabBar />
         <main className="flex-1 overflow-x-hidden">
-          {view === 'dashboard' && <DashboardView />}
-          {view === 'inquiries' && <InquiriesView />}
-          {view === 'notifications' && <NotificationsView />}
-          {view === 'ai-replay' && <AiReplayView />}
-          {view === 'ai-eval' && <AiEvalView />}
-          {view === 'audit-log' && <AuditLogView />}
-          {view === 'inquiry-detail' && <InquiryDetailView />}
-          {view === 'pending-users' && <PendingUsersView />}
-          {view === 'hr-employees' && <HrEmployeesView />}
-          {view === 'hr-leaves' && <HrLeavesView />}
-          {view === 'hr-attendance' && <HrAttendanceView />}
-          {view === 'design-overview' && <DesignOverviewView />}
-          {view === 'design-projects' && <DesignProjectsView />}
-          {view === 'design-team' && <DesignTeamView />}
-          {view === 'sales-overview' && <SalesOverviewView />}
-          {view === 'sales-leads' && <SalesLeadsView />}
-          {view === 'sales-team' && <SalesTeamView />}
-          {view === 'ops-overview' && <OpsOverviewView />}
-          {view === 'ops-shipments' && <OpsShipmentsView />}
-          {view === 'ops-team' && <OpsTeamView />}
+          <ErrorBoundary>
+            {view === 'dashboard' && <DashboardView />}
+            {view === 'inquiries' && <InquiriesView />}
+            {view === 'notifications' && <NotificationsView />}
+            {view === 'ai-replay' && <AiReplayView />}
+            {view === 'ai-eval' && <AiEvalView />}
+            {view === 'audit-log' && <AuditLogView />}
+            {view === 'inquiry-detail' && <InquiryDetailView />}
+            {view === 'pending-users' && <PendingUsersView />}
+            {view === 'hr-employees' && <HrEmployeesView />}
+            {view === 'hr-leaves' && <HrLeavesView />}
+            {view === 'hr-attendance' && <HrAttendanceView />}
+            {view === 'design-overview' && <DesignOverviewView />}
+            {view === 'design-projects' && <DesignProjectsView />}
+            {view === 'design-team' && <DesignTeamView />}
+            {view === 'sales-overview' && <SalesOverviewView />}
+            {view === 'sales-leads' && <SalesLeadsView />}
+            {view === 'sales-team' && <SalesTeamView />}
+            {view === 'ops-overview' && <OpsOverviewView />}
+            {view === 'ops-shipments' && <OpsShipmentsView />}
+            {view === 'ops-team' && <OpsTeamView />}
+          </ErrorBoundary>
         </main>
         <footer className="mt-auto border-t border-[#e5e7eb] bg-gray-50/60 py-3 px-4 sm:px-6 text-xs text-gray-500 flex items-center justify-between flex-wrap gap-2">
           <span>
