@@ -1,12 +1,23 @@
 import { NextResponse } from 'next/server';
-import { db } from '@/lib/db';
+import { db, ensureDbReady } from '@/lib/db';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
+function isDbNotConfigured(msg: string): boolean {
+  return (
+    msg.includes('URL must start with') ||
+    msg.includes('no such table') ||
+    msg.includes('does not exist') ||
+    msg.includes('database is locked') ||
+    msg.includes("Couldn't open database")
+  );
+}
+
 // GET — list attendance (optionally filter by date)
 export async function GET(req: Request) {
   try {
+    await ensureDbReady();
     const url = new URL(req.url);
     const date = url.searchParams.get('date') || new Date().toISOString().slice(0, 10);
 
@@ -29,13 +40,19 @@ export async function GET(req: Request) {
 
     return NextResponse.json({ ok: true, attendance: formatted, date });
   } catch (e) {
-    return NextResponse.json({ ok: false, error: (e as Error).message }, { status: 500 });
+    const msg = (e as Error).message || '';
+    if (isDbNotConfigured(msg)) {
+      console.error('[hr/attendance GET] DB not ready, returning empty:', msg.slice(0, 120));
+      return NextResponse.json({ ok: true, attendance: [], date: new Date().toISOString().slice(0, 10) });
+    }
+    return NextResponse.json({ ok: false, error: msg }, { status: 500 });
   }
 }
 
 // POST — check in or check out
 export async function POST(req: Request) {
   try {
+    await ensureDbReady();
     const body = await req.json();
     const { employeeId, action } = body; // action: "checkIn" | "checkOut"
 
@@ -102,6 +119,13 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ ok: false, error: 'Invalid action. Use "checkIn" or "checkOut"' }, { status: 400 });
   } catch (e) {
-    return NextResponse.json({ ok: false, error: (e as Error).message }, { status: 500 });
+    const msg = (e as Error).message || '';
+    if (isDbNotConfigured(msg)) {
+      return NextResponse.json(
+        { ok: false, error: 'Database not configured on this server. Set DATABASE_URL environment variable.' },
+        { status: 503 }
+      );
+    }
+    return NextResponse.json({ ok: false, error: msg }, { status: 500 });
   }
 }
