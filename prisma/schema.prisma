@@ -79,3 +79,112 @@ model AttendanceRecord {
 
   @@unique([employeeId, date])
 }
+
+// ── Design Department Models ──
+
+model DesignProject {
+  id          String   @id @default(cuid())
+  title       String
+  client      String   @default("")
+  category    String   @default("branding") // branding | web | print | packaging | illustration | ui-ux
+  status      String   @default("brief") // brief | in-progress | review | revision | delivered | on-hold
+  priority    String   @default("medium") // low | medium | high | urgent
+  assigneeId  String?  // optional Employee id
+  assigneeName String  @default("")
+  deadline    String   @default("") // YYYY-MM-DD
+  progress    Int      @default(0) // 0–100
+  notes       String   @default("")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  assets DesignAsset[]
+}
+
+model DesignAsset {
+  id         String   @id @default(cuid())
+  projectId  String?  // optional link to DesignProject
+  title      String
+  type       String   @default("image") // image | video | vector | doc | font | mockup
+  url        String   @default("")
+  tags       String   @default("") // comma-separated
+  uploadedBy String   @default("")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  project DesignProject? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+}
+
+// ── Sales Department Models ──
+
+model SalesLead {
+  id         String   @id @default(cuid())
+  company    String
+  contact    String   @default("")
+  email      String   @default("")
+  phone      String   @default("")
+  source     String   @default("website") // website | email | referral | cold-call | event | other
+  stage      String   @default("new") // new | contacted | qualified | proposal | negotiation | won | lost
+  value      Int      @default(0) // expected deal value in PKR
+  probability Int     @default(10) // 0–100
+  ownerName  String   @default("")
+  ownerId    String?  // optional Employee id
+  notes      String   @default("")
+  expectedCloseDate String @default("")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  orders SalesOrder[]
+}
+
+model SalesOrder {
+  id         String   @id @default(cuid())
+  leadId     String?  // optional link to SalesLead
+  orderNumber String  @unique
+  customer   String
+  contact    String   @default("")
+  email      String   @default("")
+  status     String   @default("draft") // draft | confirmed | shipped | delivered | cancelled
+  totalAmount Int     @default(0) // PKR
+  currency   String   @default("PKR")
+  ownerName  String   @default("")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  lead SalesLead? @relation(fields: [leadId], references: [id], onDelete: SetNull)
+}
+
+// ── Operations Department Models ──
+
+model Shipment {
+  id           String   @id @default(cuid())
+  trackingNumber String @unique
+  shipmentNumber String @default("") // internal reference
+  origin       String   @default("")
+  destination  String   @default("")
+  customer     String   @default("")
+  carrier      String   @default("") // DHL | FedEx | Local | Aramex | Other
+  mode         String   @default("sea") // sea | air | road | rail
+  status       String   @default("pending") // pending | picked-up | in-transit | customs | out-for-delivery | delivered | delayed | cancelled
+  weightKg     Float    @default(0)
+  packages     Int      @default(1)
+  eta          String   @default("") // YYYY-MM-DD
+  shippedAt    String   @default("")
+  deliveredAt  String   @default("")
+  notes        String   @default("")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model OpsTask {
+  id          String   @id @default(cuid())
+  title       String
+  description String   @default("")
+  category    String   @default("logistics") // logistics | warehouse | procurement | vendor | qc | other
+  status      String   @default("todo") // todo | in-progress | blocked | done
+  priority    String   @default("medium") // low | medium | high | urgent
+  assigneeId  String?
+  assigneeName String  @default("")
+  dueDate     String   @default("")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

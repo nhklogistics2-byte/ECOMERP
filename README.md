@@ -16,6 +16,13 @@ Enterprise email inquiry management system for ecomruns.com. Fetches real inquir
 - **⚡ AI Eval** — Compare OpenRouter models side-by-side
 - **🔄 AI Replay** — Draft professional replies with tone selection
 
+### Department Modules
+
+- **👥 HR Department** — Employee directory, leave requests, attendance tracking
+- **🎨 Design Department** — Project tracker (brief → in-progress → review → delivered), team overview, category & progress analytics
+- **📈 Sales Department** — Leads pipeline (Kanban + list views), 7-stage funnel (new → won/lost), per-rep performance stats, pipeline value in PKR
+- **🚚 Operations Department** — Shipment tracking (sea/air/road/rail), 8-status workflow (pending → delivered/delayed/cancelled), volume & delivery-rate analytics
+
 ## Tech Stack
 
 - **Framework:** Next.js 16 (App Router, Turbopack)
@@ -58,19 +65,38 @@ src/
 │   │   ├── generate-quotation/  # Generate PDF quotation
 │   │   ├── send-quotation/  # Send quotation via SMTP
 │   │   ├── ai-eval/         # Compare AI models
-│   │   └── ai-replay/       # Generate AI reply
+│   │   ├── ai-replay/       # Generate AI reply
+│   │   ├── hr/              # HR — employees, leaves, attendance
+│   │   ├── design/projects/ # Design — projects CRUD
+│   │   ├── sales/leads/     # Sales — leads pipeline CRUD
+│   │   └── ops/shipments/   # Operations — shipments CRUD
 │   ├── globals.css
 │   ├── layout.tsx
 │   └── page.tsx
 ├── components/
 │   ├── sidebar/             # Sidebar, Topbar, TabBar
 │   └── views/               # Dashboard, Inquiries, Notifications, AI Replay, AI Eval, Audit Log, Inquiry Detail, Quotation Form
+│                            # + HR (Employees, Leaves, Attendance)
+│                            # + Design (Overview, Projects, Team)
+│                            # + Sales (Overview, Leads, Team)
+│                            # + Operations (Overview, Shipments, Team)
 └── lib/
     ├── imap.ts              # IMAP client (two-pass fetch)
     ├── categorize.ts        # OpenRouter categorization
     ├── store.ts             # Zustand store
     ├── types.ts             # Shared types
     └── use-auto-sync.ts     # Auto-sync hook
+
+scripts/
+└── seed-departments.ts     # Seed demo data for Design / Sales / Ops
+```
+
+## Seeding Demo Data
+
+To populate the database with demo employees, design projects, sales leads, and shipments:
+
+```bash
+bun run scripts/seed-departments.ts
 ```
 
 ## License

@@ -10,7 +10,19 @@ export type ViewKey =
   | 'inquiry-detail'
   | 'hr-employees'
   | 'hr-leaves'
-  | 'hr-attendance';
+  | 'hr-attendance'
+  // Design department
+  | 'design-overview'
+  | 'design-projects'
+  | 'design-team'
+  // Sales department
+  | 'sales-overview'
+  | 'sales-leads'
+  | 'sales-team'
+  // Operations department
+  | 'ops-overview'
+  | 'ops-shipments'
+  | 'ops-team';
 
 export interface EmailAttachment {
   filename: string;
@@ -151,4 +163,79 @@ export interface AttendanceRecord {
   checkOut: string | null;
   status: AttendanceStatus;
   workHours: number;
+}
+
+// ── Design Department Types ──
+
+export type DesignCategory = 'branding' | 'web' | 'print' | 'packaging' | 'illustration' | 'ui-ux';
+export type DesignProjectStatus = 'brief' | 'in-progress' | 'review' | 'revision' | 'delivered' | 'on-hold';
+export type Priority = 'low' | 'medium' | 'high' | 'urgent';
+
+export interface DesignProject {
+  id: string;
+  title: string;
+  client: string;
+  category: DesignCategory;
+  status: DesignProjectStatus;
+  priority: Priority;
+  assigneeId: string | null;
+  assigneeName: string;
+  deadline: string;
+  progress: number;
+  notes: string;
+  createdAt: string;
+}
+
+// ── Sales Department Types ──
+
+export type LeadSource = 'website' | 'email' | 'referral' | 'cold-call' | 'event' | 'other';
+export type LeadStage = 'new' | 'contacted' | 'qualified' | 'proposal' | 'negotiation' | 'won' | 'lost';
+
+export interface SalesLead {
+  id: string;
+  company: string;
+  contact: string;
+  email: string;
+  phone: string;
+  source: LeadSource;
+  stage: LeadStage;
+  value: number;
+  probability: number;
+  ownerName: string;
+  ownerId: string | null;
+  notes: string;
+  expectedCloseDate: string;
+  createdAt: string;
+}
+
+// ── Operations Department Types ──
+
+export type ShipmentMode = 'sea' | 'air' | 'road' | 'rail';
+export type ShipmentStatus =
+  | 'pending'
+  | 'picked-up'
+  | 'in-transit'
+  | 'customs'
+  | 'out-for-delivery'
+  | 'delivered'
+  | 'delayed'
+  | 'cancelled';
+
+export interface Shipment {
+  id: string;
+  trackingNumber: string;
+  shipmentNumber: string;
+  origin: string;
+  destination: string;
+  customer: string;
+  carrier: string;
+  mode: ShipmentMode;
+  status: ShipmentStatus;
+  weightKg: number;
+  packages: number;
+  eta: string;
+  shippedAt: string;
+  deliveredAt: string;
+  notes: string;
+  createdAt: string;
 }

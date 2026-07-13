@@ -1,7 +1,7 @@
 'use client';
 
 import { create } from 'zustand';
-import type { AppNotification, AuditEntry, AttendanceRecord, CategorizedInquiry, Employee, LeaveRequest, ViewKey } from './types';
+import type { AppNotification, AuditEntry, AttendanceRecord, CategorizedInquiry, DesignProject, Employee, LeaveRequest, SalesLead, Shipment, ViewKey } from './types';
 
 interface OpenTab {
   id: string;          // unique tab id
@@ -66,6 +66,27 @@ interface AppState {
   fetchAttendance: () => Promise<void>;
   checkIn: (employeeId: string) => Promise<void>;
   checkOut: (employeeId: string) => Promise<void>;
+
+  // ── Design Department ──
+  designProjects: DesignProject[];
+  fetchDesignProjects: () => Promise<void>;
+  addDesignProject: (p: Omit<DesignProject, 'id' | 'createdAt'>) => Promise<void>;
+  updateDesignProject: (id: string, patch: Partial<DesignProject>) => Promise<void>;
+  removeDesignProject: (id: string) => Promise<void>;
+
+  // ── Sales Department ──
+  salesLeads: SalesLead[];
+  fetchSalesLeads: () => Promise<void>;
+  addSalesLead: (l: Omit<SalesLead, 'id' | 'createdAt'>) => Promise<void>;
+  updateSalesLead: (id: string, patch: Partial<SalesLead>) => Promise<void>;
+  removeSalesLead: (id: string) => Promise<void>;
+
+  // ── Operations Department ──
+  shipments: Shipment[];
+  fetchShipments: () => Promise<void>;
+  addShipment: (s: Omit<Shipment, 'id' | 'createdAt'>) => Promise<void>;
+  updateShipment: (id: string, patch: Partial<Shipment>) => Promise<void>;
+  removeShipment: (id: string) => Promise<void>;
 }
 
 const SEED_NOTIFICATIONS: AppNotification[] = [
@@ -412,5 +433,113 @@ export const useAppStore = create<AppState>((set, get) => ({
       body: JSON.stringify({ employeeId, action: 'checkOut' }),
     });
     await get().fetchAttendance();
+  },
+
+  // ── Design Department ──
+  designProjects: [],
+  fetchDesignProjects: async () => {
+    try {
+      const res = await fetch('/api/design/projects', { cache: 'no-store' });
+      const data = await res.json();
+      if (data.ok && data.projects) {
+        set({ designProjects: data.projects });
+      }
+    } catch (e) {
+      console.error('fetchDesignProjects failed:', e);
+    }
+  },
+  addDesignProject: async (p) => {
+    const res = await fetch('/api/design/projects', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(p),
+    });
+    const data = await res.json();
+    if (!data.ok) throw new Error(data.error);
+    await get().fetchDesignProjects();
+  },
+  updateDesignProject: async (id, patch) => {
+    await fetch('/api/design/projects', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, ...patch }),
+    });
+    await get().fetchDesignProjects();
+  },
+  removeDesignProject: async (id) => {
+    await fetch(`/api/design/projects?id=${id}`, { method: 'DELETE' });
+    await get().fetchDesignProjects();
+  },
+
+  // ── Sales Department ──
+  salesLeads: [],
+  fetchSalesLeads: async () => {
+    try {
+      const res = await fetch('/api/sales/leads', { cache: 'no-store' });
+      const data = await res.json();
+      if (data.ok && data.leads) {
+        set({ salesLeads: data.leads });
+      }
+    } catch (e) {
+      console.error('fetchSalesLeads failed:', e);
+    }
+  },
+  addSalesLead: async (l) => {
+    const res = await fetch('/api/sales/leads', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(l),
+    });
+    const data = await res.json();
+    if (!data.ok) throw new Error(data.error);
+    await get().fetchSalesLeads();
+  },
+  updateSalesLead: async (id, patch) => {
+    await fetch('/api/sales/leads', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, ...patch }),
+    });
+    await get().fetchSalesLeads();
+  },
+  removeSalesLead: async (id) => {
+    await fetch(`/api/sales/leads?id=${id}`, { method: 'DELETE' });
+    await get().fetchSalesLeads();
+  },
+
+  // ── Operations Department ──
+  shipments: [],
+  fetchShipments: async () => {
+    try {
+      const res = await fetch('/api/ops/shipments', { cache: 'no-store' });
+      const data = await res.json();
+      if (data.ok && data.shipments) {
+        set({ shipments: data.shipments });
+      }
+    } catch (e) {
+      console.error('fetchShipments failed:', e);
+    }
+  },
+  addShipment: async (s) => {
+    const res = await fetch('/api/ops/shipments', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(s),
+    });
+    const data = await res.json();
+    if (!data.ok) throw new Error(data.error);
+    await get().fetchShipments();
+  },
+  updateShipment: async (id, patch) => {
+    await fetch('/api/ops/shipments', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, ...patch }),
+    });
+    await get().fetchShipments();
+  },
+  removeShipment: async (id) => {
+    await fetch(`/api/ops/shipments?id=${id}`, { method: 'DELETE' });
+    await get().fetchShipments();
   },
 }));

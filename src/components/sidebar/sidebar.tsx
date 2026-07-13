@@ -19,6 +19,11 @@ import {
   CalendarCheck,
   CalendarDays,
   UserCircle,
+  Palette,
+  FolderKanban,
+  TrendingUp,
+  Truck,
+  Package,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAppStore } from '@/lib/store';
@@ -40,7 +45,7 @@ interface NavSection {
 export function Sidebar() {
   const { view, setView, sidebarOpen, setSidebarOpen, inquiries, notifications } = useAppStore();
   const [openSections, setOpenSections] = useState<Set<string>>(
-    new Set(['OVERVIEW', 'AI & ADMIN', 'MANAGEMENT', 'HR'])
+    new Set(['OVERVIEW', 'AI & ADMIN', 'MANAGEMENT', 'HR', 'DESIGN', 'SALES', 'OPERATIONS'])
   );
 
   const unreadCount = notifications.filter((n) => !n.read).length;
@@ -74,6 +79,30 @@ export function Sidebar() {
         { key: 'hr-employees', label: 'Employees', icon: UserCircle },
         { key: 'hr-leaves', label: 'Leave Requests', icon: CalendarDays, badge: pendingLeaves },
         { key: 'hr-attendance', label: 'Attendance', icon: CalendarCheck },
+      ],
+    },
+    {
+      title: 'DESIGN',
+      items: [
+        { key: 'design-overview', label: 'Overview', icon: Palette },
+        { key: 'design-projects', label: 'Projects', icon: FolderKanban },
+        { key: 'design-team', label: 'Team', icon: Users },
+      ],
+    },
+    {
+      title: 'SALES',
+      items: [
+        { key: 'sales-overview', label: 'Overview', icon: TrendingUp },
+        { key: 'sales-leads', label: 'Leads Pipeline', icon: TrendingUp },
+        { key: 'sales-team', label: 'Team', icon: Users },
+      ],
+    },
+    {
+      title: 'OPERATIONS',
+      items: [
+        { key: 'ops-overview', label: 'Overview', icon: Truck },
+        { key: 'ops-shipments', label: 'Shipments', icon: Package },
+        { key: 'ops-team', label: 'Team', icon: Users },
       ],
     },
     {
