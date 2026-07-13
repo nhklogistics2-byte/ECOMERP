@@ -7,7 +7,10 @@ export type ViewKey =
   | 'ai-replay'
   | 'ai-eval'
   | 'audit-log'
-  | 'inquiry-detail';
+  | 'inquiry-detail'
+  | 'hr-employees'
+  | 'hr-leaves'
+  | 'hr-attendance';
 
 export interface EmailAttachment {
   filename: string;
@@ -102,4 +105,50 @@ export interface ExtractResult {
   latencyMs?: number;
   error?: string;
   cached?: boolean;
+}
+
+// ── HR Types ──
+
+export interface Employee {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  role: string;
+  department: string;
+  status: 'active' | 'on-leave' | 'inactive';
+  joinDate: string;
+  salary: number;
+  leaveBalance: number;
+  avatar: string; // initials
+}
+
+export type LeaveStatus = 'pending' | 'approved' | 'rejected';
+export type LeaveType = 'annual' | 'sick' | 'casual' | 'unpaid';
+
+export interface LeaveRequest {
+  id: string;
+  employeeId: string;
+  employeeName: string;
+  type: LeaveType;
+  fromDate: string;
+  toDate: string;
+  days: number;
+  reason: string;
+  status: LeaveStatus;
+  appliedAt: string;
+  reviewedBy?: string;
+}
+
+export type AttendanceStatus = 'present' | 'absent' | 'late' | 'half-day' | 'remote';
+
+export interface AttendanceRecord {
+  id: string;
+  employeeId: string;
+  employeeName: string;
+  date: string;
+  checkIn: string | null;
+  checkOut: string | null;
+  status: AttendanceStatus;
+  workHours: number;
 }

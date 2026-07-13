@@ -11,6 +11,10 @@ import { AiReplayView } from '@/components/views/ai-replay-view';
 import { AiEvalView } from '@/components/views/ai-eval-view';
 import { AuditLogView } from '@/components/views/audit-log-view';
 import { InquiryDetailView } from '@/components/views/inquiry-detail-view';
+import { PendingUsersView } from '@/components/views/pending-users-view';
+import { HrEmployeesView } from '@/components/views/hr-employees-view';
+import { HrLeavesView } from '@/components/views/hr-leaves-view';
+import { HrAttendanceView } from '@/components/views/hr-attendance-view';
 import { useAppStore } from '@/lib/store';
 import { useAutoSync } from '@/lib/use-auto-sync';
 
@@ -57,6 +61,10 @@ export default function Page() {
           {view === 'ai-eval' && <AiEvalView />}
           {view === 'audit-log' && <AuditLogView />}
           {view === 'inquiry-detail' && <InquiryDetailView />}
+          {view === 'pending-users' && <PendingUsersView />}
+          {view === 'hr-employees' && <HrEmployeesView />}
+          {view === 'hr-leaves' && <HrLeavesView />}
+          {view === 'hr-attendance' && <HrAttendanceView />}
         </main>
         <footer className="mt-auto border-t border-[#e5e7eb] bg-gray-50/60 py-3 px-4 sm:px-6 text-xs text-gray-500 flex items-center justify-between flex-wrap gap-2">
           <span>

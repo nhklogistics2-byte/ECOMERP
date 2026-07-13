@@ -16,6 +16,9 @@ import {
   LogOut,
   X,
   ChevronDown,
+  CalendarCheck,
+  CalendarDays,
+  UserCircle,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAppStore } from '@/lib/store';
@@ -37,10 +40,11 @@ interface NavSection {
 export function Sidebar() {
   const { view, setView, sidebarOpen, setSidebarOpen, inquiries, notifications } = useAppStore();
   const [openSections, setOpenSections] = useState<Set<string>>(
-    new Set(['OVERVIEW', 'AI & ADMIN', 'MANAGEMENT'])
+    new Set(['OVERVIEW', 'AI & ADMIN', 'MANAGEMENT', 'HR'])
   );
 
   const unreadCount = notifications.filter((n) => !n.read).length;
+  const pendingLeaves = useAppStore((s) => s.leaveRequests.filter((r) => r.status === 'pending').length);
 
   const NAV_SECTIONS: NavSection[] = [
     {
@@ -62,6 +66,14 @@ export function Sidebar() {
         { key: 'ai-replay', label: 'AI Replay', icon: Repeat2 },
         { key: 'ai-eval', label: 'AI Evaluation', icon: Sparkles },
         { key: 'audit-log', label: 'Audit Log', icon: ScrollText },
+      ],
+    },
+    {
+      title: 'HR',
+      items: [
+        { key: 'hr-employees', label: 'Employees', icon: UserCircle },
+        { key: 'hr-leaves', label: 'Leave Requests', icon: CalendarDays, badge: pendingLeaves },
+        { key: 'hr-attendance', label: 'Attendance', icon: CalendarCheck },
       ],
     },
     {

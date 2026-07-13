@@ -16,6 +16,9 @@ const VIEW_LABELS: Record<ViewKey, { label: string; sub: string }> = {
   'audit-log': { label: 'Audit Log', sub: 'Home' },
   'inquiry-detail': { label: 'Inquiry Detail', sub: 'Home' },
   'pending-users': { label: 'Pending Users', sub: 'Home' },
+  'hr-employees': { label: 'Employees', sub: 'HR' },
+  'hr-leaves': { label: 'Leave Requests', sub: 'HR' },
+  'hr-attendance': { label: 'Attendance', sub: 'HR' },
 };
 
 export function Topbar({
